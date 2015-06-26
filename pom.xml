@@ -14,9 +14,9 @@
     </parent>
 
     <scm>
-        <developerConnection>scm:git:ssh://git@github.com/altran/Whydah-SSOLoginWebApp.git</developerConnection>
-        <connection>scm:git:https://github.com/altran/Whydah-SSOLoginWebApp.git</connection>
-        <url>https://github.com/altran/Whydah-SSOLoginWebApp</url>
+        <developerConnection>scm:git:ssh://git@github.com/cantara/Whydah-SSOLoginWebApp.git</developerConnection>
+        <connection>scm:git:https://github.com/cantara/Whydah-SSOLoginWebApp.git</connection>
+        <url>https://github.com/cantara/Whydah-SSOLoginWebApp</url>
         <tag>HEAD</tag>
     </scm>
 
