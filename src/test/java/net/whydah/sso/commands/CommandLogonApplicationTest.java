@@ -25,6 +25,7 @@ public class CommandLogonApplicationTest {
     private static Properties properties;
     private static URI tokenServiceUri;
     private static ApplicationCredential applicationCredential;
+    private static String applicationId;
 
 
     @BeforeClass
@@ -32,15 +33,14 @@ public class CommandLogonApplicationTest {
         System.setProperty(ApplicationMode.IAM_MODE_KEY, ApplicationMode.TEST);
         properties = AppConfig.readProperties();
         tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
-        applicationCredential = new ApplicationCredential();
-        applicationCredential.setApplicationID(properties.getProperty("applicationid"));
+        applicationId=properties.getProperty("applicationid");
 
     }
 
     @Test
     public void testApplicationLoginCommandFallback() throws Exception {
 
-        applicationCredential.setApplicationSecret("false secret");
+        applicationCredential= new ApplicationCredential(applicationId,"false secret");
 
         String myApplicationTokenXml = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
@@ -58,7 +58,7 @@ public class CommandLogonApplicationTest {
     @Test
     public void testApplicationLoginCommand() throws Exception {
 
-        applicationCredential.setApplicationSecret(properties.getProperty("applicationsecret"));
+        applicationCredential= new ApplicationCredential(applicationId,properties.getProperty("applicationsecret"));
 
         String myApplicationTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
