@@ -1,5 +1,7 @@
 package net.whydah.sso.commands;
 
+import net.whydah.sso.application.ApplicationXpathHelper;
+import net.whydah.sso.commands.appauth.CommandLogonApplicationWithStubbedFallback;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.application.ApplicationCredential;
@@ -35,23 +37,22 @@ public class CommandLogonApplicationTest {
 
     }
 
-
     @Test
     public void testApplicationLoginCommandFallback() throws Exception {
 
         applicationCredential.setApplicationSecret("false secret");
 
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, applicationCredential).execute();
+        String myApplicationTokenXml = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
-        assertEquals("FallbackApplicationTokenID", myApplicationTokenID);
+        assertEquals("47289347982137421", ApplicationXpathHelper.getAppTokenIdFromAppTokenXml(myApplicationTokenXml));
 
-        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationCredential).queue();
-        assertEquals("FallbackApplicationTokenID", fAppTokenID.get());
+        Future<String> fAppTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).queue();
+        assertEquals("47289347982137421", ApplicationXpathHelper.getAppTokenIdFromAppTokenXml(fAppTokenID.get()));
 
 
-        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationCredential).observe();
+        Observable<String> oAppTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).observe();
         // blocking
-        assertEquals("FallbackApplicationTokenID", oAppTokenID.toBlocking().single());
+        assertEquals("47289347982137421", ApplicationXpathHelper.getAppTokenIdFromAppTokenXml(oAppTokenID.toBlocking().single()));
     }
 
     @Test
@@ -59,14 +60,14 @@ public class CommandLogonApplicationTest {
 
         applicationCredential.setApplicationSecret(properties.getProperty("applicationsecret"));
 
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, applicationCredential).execute();
+        String myApplicationTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
         assertTrue(myApplicationTokenID.length() > 6);
 
-        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationCredential).queue();
+        Future<String> fAppTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).queue();
         assertTrue(fAppTokenID.get().length() > 6);
 
-        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationCredential).observe();
+        Observable<String> oAppTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).observe();
         // blocking
         assertTrue(oAppTokenID.toBlocking().single().length() > 6);
     }
