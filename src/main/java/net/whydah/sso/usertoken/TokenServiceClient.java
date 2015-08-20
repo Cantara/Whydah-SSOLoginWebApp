@@ -315,7 +315,7 @@ public class TokenServiceClient {
         //todo sjekke om myAppTokenXml er gyldig før reauth
         WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        ApplicationCredential appCredential = new ApplicationCredential(applicationid,applicationsecret);
+        ApplicationCredential appCredential = new ApplicationCredential(applicationid, applicationsecret);
 
 
         formData.add("applicationcredential", ApplicationCredentialSerializer.toXML(appCredential));
@@ -328,7 +328,8 @@ public class TokenServiceClient {
         }
         //todo håndtere feil i statuskode + feil ved app-pålogging (retry etc)
         if (response.getStatus() != 200) {
-            log.error("Application authentication failed with statuscode {}", response.getStatus());
+            log.error("Application authentication failed with {} {}. applicationid={}, path={}",
+                    response.getClientResponseStatus().getStatusCode(), response.getClientResponseStatus().getReasonPhrase(), applicationid, logonResource.getURI());
             throw new RuntimeException("Application authentication failed");
         }
         myAppTokenXml = response.getEntity(String.class);
