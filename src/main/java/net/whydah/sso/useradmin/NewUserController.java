@@ -73,6 +73,8 @@ public class NewUserController {
                         String error = uasResponse.getEntity(String.class);
                         log.error(error);
                         model.addAttribute("Unable to send user creation mail to user for username=" + username);
+                        model.addAttribute("logoURL", LOGOURL);
+
                         return "newuser";
                     }
 
