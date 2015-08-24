@@ -1,10 +1,12 @@
 SSOLoginWebApp
 ====================
 
+SSOLoginWebApp: ![Build Status](http://jenkins.capraconsulting.no/buildStatus/icon?job=Whydah-SSOLoginWebApp)
+
 The web-frontend for the Whydah SSO services. It uses SecurityTokenService and UserIdentityBackend
 behind the scenes, where SecurityTokenService needs to be accessible from the same zone that your applications reside.
 
-![Architectural Overview](https://raw2.github.com/altran/Whydah-SSOLoginWebApp/master/Whydah%20infrastructure.png)
+![Architectural Overview](https://raw.githubusercontent.com/cantara/Whydah/master/images/Whydah%20infrastructure.png)
 
 
 Start/Install
