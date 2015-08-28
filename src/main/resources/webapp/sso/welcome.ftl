@@ -15,7 +15,7 @@
 
         <div id="logo">
             <img src="${logoURL}" alt="Site logo"/>
-            <h2>Welcome, ${realname!"Whydah user"}</h2>
+            <h2>Welcome ${realname!"Whydah user"}</h2>
         </div>
 
         <div class="wide-box">
