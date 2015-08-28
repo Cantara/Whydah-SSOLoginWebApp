@@ -33,9 +33,24 @@
 
                 </tbody>
             </table>
+
+            <h3>Your profile details</h3>
+            Phone: <br/>
+            Name: ${realname!"Whydah user"} <br/>
+            Address: <br/>
+            Email: <br/>
+            Security level: 0 (Lowest) <br/>
+            <br/>
             <p><a href="logout" class="button">Log out</a></p>
             <p><small>Logout affects all Whydah-connected services</small></p>
 
+            <br/>
+            <h3>Elevate your session security</h3>
+            <div id="secureproviders">
+               <img src="images/BankID.png" alt="BankID"/>
+               <img src="images/MinID.png" alt="MinID"/>
+               <img src="images/icon-multifactor-authentication.png" alt="Multi-factor Authentication"/>
+            </div>
             <br/><br/>
 
             <small>Whydah, SSO WebApp version: ${version!"<i>Unknown</i>"} </small>
