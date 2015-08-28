@@ -125,6 +125,7 @@ public class SSOLoginController {
             }
         } catch (Exception e){
             log.warn("welcome redirect - SecurityTokenException exception: ",e);
+            CookieManager.clearUserTokenCookies(request, response);
             ModelHelper.setEnabledLoginTypes(model);
             return "login";
         }
@@ -148,6 +149,7 @@ public class SSOLoginController {
             log.warn("action - getUserToken failed. Redirecting to login.");
             model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in.");
             ModelHelper.setEnabledLoginTypes(model);
+            CookieManager.clearUserTokenCookies(request, response);
             model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
             return "login";
         }
