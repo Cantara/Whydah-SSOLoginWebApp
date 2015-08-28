@@ -30,7 +30,7 @@ public class CookieManager {
         }
     }
 
-    public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds, HttpServletResponse response) {
+    public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds,HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = new Cookie(USER_TOKEN_REFERENCE_NAME, userTokenId);
         cookie.setValue(userTokenId);
 
@@ -46,6 +46,14 @@ public class CookieManager {
         if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
             cookie.setSecure(true);
         }
+        if ("https".equalsIgnoreCase(request.getScheme())) {
+            cookie.setSecure(true);
+        } else {
+            log.warn("Unsecure session detected, using unsecure cookie");
+            cookie.setSecure(false);
+
+        }
+
         log.debug("Created cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                 cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
         response.addCookie(cookie);
@@ -60,7 +68,13 @@ public class CookieManager {
                 cookie.setDomain(cookiedomain);
             }
             cookie.setPath("/");
-            cookie.setSecure(true);
+            if ("https".equalsIgnoreCase(request.getScheme())) {
+                cookie.setSecure(true);
+            } else {
+                log.warn("Unsecure session detected, using unsecure cookie");
+                cookie.setSecure(false);
+
+            }
             response.addCookie(cookie);
             log.trace("Cleared cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                     cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());

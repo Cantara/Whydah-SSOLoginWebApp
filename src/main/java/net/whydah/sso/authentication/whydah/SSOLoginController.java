@@ -158,7 +158,7 @@ public class SSOLoginController {
 
         String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
         Integer tokenRemainingLifetimeSeconds = TokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
-        CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, response);
+        CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
 
         // ticket on redirect
         if (redirectURI.toLowerCase().contains(SessionHelper.USERTICKET)) {

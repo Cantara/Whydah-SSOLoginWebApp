@@ -121,7 +121,7 @@ public class NetIQLoginController {
 
             String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
             Integer tokenRemainingLifetimeSeconds = TokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
-            CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, response);
+            CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
 
             String clientRedirectURI = request.getParameter("redirectURI");
             if (clientRedirectURI!=null) {
