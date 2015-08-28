@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -187,7 +188,12 @@ public class SSOLoginController {
             log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
             return DEFAULT_REDIRECT;
         }
-        return redirectURI;
+        try {
+            URI redirect = new URI(redirectURI);
+            return redirectURI;
+        } catch (Exception e){
+            return  DEFAULT_REDIRECT;
+        }
     }
 
 
