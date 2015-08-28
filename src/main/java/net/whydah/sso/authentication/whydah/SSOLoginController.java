@@ -112,12 +112,15 @@ public class SSOLoginController {
                 userToken = tokenServiceClient.getUserTokenByUserTicket(userTicket);
                 model.addAttribute(TokenServiceClient.USERTICKET, userTicket);
                 model.addAttribute(TokenServiceClient.USER_TOKEN_ID, UserTokenXpathHelper.getUserTokenId(userToken));
+
+                // TODO  try userToken from cookie if usertoken from ticket fail..  now throw exception
             } else if (userTokenId != null && userTokenId.length() > 3) {
                 log.trace("Welcome - No userTicket, using userTokenID from cookie");
                 userToken = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
                 model.addAttribute(TokenServiceClient.USERTICKET, "No userTicket, using userTokenID");
                 model.addAttribute(TokenServiceClient.USER_TOKEN_ID, userTokenId);
             } else {
+                // TODO cleanup - this messes up the log for a normal case
                 throw new UnauthorizedException();
             }
         } catch (Exception e){
