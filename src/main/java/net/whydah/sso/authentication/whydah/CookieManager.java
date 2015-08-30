@@ -30,7 +30,18 @@ public class CookieManager {
         }
     }
 
-    public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds,HttpServletRequest request, HttpServletResponse response) {
+    public static void addSecurityHTTPHeaders(HttpServletResponse response) {
+        response.setHeader("X-Frame-Options", "sameorigin");
+        response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        response.setHeader("X-Content-Type-Options", "nosniff");
+        response.setHeader("X-XSS-Protection", "1; mode=block");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "-1");
+        response.setHeader("X-Permitted-Cross-Domain-Policies", "master-only");
+    }
+
+        public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds,HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = new Cookie(USER_TOKEN_REFERENCE_NAME, userTokenId);
         cookie.setValue(userTokenId);
 

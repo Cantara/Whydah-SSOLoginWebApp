@@ -53,6 +53,7 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
         model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+        CookieManager.addSecurityHTTPHeaders(response);
 
 
         //usertokenId = cookieManager.getUserTokenIdFromCookie(request, response);
@@ -107,6 +108,7 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
+        CookieManager.addSecurityHTTPHeaders(response);
         try {
             if (userTicket != null && userTicket.length() > 3) {
                 log.trace("Welcome - Using userTicket");
