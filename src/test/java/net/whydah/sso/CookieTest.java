@@ -95,8 +95,10 @@ public class CookieTest {
 
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
-                    cookie.put(token.substring(0, token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
-                            token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1, token.length()));
+                    if (token.indexOf(NAME_VALUE_SEPARATOR)>=0){
+                        cookie.put(token.substring(0, token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
+                                token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1, token.length()));
+                    }
                 }
             }
         }
