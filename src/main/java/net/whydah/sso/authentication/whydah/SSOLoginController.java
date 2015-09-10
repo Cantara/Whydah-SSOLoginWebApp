@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ public class SSOLoginController {
     private String LOGOURL = "/sso/images/site-logo.png";
     private String APP_LINKS = "{}";
     private String whydahVersion = ServerRunner.version;
+    private static Map<String,String> csrftokens = new HashMap<>();
 
     //private final int MIN_REDIRECT_SIZE=4;
     //private final ModelHelper modelHelper = new ModelHelper(this);
@@ -53,6 +56,8 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
         model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+
+        model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
         CookieManager.addSecurityHTTPHeaders(response);
 
 
@@ -107,7 +112,7 @@ public class SSOLoginController {
         String userToken;
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
-        model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
+        model.addAttribute(SessionHelper.WHYDAH_VERSION, whydahVersion);
         CookieManager.addSecurityHTTPHeaders(response);
         try {
             if (userTicket != null && userTicket.length() > 3) {
@@ -140,11 +145,23 @@ public class SSOLoginController {
 
     @RequestMapping("/action")
     public String action(HttpServletRequest request, HttpServletResponse response, Model model) {
-        UserCredential user = new UserNameAndPasswordCredential(request.getParameter(SessionHelper.USER), request.getParameter(SessionHelper.PASSWORD));
         String redirectURI = getRedirectURI(request);
         log.trace("action: redirectURI: {}", redirectURI);
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
+
+
+        if (!validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
+            log.warn("action - CSRFtoken verification failed. Redirecting to login.");
+            model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in - CSRFtoken missing or incorrect");
+            model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
+            ModelHelper.setEnabledLoginTypes(model);
+            CookieManager.clearUserTokenCookies(request, response);
+            model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+            return "login";
+
+        }
+        UserCredential user = new UserNameAndPasswordCredential(request.getParameter(SessionHelper.USER), request.getParameter(SessionHelper.PASSWORD));
         String userTicket = UUID.randomUUID().toString();
         String userTokenXml = tokenServiceClient.getUserToken(user, userTicket);
 
@@ -182,6 +199,19 @@ public class SSOLoginController {
     }
 
 
+    private String getCSRFtoken(){
+        String csrftoken = UUID.randomUUID().toString();
+        csrftokens.put(csrftoken,csrftoken);
+        return csrftoken;
+    }
+
+    private boolean validCSRFToken(String csrftoken){
+        String token = csrftokens.get(csrftoken);
+        if (token!=null && token.length()>4){
+            return true;
+        }
+        return false;
+    }
 
     private String getRedirectURI(HttpServletRequest request) {
         String redirectURI = request.getParameter(SessionHelper.REDIRECT_URI);

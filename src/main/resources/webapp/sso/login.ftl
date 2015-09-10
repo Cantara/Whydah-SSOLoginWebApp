@@ -34,6 +34,7 @@
                         <input id="user_session_login" name="user" type="text" placeholder="Username" autofocus>
                         <h4><label for="user_session_password">Password</label></h4>
                         <input id="user_session_password" name="password" type="password" autocomplete="off" placeholder="Password">
+                         <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                         <input type="hidden" name="redirectURI" value="${redirectURI!"welcome"}">
                         <input class="button button-login" name="commit" type="submit" value="Login"/>
                     </div>

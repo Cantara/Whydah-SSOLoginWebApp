@@ -13,4 +13,6 @@ public class SessionHelper {
     public static final String IAM_MODE = "iammode";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
-    public static final String WHYDAH_VERSION = "version";}
+    public static final String WHYDAH_VERSION = "version";
+    public static final String CSRFtoken = "CSRFtoken";
+}
