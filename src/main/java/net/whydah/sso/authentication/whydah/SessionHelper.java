@@ -1,12 +1,10 @@
 package net.whydah.sso.authentication.whydah;
 
-/**
- * Created by totto on 9/25/14.
- */
 public class SessionHelper {
     public static final String USERTICKET = "userticket";
     public static final String REDIRECT = "redirect";
     public static final String REDIRECT_URI = "redirectURI";
+    public static final String SESSIONCHECK = "SessionCheck";
     public static final String LOGO_URL = "logoURL";
     public static final String APP_LINKS = "appLinks";
     public static final String LOGIN_ERROR = "loginError";

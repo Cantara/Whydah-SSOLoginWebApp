@@ -52,6 +52,7 @@ public class SSOLoginController {
     @RequestMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response,Model model) {
         String redirectURI = getRedirectURI(request);
+        boolean sessionCheckOnly = isSessionCheckOnly(request);
 
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
@@ -63,7 +64,7 @@ public class SSOLoginController {
 
         //usertokenId = cookieManager.getUserTokenIdFromCookie(request, response);
         String userTokenIdFromCookie = CookieManager.getUserTokenIdFromCookie(request);
-        log.trace("login: redirectURI={}, userTokenIdFromCookie={}", redirectURI, userTokenIdFromCookie);
+        log.trace("login: redirectURI={}, SessionCheck={}, userTokenIdFromCookie={}", redirectURI, sessionCheckOnly, userTokenIdFromCookie);
 
         WhydahUserTokenId whydahUserTokenId = WhydahUserTokenId.invalidTokenId();
         if ("logout".equalsIgnoreCase(userTokenIdFromCookie)) {
@@ -211,6 +212,15 @@ public class SSOLoginController {
             return true;
         }
         return false;
+    }
+
+    private boolean isSessionCheckOnly(HttpServletRequest request) {
+        String redirectURI = request.getParameter(SessionHelper.SESSIONCHECK);
+        if (redirectURI == null || redirectURI.length() < 1) {
+            log.trace("isSessionCheckOnly - false - No SESSIONCHECK param found");
+            return false;
+        }
+        return true;
     }
 
     private String getRedirectURI(HttpServletRequest request) {
