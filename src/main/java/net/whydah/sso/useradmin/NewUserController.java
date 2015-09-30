@@ -41,7 +41,7 @@ public class NewUserController {
     }
 
     @RequestMapping("/signup")
-    public String newUser(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+    public String signup(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
         log.trace("/signup entry");
         String username = request.getParameter("username");
         String email = request.getParameter("email");
@@ -58,8 +58,8 @@ public class NewUserController {
 
             ;
             try {
-                WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()).path("userTokenId").path("user");
-                log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
+                WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()).path("signup");//.path("signup");
+                log.trace("signup was called. Calling UAS with url " + uasWR.getURI());
 
                 ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
                 if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
