@@ -66,7 +66,9 @@ public class NewUserController {
                     String error = uasResponse.getEntity(String.class);
                     log.error(error);
                     model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
-                } else {
+                }
+                //This functionallity is moved to SignupService in UAS
+                /*else {
                     uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + username);
                     uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
                     if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
@@ -77,8 +79,8 @@ public class NewUserController {
 
                         return "newuser";
                     }
-
                 }
+                */
 
             } catch (IllegalStateException ise) {
                 log.info(ise.getMessage());
