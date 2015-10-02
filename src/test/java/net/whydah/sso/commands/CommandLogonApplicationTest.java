@@ -4,7 +4,7 @@ import net.whydah.sso.application.ApplicationXpathHelper;
 import net.whydah.sso.commands.appauth.CommandLogonApplicationWithStubbedFallback;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
-import net.whydah.sso.application.ApplicationCredential;
+import net.whydah.sso.application.types.ApplicationCredential;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import rx.Observable;
@@ -17,9 +17,6 @@ import java.util.concurrent.Future;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by totto on 12/2/14.
- */
 public class CommandLogonApplicationTest {
 
     private static Properties properties;
