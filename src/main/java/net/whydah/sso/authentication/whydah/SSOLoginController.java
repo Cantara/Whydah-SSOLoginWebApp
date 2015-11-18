@@ -101,6 +101,7 @@ public class SSOLoginController {
             }
         }
         ModelHelper.setEnabledLoginTypes(model);
+        model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
         return "login";
     }
 
@@ -136,6 +137,7 @@ public class SSOLoginController {
             log.warn("welcome redirect - SecurityTokenException exception: ",e);
             CookieManager.clearUserTokenCookies(request, response);
             ModelHelper.setEnabledLoginTypes(model);
+            model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
             return "login";
         }
         model.addAttribute(TokenServiceClient.USERTOKEN, trim(userToken));
@@ -172,6 +174,7 @@ public class SSOLoginController {
             ModelHelper.setEnabledLoginTypes(model);
             CookieManager.clearUserTokenCookies(request, response);
             model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+            model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
             return "login";
         }
         if (redirectURI.contains(TokenServiceClient.USERTICKET)) {
