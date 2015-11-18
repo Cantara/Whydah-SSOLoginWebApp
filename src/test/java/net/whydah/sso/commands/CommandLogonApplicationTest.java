@@ -1,6 +1,6 @@
 package net.whydah.sso.commands;
 
-import net.whydah.sso.application.ApplicationXpathHelper;
+import net.whydah.sso.application.helpers.ApplicationXpathHelper;
 import net.whydah.sso.commands.appauth.CommandLogonApplicationWithStubbedFallback;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;

@@ -5,7 +5,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import net.whydah.sso.application.ApplicationCredentialSerializer;
+import net.whydah.sso.application.mappers.ApplicationCredentialMapper;
 import net.whydah.sso.application.types.ApplicationCredential;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
@@ -318,7 +318,7 @@ public class TokenServiceClient {
         ApplicationCredential appCredential = new ApplicationCredential(applicationid, applicationsecret);
 
 
-        formData.add("applicationcredential", ApplicationCredentialSerializer.toXML(appCredential));
+        formData.add("applicationcredential", ApplicationCredentialMapper.toXML(appCredential));
         ClientResponse response;
         try {
             response = logonResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
