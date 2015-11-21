@@ -26,6 +26,7 @@
         <spring.version>4.0.6.RELEASE</spring.version>
         <org.springframework.security-version>3.2.0.RELEASE</org.springframework.security-version>
         <jetty.version>7.3.0.v20110203</jetty.version>
+        <metrics.version>3.1.0</metrics.version>
     </properties>
 
     <repositories>
@@ -109,7 +110,16 @@
             <artifactId>spring-security-web</artifactId>
             <version>${org.springframework.security-version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-servlets</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

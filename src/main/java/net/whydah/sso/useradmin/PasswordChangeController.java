@@ -17,6 +17,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
+import com.codahale.metrics.*;
 
 /**
  * Password management self service.
@@ -24,6 +25,8 @@ import java.util.Properties;
 @Controller
 public class PasswordChangeController {
     private static final Logger log = LoggerFactory.getLogger(PasswordChangeController.class);
+    static final MetricRegistry metrics = new MetricRegistry();
+    private final Meter resetPasswordRequests = metrics.meter("requests");
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
     private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
@@ -48,6 +51,7 @@ public class PasswordChangeController {
     @RequestMapping("/resetpassword")
     public String resetpassword(HttpServletRequest request, Model model) {
         log.trace("resetpassword was called");
+        resetPasswordRequests.mark();
         model.addAttribute("logoURL", LOGOURL);
         String user = request.getParameter("username");
         if (user == null) {
