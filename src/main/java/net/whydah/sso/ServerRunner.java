@@ -1,5 +1,6 @@
 package net.whydah.sso;
 
+import com.codahale.metrics.servlets.AdminServlet;
 import net.whydah.sso.config.ApplicationMode;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -39,11 +40,12 @@ public class ServerRunner {
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
+        context.addServlet(new ServletHolder(new AdminServlet()),"/metrics/*");
+
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextConfigLocation("classpath:webapp/sso/mvc-config.xml");
         ServletHolder servletHolder = new ServletHolder(dispatcherServlet);
         context.addServlet(servletHolder, "/*");
-        //appConfig = AppConfig.readProperties();
     }
 
     public void start() throws Exception {
