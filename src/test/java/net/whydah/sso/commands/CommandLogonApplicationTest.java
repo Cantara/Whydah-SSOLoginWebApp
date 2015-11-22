@@ -55,7 +55,7 @@ public class CommandLogonApplicationTest {
     @Test
     public void testApplicationLoginCommand() throws Exception {
 
-        applicationCredential= new ApplicationCredential("","",applicationId,properties.getProperty("applicationsecret"));
+        applicationCredential= new ApplicationCredential("",applicationId,properties.getProperty("applicationsecret"));
 
         String myApplicationTokenID = new CommandLogonApplicationWithStubbedFallback(tokenServiceUri, applicationCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
