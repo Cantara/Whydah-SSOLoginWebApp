@@ -37,6 +37,7 @@ public class TokenServiceClient {
     private final Client tokenServiceClient = Client.create();
     private final URI tokenServiceUri;
     private final String applicationid;
+    private final String applicationname;
     private final String applicationsecret;
 
     private String myAppTokenXml;
@@ -54,6 +55,7 @@ public class TokenServiceClient {
             }
             this.tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
             this.applicationid = properties.getProperty("applicationid");
+            this.applicationname = properties.getProperty("applicationname");
             this.applicationsecret= properties.getProperty("applicationsecret");
         } catch (IOException e) {
             throw new IllegalArgumentException("Error constructing SSOHelper.", e);
@@ -315,7 +317,7 @@ public class TokenServiceClient {
         //todo sjekke om myAppTokenXml er gyldig før reauth
         WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        ApplicationCredential appCredential = new ApplicationCredential(applicationid, applicationsecret);
+        ApplicationCredential appCredential = new ApplicationCredential(applicationid, applicationname, applicationsecret);
 
 
         formData.add("applicationcredential", ApplicationCredentialMapper.toXML(appCredential));
