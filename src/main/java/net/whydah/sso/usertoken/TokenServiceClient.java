@@ -10,6 +10,8 @@ import net.whydah.sso.application.types.ApplicationCredential;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
+import net.whydah.sso.authentication.whydah.SSOLoginController;
+import net.whydah.sso.authentication.whydah.SSOLogoutController;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.util.SSLTool;
@@ -35,6 +37,7 @@ public class TokenServiceClient {
     private static final Logger log = LoggerFactory.getLogger(TokenServiceClient.class);
 
     private final Client tokenServiceClient = Client.create();
+    private final URI userAdminServiceUri;
     private final URI tokenServiceUri;
     private final String applicationid;
     private final String applicationname;
@@ -54,6 +57,7 @@ public class TokenServiceClient {
 
             }
             this.tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
+            this.userAdminServiceUri = UriBuilder.fromUri(properties.getProperty("useradminservice")).build();
             this.applicationid = properties.getProperty("applicationid");
             this.applicationname = properties.getProperty("applicationname");
             this.applicationsecret= properties.getProperty("applicationsecret");
@@ -82,6 +86,11 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
+            if (SSOLoginController.APP_LINKS.length()<6){
+                String userTokenId = UserTokenMapper.fromUserTokenXml(responseXML).getTokenid();
+                String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId, userTokenId, "").execute();
+                SSOLoginController.APP_LINKS=ApplicationMapper.toShortListJson(ApplicationMapper.fromJsonList(applicationsJson));
+            }
             return responseXML;
         }
 

@@ -31,7 +31,7 @@ public class SSOLoginController {
     private final static Logger log = LoggerFactory.getLogger(SSOLoginController.class);
     private final TokenServiceClient tokenServiceClient;
     private String LOGOURL = "/sso/images/site-logo.png";
-    private String APP_LINKS = "{}";
+    public static String APP_LINKS = "[{}]";
     private String whydahVersion = ServerRunner.version;
     private static Map<String,String> csrftokens = new HashMap<>();
 
