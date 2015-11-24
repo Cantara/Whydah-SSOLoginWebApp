@@ -7,7 +7,7 @@ import net.whydah.sso.authentication.whydah.CookieManager;
 import net.whydah.sso.authentication.whydah.SSOLoginController;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.usertoken.TokenServiceClient;
-import net.whydah.sso.usertoken.UserTokenXpathHelper;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
