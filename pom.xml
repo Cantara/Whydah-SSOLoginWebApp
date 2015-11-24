@@ -12,6 +12,7 @@
         <version>5</version>
     </parent>
 
+
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/cantara/Whydah-SSOLoginWebApp.git</developerConnection>
         <connection>scm:git:https://github.com/cantara/Whydah-SSOLoginWebApp.git</connection>
