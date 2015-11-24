@@ -7,7 +7,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.application.mappers.ApplicationCredentialMapper;
 import net.whydah.sso.application.types.ApplicationCredential;
-import net.whydah.sso.user.types.UserTokenMapper;
+import net.whydah.sso.user.mappers.UserTokenMapper;
 import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.commands.adminapi.application.CommandListApplications;
 import net.whydah.sso.authentication.UserCredential;
