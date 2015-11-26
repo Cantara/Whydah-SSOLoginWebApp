@@ -90,11 +90,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
-            if (SSOLoginController.APP_LINKS.length()<6){
-                String userTokenId = UserTokenMapper.fromUserTokenXml(responseXML).getTokenid();
-                String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId, userTokenId, "").execute();
-                SSOLoginController.APP_LINKS=ApplicationMapper.toShortListJson(ApplicationMapper.fromJsonList(applicationsJson));
-            }
+            updateApplinks(responseXML);
             return responseXML;
         }
 
@@ -111,6 +107,14 @@ public class TokenServiceClient {
         }
         return null;
         //throw new RuntimeException("User authentication failed with status code " + response.getStatus());
+    }
+
+    private void updateApplinks(String responseXML) {
+        if (SSOLoginController.APP_LINKS.length() < 6) {
+            String userTokenId = UserTokenMapper.fromUserTokenXml(responseXML).getTokenid();
+            String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId, userTokenId, "").execute();
+            SSOLoginController.APP_LINKS = ApplicationMapper.toShortListJson(ApplicationMapper.fromJsonList(applicationsJson));
+        }
     }
 
     public boolean createTicketForUserTokenID(String userticket, String userTokenID){
@@ -157,6 +161,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("Response OK with XML: {}", responseXML);
+            updateApplinks(responseXML);
             return responseXML;
         }
         //retry
@@ -188,6 +193,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("Response OK with XML: {}", responseXML);
+            updateApplinks(responseXML);
             return responseXML;
         }
         //retry
@@ -267,6 +273,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
+            updateApplinks(responseXML);
             return responseXML;
         }
 
@@ -310,6 +317,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
+            updateApplinks(responseXML);
             return responseXML;
         }
 
