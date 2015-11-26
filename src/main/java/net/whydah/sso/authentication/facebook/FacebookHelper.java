@@ -81,23 +81,9 @@ public class FacebookHelper {
 
     /**
      * Will produce a xml looking like this
-     * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-     <user>
-     <params>
-     <fbAccessToken>accessMe1234567</fbAccessToken>
-     <userId>null</userId>
-     <firstName>null</firstName>
-     <lastName>null</lastName>
-     <username>null</username>
-     <gender>null</gender>
-     <email>null</email>
-     <birthday>null</birthday>
-     <hometown>null</hometown>
-     </params>
-     </user>
-     * @param fbUser
-     * @param fbAccessToken
-     * @return
+     * @param fbUser - the facebook user object
+     * @param fbAccessToken - the facebook access token
+     * @return - our representation of the facebook user data
      */
     public static String getFacebookUserAsXml(User fbUser, String fbAccessToken) {
         StringBuilder strb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n ");
