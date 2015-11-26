@@ -68,7 +68,6 @@ public class SSOLoginController {
 
         WhydahUserTokenId whydahUserTokenId = WhydahUserTokenId.invalidTokenId();
         if ("logout".equalsIgnoreCase(userTokenIdFromCookie)) {
-            //TODO ED: Needs to be reviewed/changed - will never happend AFAIK
             log.info("userTokenId={} from cookie. TODO: should probably clear the logout cookie here?", userTokenIdFromCookie);
             CookieManager.clearUserTokenCookies(request, response);
             //usertokenId = WhydahUserTokenId.invalidTokenId();
@@ -142,6 +141,7 @@ public class SSOLoginController {
         }
         model.addAttribute(TokenServiceClient.USERTOKEN, trim(userToken));
         model.addAttribute(SessionHelper.APP_LINKS, APP_LINKS);
+        log.trace("embedded applinks: " + APP_LINKS);
         model.addAttribute(TokenServiceClient.REALNAME, UserTokenXpathHelper.getRealName(userToken));
         return "welcome";
     }
