@@ -41,7 +41,6 @@ public class SSOLoginController {
 
     public SSOLoginController() throws IOException {
         Properties properties = AppConfig.readProperties();
-        //String MY_APP_URI = properties.getProperty("myuri");
         LOGOURL = properties.getProperty("logourl");
         APP_LINKS = properties.getProperty("applinks");
 
@@ -242,6 +241,7 @@ public class SSOLoginController {
     }
 
 
+
     public static String trim(String input) {
         BufferedReader reader = new BufferedReader(new StringReader(input));
         StringBuffer result = new StringBuffer();
@@ -254,6 +254,8 @@ public class SSOLoginController {
             throw new RuntimeException(e);
         }
     }
+
+
 }
 
 

@@ -18,6 +18,7 @@ public class CookieManager {
     private static final int DEFAULT_COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
     private static String cookiedomain = null;
+    private static String MY_APP_URI;
 
     private CookieManager() {
     }
@@ -25,6 +26,7 @@ public class CookieManager {
     static {
         try {
             cookiedomain = AppConfig.readProperties().getProperty("cookiedomain");
+            MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
         } catch (IOException e) {
             log.warn("AppConfig.readProperties failed. cookiedomain was set to {}", cookiedomain, e);
         }
@@ -60,8 +62,8 @@ public class CookieManager {
         if ("https".equalsIgnoreCase(request.getScheme())) {
             cookie.setSecure(true);
         } else {
-            log.warn("Unsecure session detected, using unsecure cookie");
-            cookie.setSecure(false);
+            log.warn("Unsecure session detected, using myuri to define coocie security");
+            cookie.setSecure(secureCookie(MY_APP_URI));
 
         }
 
@@ -82,8 +84,8 @@ public class CookieManager {
             if ("https".equalsIgnoreCase(request.getScheme())) {
                 cookie.setSecure(true);
             } else {
-                log.warn("Unsecure session detected, using unsecure cookie");
-                cookie.setSecure(false);
+                log.warn("Unsecure session detected, using myuri to define coocie security");
+                cookie.setSecure(secureCookie(MY_APP_URI));
 
             }
             response.addCookie(cookie);
@@ -120,6 +122,10 @@ public class CookieManager {
             }
         }
         return null;
+    }
+
+    public static boolean secureCookie(String myuri) {
+        return myuri.indexOf("https") >= 0;
     }
 
     /*
