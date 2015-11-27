@@ -5,6 +5,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.authentication.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.authentication.whydah.CookieManager;
+import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.usertoken.TokenServiceClient;
 import org.slf4j.Logger;
@@ -98,8 +100,10 @@ public class NewUserController {
 
         }
 
-        model.addAttribute("logoURL", LOGOURL);
-        return "newuser";
+        ModelHelper.setEnabledLoginTypes(model);
+        CookieManager.clearUserTokenCookies(request, response);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        return "login";
     }
 
     @RequestMapping("/createnewuser")

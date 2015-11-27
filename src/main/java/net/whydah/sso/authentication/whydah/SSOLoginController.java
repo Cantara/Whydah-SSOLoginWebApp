@@ -33,7 +33,6 @@ public class SSOLoginController {
     private String LOGOURL = "/sso/images/site-logo.png";
     public static String APP_LINKS = "[{}]";
     private String whydahVersion = ServerRunner.version;
-    private static Map<String,String> csrftokens = new HashMap<>();
 
     //private final int MIN_REDIRECT_SIZE=4;
     //private final ModelHelper modelHelper = new ModelHelper(this);
@@ -57,7 +56,7 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
         model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
 
-        model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         CookieManager.addSecurityHTTPHeaders(response);
 
 
@@ -99,7 +98,7 @@ public class SSOLoginController {
             }
         }
         ModelHelper.setEnabledLoginTypes(model);
-        model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         return "login";
     }
 
@@ -135,7 +134,7 @@ public class SSOLoginController {
             log.warn("welcome redirect - SecurityTokenException exception: ",e);
             CookieManager.clearUserTokenCookies(request, response);
             ModelHelper.setEnabledLoginTypes(model);
-            model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
         model.addAttribute(TokenServiceClient.USERTOKEN, trim(userToken));
@@ -153,10 +152,10 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
 
 
-        if (!validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
+        if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
             log.warn("action - CSRFtoken verification failed. Redirecting to login.");
             model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in - CSRFtoken missing or incorrect");
-            model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             ModelHelper.setEnabledLoginTypes(model);
             CookieManager.clearUserTokenCookies(request, response);
             model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
@@ -173,7 +172,7 @@ public class SSOLoginController {
             ModelHelper.setEnabledLoginTypes(model);
             CookieManager.clearUserTokenCookies(request, response);
             model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
-            model.addAttribute(SessionHelper.CSRFtoken, getCSRFtoken());
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
         if (redirectURI.contains(TokenServiceClient.USERTICKET)) {
@@ -202,19 +201,6 @@ public class SSOLoginController {
     }
 
 
-    private String getCSRFtoken(){
-        String csrftoken = UUID.randomUUID().toString();
-        csrftokens.put(csrftoken,csrftoken);
-        return csrftoken;
-    }
-
-    private boolean validCSRFToken(String csrftoken){
-        String token = csrftokens.get(csrftoken);
-        if (token!=null && token.length()>4){
-            return true;
-        }
-        return false;
-    }
 
     private boolean isSessionCheckOnly(HttpServletRequest request) {
         String redirectURI = request.getParameter(SessionHelper.SESSIONCHECK);
