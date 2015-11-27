@@ -76,21 +76,11 @@ public class NewUserController {
                     String error = uasResponse.getEntity(String.class);
                     log.error(error);
                     model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
+                } else {
+                    ModelHelper.setEnabledLoginTypes(model);
+                    model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+                    return "login";
                 }
-                //This functionallity is moved to SignupService in UAS
-                /*else {
-                    uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + username);
-                    uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
-                    if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-                        String error = uasResponse.getEntity(String.class);
-                        log.error(error);
-                        model.addAttribute("Unable to send user creation mail to user for username=" + username);
-                        model.addAttribute("logoURL", LOGOURL);
-
-                        return "newuser";
-                    }
-                }
-                */
 
             } catch (IllegalStateException ise) {
                 log.info(ise.getMessage());
@@ -103,7 +93,7 @@ public class NewUserController {
         ModelHelper.setEnabledLoginTypes(model);
         CookieManager.clearUserTokenCookies(request, response);
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-        return "login";
+        return "newuser";
     }
 
     @RequestMapping("/createnewuser")
