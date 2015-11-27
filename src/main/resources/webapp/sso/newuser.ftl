@@ -10,7 +10,7 @@
     <div id="page-content">
         <div id="signup-page">
             <div id="logo">
-                <img src="${logoURL}" alt="Whydah User Registration"/>
+                <img src="${logoURL!}" alt="Whydah User Registration"/>
                 <h2>Register new user</h2>
             </div>
 

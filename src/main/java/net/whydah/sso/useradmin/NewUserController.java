@@ -53,6 +53,7 @@ public class NewUserController {
     @RequestMapping("/signup")
     public String signup(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
         log.trace("/signup entry");
+        model.addAttribute("logoURL", LOGOURL);
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String firstName = request.getParameter("firstname");
