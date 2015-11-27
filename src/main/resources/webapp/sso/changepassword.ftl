@@ -28,7 +28,7 @@
                 <button class="button" type="button" value="Change password" onClick="changePassword();">Change password</button>
                 <p>Note: Use of the 1000 most common passwords are prohibited for you own safety. Please create
                 a safe password. The longer the password the more safe it is. Passwords with
-                12-20 characters are considered good passwords in 2014.</p>
+                12-20 characters are considered ok.</p>
             </form>
             <script>
                 function changePassword(){
