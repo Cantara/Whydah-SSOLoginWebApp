@@ -37,6 +37,8 @@ public class TokenServiceClient {
     public static final String USERTOKEN = "usertoken";
     public static final String REALNAME = "realname";
     public static final String USER_TOKEN_ID = "usertokenid";
+    public static final String PHONE_NUMBER = "phonenumber";
+    public static final String EMAIL = "email";
 
     private static final Logger log = LoggerFactory.getLogger(TokenServiceClient.class);
 

@@ -141,6 +141,8 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.APP_LINKS, APP_LINKS);
         log.trace("embedded applinks: " + APP_LINKS);
         model.addAttribute(TokenServiceClient.REALNAME, UserTokenXpathHelper.getRealName(userToken));
+        model.addAttribute(TokenServiceClient.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userToken));
+        model.addAttribute(TokenServiceClient.EMAIL, UserTokenXpathHelper.getEmail(userToken));
         return "welcome";
     }
 
@@ -180,6 +182,9 @@ public class SSOLoginController {
             model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
             ModelHelper.setEnabledLoginTypes(model);
             model.addAttribute(SessionHelper.REDIRECT_URI, "");
+            model.addAttribute(TokenServiceClient.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
+            model.addAttribute(TokenServiceClient.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
+            model.addAttribute(TokenServiceClient.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
             return "welcome";
         }
 

@@ -35,10 +35,9 @@
             </table>
 
             <h3>Your profile details</h3>
-            Phone: <br/>
-            Name: ${realname!"Whydah user"} <br/>
-            Address: <br/>
-            Email: <br/>
+            <strong>Phone:</strong> ${phonenumber!"Whydah number"} <br/>
+            <strong>Name:</strong> ${realname!"Whydah user"} <br/>
+            <strong>Email:</strong> ${email!"Whydah email"} <br/>
             Security level: 0 (Lowest) <br/>
             <br/>
             <p><a href="logout" class="button">Log out</a></p>
