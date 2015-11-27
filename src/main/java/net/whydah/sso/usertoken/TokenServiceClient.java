@@ -110,7 +110,7 @@ public class TokenServiceClient {
     }
 
     private void updateApplinks(String responseXML) {
-        if (SSOLoginController.APP_LINKS != null || SSOLoginController.APP_LINKS.length() < 6) {
+        if (SSOLoginController.APP_LINKS == null || SSOLoginController.APP_LINKS.length() < 6) {
             String userTokenId = UserTokenMapper.fromUserTokenXml(responseXML).getTokenid();
             String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId, userTokenId, "").execute();
             SSOLoginController.APP_LINKS = ApplicationMapper.toShortListJson(ApplicationMapper.fromJsonList(applicationsJson));
