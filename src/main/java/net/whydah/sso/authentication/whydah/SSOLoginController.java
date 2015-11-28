@@ -31,7 +31,6 @@ public class SSOLoginController {
     private final static Logger log = LoggerFactory.getLogger(SSOLoginController.class);
     private final TokenServiceClient tokenServiceClient;
     private String LOGOURL = "/sso/images/site-logo.png";
-    public static String APP_LINKS = "[{}]";
     private String whydahVersion = ServerRunner.version;
 
     //private final int MIN_REDIRECT_SIZE=4;
@@ -41,8 +40,6 @@ public class SSOLoginController {
     public SSOLoginController() throws IOException {
         Properties properties = AppConfig.readProperties();
         LOGOURL = properties.getProperty("logourl");
-        APP_LINKS = properties.getProperty("applinks");
-
         this.tokenServiceClient = new TokenServiceClient();
     }
 
@@ -119,8 +116,6 @@ public class SSOLoginController {
                 userToken = tokenServiceClient.getUserTokenByUserTicket(userTicket);
                 model.addAttribute(TokenServiceClient.USERTICKET, userTicket);
                 model.addAttribute(TokenServiceClient.USER_TOKEN_ID, UserTokenXpathHelper.getUserTokenId(userToken));
-
-                // TODO  try userToken from cookie if usertoken from ticket fail..  now throw exception
             } else if (userTokenId != null && userTokenId.length() > 3) {
                 log.trace("Welcome - No userTicket, using userTokenID from cookie");
                 userToken = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
@@ -138,8 +133,8 @@ public class SSOLoginController {
             return "login";
         }
         model.addAttribute(TokenServiceClient.USERTOKEN, trim(userToken));
-        model.addAttribute(SessionHelper.APP_LINKS, APP_LINKS);
-        log.trace("embedded applinks: " + APP_LINKS);
+        model.addAttribute(SessionHelper.APP_LINKS, SessionHelper.getAppLinks());
+        log.trace("embedded applinks: " + SessionHelper.getAppLinks());
         model.addAttribute(TokenServiceClient.REALNAME, UserTokenXpathHelper.getRealName(userToken));
         model.addAttribute(TokenServiceClient.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userToken));
         model.addAttribute(TokenServiceClient.EMAIL, UserTokenXpathHelper.getEmail(userToken));

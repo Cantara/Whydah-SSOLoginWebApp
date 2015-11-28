@@ -1,10 +1,19 @@
 package net.whydah.sso.authentication.whydah;
 
+import net.whydah.sso.application.mappers.ApplicationMapper;
+import net.whydah.sso.commands.adminapi.application.CommandListApplications;
+import net.whydah.sso.user.mappers.UserTokenMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class SessionHelper {
+    private static final Logger log = LoggerFactory.getLogger(SessionHelper.class);
+
     public static final String USERTICKET = "userticket";
     public static final String REDIRECT = "redirect";
     public static final String REDIRECT_URI = "redirectURI";
@@ -18,7 +27,17 @@ public class SessionHelper {
     public static final String WHYDAH_VERSION = "version";
     public static final String CSRFtoken = "CSRFtoken";
 
+
+    public static String getAppLinks() {
+        return myAppLinks;
+    }
+
+    public static void setAppLinks(String appLinks) {
+        myAppLinks = appLinks;
+    }
+
     private static Map<String, String> csrftokens = new HashMap<>();
+    private static String myAppLinks = "[{}]";
 
 
     public static String getCSRFtoken() {
@@ -33,6 +52,23 @@ public class SessionHelper {
             return true;
         }
         return false;
+    }
+
+    public static void updateApplinks(URI userAdminServiceUri, String myAppTokenId, String responseXML) {
+        if (shouldUpdate() || getAppLinks() == null || myAppLinks.length() < 6) {
+            String userTokenId = UserTokenMapper.fromUserTokenXml(responseXML).getTokenid();
+            String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId, userTokenId, "").execute();
+            log.debug("AppLications returned:" + applicationsJson);
+            if (applicationsJson != null || applicationsJson.length() > 20) {
+                setAppLinks(ApplicationMapper.toShortListJson(ApplicationMapper.fromJsonList(applicationsJson)));
+            }
+        }
+    }
+
+
+    public static boolean shouldUpdate() {
+        int max = 100;
+        return (5 >= ((int) (Math.random() * max)));  // update on 5 percent of requests
     }
 
 }
