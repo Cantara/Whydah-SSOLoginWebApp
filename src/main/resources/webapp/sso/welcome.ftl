@@ -34,11 +34,11 @@
                 </tbody>
             </table>
 
-            <h3>Your profile details</h3>
+            <h3>Your profile</h3>
             <strong>Phone:</strong> ${phonenumber!"Whydah number"} <br/>
             <strong>Name:</strong> ${realname!"Whydah user"} <br/>
             <strong>Email:</strong> ${email!"Whydah email"} <br/>
-            Security level: 0 (Lowest) <br/>
+            <strong>Security level:</strong> ${securitylevel!"0"} <br/>
             <br/>
             <p><a href="logout" class="button">Log out</a></p>
             <p><small>Logout affects all Whydah-connected services</small></p>

@@ -7,6 +7,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.application.mappers.ApplicationCredentialMapper;
 import net.whydah.sso.application.types.ApplicationCredential;
+import net.whydah.sso.authentication.ModelHelper;
 import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.user.helpers.UserHelper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
@@ -35,12 +36,6 @@ import java.util.Properties;
 import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
 public class TokenServiceClient {
-    public static final String USERTICKET = "userticket";
-    public static final String USERTOKEN = "usertoken";
-    public static final String REALNAME = "realname";
-    public static final String USER_TOKEN_ID = "usertokenid";
-    public static final String PHONE_NUMBER = "phonenumber";
-    public static final String EMAIL = "email";
 
     private static final Logger log = LoggerFactory.getLogger(TokenServiceClient.class);
 
@@ -210,7 +205,7 @@ public class TokenServiceClient {
         logonApplication();
         WebResource releaseResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/release_usertoken");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add(USER_TOKEN_ID, userTokenId);
+        formData.add(ModelHelper.USER_TOKEN_ID, userTokenId);
         ClientResponse response = releaseResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() != OK.getStatusCode()) {
             log.warn("releaseUserToken failed for userTokenId={}: {}", userTokenId, response);
@@ -400,7 +395,7 @@ public class TokenServiceClient {
 
     public String appendTicketToRedirectURI(String redirectURI, String userticket) {
         char paramSep = redirectURI.contains("?") ? '&' : '?';
-        redirectURI += paramSep + TokenServiceClient.USERTICKET + '=' + userticket;
+        redirectURI += paramSep + ModelHelper.USERTICKET + '=' + userticket;
         return redirectURI;
     }
 }

@@ -103,7 +103,7 @@ public class SSOLoginController {
 
     @RequestMapping("/welcome")
     public String welcome(HttpServletRequest request, HttpServletResponse response,Model model) {
-        String userTicket = request.getParameter(TokenServiceClient.USERTICKET);
+        String userTicket = request.getParameter(ModelHelper.USERTICKET);
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
         String userToken;
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
@@ -114,13 +114,13 @@ public class SSOLoginController {
             if (userTicket != null && userTicket.length() > 3) {
                 log.trace("Welcome - Using userTicket");
                 userToken = tokenServiceClient.getUserTokenByUserTicket(userTicket);
-                model.addAttribute(TokenServiceClient.USERTICKET, userTicket);
-                model.addAttribute(TokenServiceClient.USER_TOKEN_ID, UserTokenXpathHelper.getUserTokenId(userToken));
+                model.addAttribute(ModelHelper.USERTICKET, userTicket);
+                model.addAttribute(ModelHelper.USER_TOKEN_ID, UserTokenXpathHelper.getUserTokenId(userToken));
             } else if (userTokenId != null && userTokenId.length() > 3) {
                 log.trace("Welcome - No userTicket, using userTokenID from cookie");
                 userToken = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
-                model.addAttribute(TokenServiceClient.USERTICKET, "No userTicket, using userTokenID");
-                model.addAttribute(TokenServiceClient.USER_TOKEN_ID, userTokenId);
+                model.addAttribute(ModelHelper.USERTICKET, "No userTicket, using userTokenID");
+                model.addAttribute(ModelHelper.USER_TOKEN_ID, userTokenId);
             } else {
                 // TODO cleanup - this messes up the log for a normal case
                 throw new UnauthorizedException();
@@ -132,12 +132,13 @@ public class SSOLoginController {
             model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
-        model.addAttribute(TokenServiceClient.USERTOKEN, trim(userToken));
+        model.addAttribute(ModelHelper.USERTOKEN, trim(userToken));
         model.addAttribute(SessionHelper.APP_LINKS, SessionHelper.getAppLinks());
         log.trace("embedded applinks: " + SessionHelper.getAppLinks());
-        model.addAttribute(TokenServiceClient.REALNAME, UserTokenXpathHelper.getRealName(userToken));
-        model.addAttribute(TokenServiceClient.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userToken));
-        model.addAttribute(TokenServiceClient.EMAIL, UserTokenXpathHelper.getEmail(userToken));
+        model.addAttribute(ModelHelper.REALNAME, UserTokenXpathHelper.getRealName(userToken));
+        model.addAttribute(ModelHelper.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userToken));
+        model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userToken));
+        model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userToken));
         return "welcome";
     }
 
@@ -172,14 +173,15 @@ public class SSOLoginController {
             model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
-        if (redirectURI.contains(TokenServiceClient.USERTICKET)) {
+        if (redirectURI.contains(ModelHelper.USERTICKET)) {
             log.warn("action - redirectURI contain ticket. Redirecting to welcome.");
             model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
             ModelHelper.setEnabledLoginTypes(model);
             model.addAttribute(SessionHelper.REDIRECT_URI, "");
-            model.addAttribute(TokenServiceClient.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
-            model.addAttribute(TokenServiceClient.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
-            model.addAttribute(TokenServiceClient.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
+            model.addAttribute(ModelHelper.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
+            model.addAttribute(ModelHelper.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
+            model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
+            model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
             return "welcome";
         }
 

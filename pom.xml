@@ -22,7 +22,7 @@
 
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah-typelib-version>1.0.5</whydah-typelib-version>
+        <whydah-typelib-version>1.0.6</whydah-typelib-version>
         <whydah-sdk-version>2.1.21-SNAPSHOT</whydah-sdk-version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.0.6.RELEASE</spring.version>
