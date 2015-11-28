@@ -40,20 +40,20 @@
             <h3>Your profile</h3>
             <table id="profile">
                  <tr>
-                      <td><strong>Name:</strong></td>
-                      <td>${realname!"Whydah username"}</td>
+                      <td> <strong>Name:</strong> </td>
+                      <td> ${realname!"Whydah username"} </td>
                  <tr/>
                  <tr>
-                      <td><strong>Mobile Phone:</strong></td>
-                      <td>${phonenumber!"Whydah cellPhone"}</td>
+                      <td> <strong>Mobile Phone:</strong> </td>
+                      <td> ${phonenumber!"Whydah cellPhone"} </td>
                  <tr/>
                  <tr>
-                      <td><strong>Email:</strong> </td>
-                      <td>${email!"Whydah email"}</td>
+                      <td> <strong>Email:</strong> </td>
+                      <td> ${email!"Whydah email"} </td>
                  <tr/>
                  <tr>
-                      <td><strong>Security level:</strong>/td>
-                      <td>${securitylevel!}</td>
+                      <td> <strong>Security level:</strong> </td>
+                      <td> ${securitylevel!} </td>
                  <tr/>
             </table>
             <br/>
