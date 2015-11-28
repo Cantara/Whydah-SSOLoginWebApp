@@ -139,6 +139,7 @@ public class SSOLoginController {
         model.addAttribute(ModelHelper.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userToken));
         model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userToken));
         model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userToken));
+        model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userToken));
         return "welcome";
     }
 
