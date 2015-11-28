@@ -51,12 +51,19 @@
                       <td> <strong>Email:</strong> </td>
                       <td> ${email!"Whydah email"} </td>
                  <tr/>
+            </table>
+            <br/>
+            <br/>
+            <br/>
+
+            <h3>Your session</h3>
+            <table id="profile">
                  <tr>
                       <td> <strong>Session security level:</strong> </td>
                       <td> ${securitylevel!} </td>
                  <tr/>
                  <tr>
-                      <td> <strong>Whydah DEFCON level:</strong> </td>
+                      <td> <strong>Whydah threat level:</strong> </td>
                       <td> ${defcon!} </td>
                  <tr/>
             </table>
