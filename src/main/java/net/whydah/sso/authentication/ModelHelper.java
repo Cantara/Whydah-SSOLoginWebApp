@@ -15,6 +15,7 @@ public class ModelHelper {
     public static final String PHONE_NUMBER = "phonenumber";
     public static final String SECURITY_LEVEL = "securitylevel";
     public static final String EMAIL = "email";
+    public static final String DEFCON = "defcon";
 
     static {
         try {
