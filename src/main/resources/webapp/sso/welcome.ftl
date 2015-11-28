@@ -35,10 +35,24 @@
             </table>
 
             <h3>Your profile</h3>
-            <strong>Phone:</strong> ${phonenumber!"Whydah number"} <br/>
-            <strong>Name:</strong> ${realname!"Whydah user"} <br/>
-            <strong>Email:</strong> ${email!"Whydah email"} <br/>
-            <strong>Security level:</strong> ${securitylevel!"0"} <br/>
+            <table id="profile">
+                 <tr>
+                      <td><strong>Name:</strong></td>
+                      <td>${realname!"Whydah user"}</td>
+                 <tr/>
+                 <tr>
+                      <td><strong>Mobile Phone:</strong></td>
+                      <td>${phonenumber!"Whydah number"}</td>
+                 <tr/>
+                 <tr>
+                      <td><strong>Email:</strong> </td>
+                      <td>${email!"Whydah email"}</td>
+                 <tr/>
+                 <tr>
+                      <td><strong>Security level:</strong>/td>
+                      <td>${securitylevel!"0"}</td>
+                 <tr/>
+            </table>
             <br/>
             <p><a href="logout" class="button">Log out</a></p>
             <p><small>Logout affects all Whydah-connected services</small></p>
