@@ -81,7 +81,7 @@
             </div>
             <br/><br/>
 
-            <small>Whydah, SSO WebApp version: ${version!"<i>Unknown</i>"} </small>
+            <small>Whydah-SSOLoginWebApp: ${version!"<i>Unknown</i>"} </small>
         </div>
 
     </div>
