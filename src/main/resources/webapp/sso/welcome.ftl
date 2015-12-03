@@ -96,14 +96,25 @@
             var $app = $(app);
             var a = {};
             a.applicationName = $app.find('applicationName').text();
-            if(appLinks[a.applicationName]) a.applicationName = '<a href="'+appLinks[a.applicationName]+'">'+a.applicationName+'</a>';
+            var appInfo = appLinks.filter(function(app){
+                if(a.applicationName === app.name){
+                    return app;
+                }
+            });
+
+            if( appInfo[0].applicationUrl && appInfo[0].applicationUrl !== "null" ){
+                a.applicationName = '<a href="'+appInfo[0].applicationUrl+'"target="_blank">'+a.applicationName+'</a>';
+            }
+
+
             a.organizationName = $app.find('organizationName').text();
             a.roleName = $app.find('role').attr('name');
             a.roleValue = $app.find('role').attr('value');
-            roleTableContent += '<tr><td data-th="Application">'+a.applicationName
-                +'</td><td data-th="Organization">'+a.organizationName
-                +'</td><td data-th="Role">'+a.roleName
-                +'</td><td data-th="Value">'+a.roleValue+'</td></tr>';
+
+            roleTableContent += '<tr><td data-th="Application">'+ a.applicationName
+                    +'</td><td data-th="Organization">'+a.organizationName
+                    +'</td><td data-th="Role">'+a.roleName
+                    +'</td><td data-th="Value">'+a.roleValue+'</td></tr>';
         });
         roleTableContent = roleTableContent || '<tr><td colspan="4">No roles found.</td></tr>';
         $('#roles tbody').html(roleTableContent);
