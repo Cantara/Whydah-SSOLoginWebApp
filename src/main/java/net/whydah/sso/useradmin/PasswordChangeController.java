@@ -3,6 +3,7 @@ package net.whydah.sso.useradmin;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.usertoken.TokenServiceClient;
 import org.slf4j.Logger;
@@ -32,14 +33,11 @@ public class PasswordChangeController {
     private URI uasServiceUri;
     private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
     String LOGOURL = "/sso/images/site-logo.png";
-    String MY_APP_URI = "";
 
 
-    //TODO Should go via UAS.
     public PasswordChangeController() throws IOException {
         uasServiceUri = UriBuilder.fromUri(AppConfig.readProperties().getProperty("useradminservice")).build();
         Properties properties = AppConfig.readProperties();
-        String MY_APP_URI = properties.getProperty("myuri");
         LOGOURL = properties.getProperty("logourl");
     }
 
@@ -95,20 +93,22 @@ public class PasswordChangeController {
 //        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
         WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()+"/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
         log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
+        if (SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
 
-        ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
-        model.addAttribute("logoURL", LOGOURL);
-        model.addAttribute("username", passwordChangeToken.getUser());
-        if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            String error = response.getEntity(String.class);
-            log.error(error);
-            if(response.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
-                model.addAttribute("error", "The password you entered was found to be too weak, please try another password.");
-            } else {
-                model.addAttribute("error", error+"\nusername:"+passwordChangeToken.getUser());
+            ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
+            model.addAttribute("logoURL", LOGOURL);
+            model.addAttribute("username", passwordChangeToken.getUser());
+            if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+                String error = response.getEntity(String.class);
+                log.error(error);
+                if (response.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
+                    model.addAttribute("error", "The password you entered was found to be too weak, please try another password.");
+                } else {
+                    model.addAttribute("error", error + "\nusername:" + passwordChangeToken.getUser());
+                }
+                model.addAttribute("token", passwordChangeToken.getToken());
+                return "changepassword";
             }
-            model.addAttribute("token", passwordChangeToken.getToken());
-            return "changepassword";
         }
         return "changedpassword";
     }

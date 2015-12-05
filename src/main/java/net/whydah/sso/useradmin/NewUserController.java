@@ -54,6 +54,7 @@ public class NewUserController {
     public String signup(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
         log.trace("/signup entry");
         model.addAttribute("logoURL", LOGOURL);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String firstName = request.getParameter("firstname");
@@ -101,6 +102,7 @@ public class NewUserController {
     public String createNewUser(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
         log.trace("/createnewuser entry");
         model.addAttribute("logoURL", LOGOURL);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         //String fbId = "";
         //String username = "user";
         UserCredential userCredential = new UserCredential() {
