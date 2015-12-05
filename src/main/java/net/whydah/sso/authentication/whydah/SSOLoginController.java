@@ -79,6 +79,7 @@ public class SSOLoginController {
             if (DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)){
                 log.trace("login - Did not find any sensible redirectURI, using /welcome");
                 model.addAttribute(SessionHelper.REDIRECT, redirectURI);
+                model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
                 log.info("login - Redirecting to {}", redirectURI);
                 return "action";
 
@@ -91,6 +92,7 @@ public class SSOLoginController {
                 // Action use redirect - not redirectURI
                 model.addAttribute(SessionHelper.REDIRECT, redirectURI);
                 log.info("login - Redirecting to {}", redirectURI);
+                model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
                 return "action";
             }
         }
@@ -200,6 +202,7 @@ public class SSOLoginController {
         // Action use redirect...
         model.addAttribute(SessionHelper.REDIRECT, redirectURI);
         model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         log.info("action - Redirecting to {}", redirectURI);
         return "action";
     }
