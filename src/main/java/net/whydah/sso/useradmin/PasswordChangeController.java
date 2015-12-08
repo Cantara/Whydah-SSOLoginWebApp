@@ -108,6 +108,7 @@ public class PasswordChangeController {
             model.addAttribute("token", passwordChangeToken.getToken());
             return "changepassword";
         }
+        return "changedpassword";
     }
 
     private PasswordChangeToken getTokenFromPath(HttpServletRequest request) {
