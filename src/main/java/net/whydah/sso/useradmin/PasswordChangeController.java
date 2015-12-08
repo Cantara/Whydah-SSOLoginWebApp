@@ -96,7 +96,6 @@ public class PasswordChangeController {
         if (SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
 
             ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
-            model.addAttribute("logoURL", LOGOURL);
             model.addAttribute("username", passwordChangeToken.getUser());
             if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
                 String error = response.getEntity(String.class);
@@ -110,6 +109,7 @@ public class PasswordChangeController {
                 return "changepassword";
             }
         }
+        model.addAttribute("username", passwordChangeToken.getUser());
         return "changedpassword";
     }
 

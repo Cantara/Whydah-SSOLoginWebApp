@@ -13,7 +13,7 @@
             <h2>Password changed</h2>
         </div>
         <div class="login-box">
-            <h4>Username:  ${username} </h4>
+            <h4>Username:  ${username!} </h4>
             <br/><br/>
             <a href="/sso/welcome">Log in.</a>
         </div>
