@@ -72,7 +72,7 @@ public class PasswordChangeController {
 
     @RequestMapping("/changepassword/*")
     public String changePasswordFromLink(HttpServletRequest request, Model model) {
-        log.trace("changePasswordFromLink was called");
+        log.warn("changePasswordFromLink was called");
         model.addAttribute("logoURL", LOGOURL);
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
         model.addAttribute("username", passwordChangeToken.getUser());
