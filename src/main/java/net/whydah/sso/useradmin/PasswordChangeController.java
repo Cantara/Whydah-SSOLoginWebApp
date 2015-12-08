@@ -19,6 +19,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
+
 import com.codahale.metrics.*;
 
 /**
@@ -58,12 +59,12 @@ public class PasswordChangeController {
         }
 
         model.addAttribute("logoURL", LOGOURL);
-        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()+"/auth/password/reset/username/" + user);
+        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + user);
         ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
             String error = response.getEntity(String.class);
             log.error(error);
-            model.addAttribute("error", error+"\nusername:"+user);
+            model.addAttribute("error", error + "\nusername:" + user);
             return "resetpassword";
         }
         return "resetpassworddone";
@@ -91,26 +92,22 @@ public class PasswordChangeController {
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
         String newpassword = request.getParameter("newpassword");
 //        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
-        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()+"/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
+        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
         log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
-        if (SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
 
-            ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
-            model.addAttribute("username", passwordChangeToken.getUser());
-            if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-                String error = response.getEntity(String.class);
-                log.error(error);
-                if (response.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
-                    model.addAttribute("error", "The password you entered was found to be too weak, please try another password.");
-                } else {
-                    model.addAttribute("error", error + "\nusername:" + passwordChangeToken.getUser());
-                }
-                model.addAttribute("token", passwordChangeToken.getToken());
-                return "changepassword";
-            }
-        }
+        ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
         model.addAttribute("username", passwordChangeToken.getUser());
-        return "changedpassword";
+        if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+            String error = response.getEntity(String.class);
+            log.error(error);
+            if (response.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
+                model.addAttribute("error", "The password you entered was found to be too weak, please try another password.");
+            } else {
+                model.addAttribute("error", error + "\nusername:" + passwordChangeToken.getUser());
+            }
+            model.addAttribute("token", passwordChangeToken.getToken());
+            return "changepassword";
+        }
     }
 
     private PasswordChangeToken getTokenFromPath(HttpServletRequest request) {
