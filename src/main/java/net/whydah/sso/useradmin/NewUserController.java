@@ -67,7 +67,12 @@ public class NewUserController {
                     "\", \"lastName\":\"" + lastName +
                     "\", \"personRef\":\"\", \"email\":\"" + email +
                     "\", \"cellPhone\":\"" + cellPhone + "\"}";
-
+            if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
+                log.warn("action - CSRFtoken verification failed. Redirecting to login.");
+                ModelHelper.setEnabledLoginTypes(model);
+                model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+                return "login";
+            }
             ;
             try {
                 WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()).path("signup");//.path("signup");
