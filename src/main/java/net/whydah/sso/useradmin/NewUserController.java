@@ -56,7 +56,7 @@ public class NewUserController {
         model.addAttribute("logoURL", LOGOURL);
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         String username = request.getParameter("username");
-        String email = request.getParameter("email");
+        String email = request.getParameter("useremail");
         String firstName = request.getParameter("firstname");
         String lastName = request.getParameter("lastname");
         String cellPhone = request.getParameter("cellphone");
