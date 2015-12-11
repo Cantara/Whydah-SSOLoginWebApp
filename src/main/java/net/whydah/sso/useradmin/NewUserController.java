@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Enumeration;
 import java.util.Properties;
 
 @Controller
@@ -53,6 +54,7 @@ public class NewUserController {
     @RequestMapping("/signup")
     public String signup(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
         log.trace("/signup entry");
+        printParams(request);
         model.addAttribute("logoURL", LOGOURL);
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         String username = request.getParameter("username");
@@ -145,5 +147,19 @@ public class NewUserController {
         return "action";
     }
 
+    private void printParams(HttpServletRequest req) {
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String logString = "";
+            String paramName = parameterNames.nextElement();
+            logString = logString + paramName + " - ";
+            String[] paramValues = req.getParameterValues(paramName);
+            for (int i = 0; i < paramValues.length; i++) {
+                String paramValue = paramValues[i];
+                logString = logString + paramValue;
+            }
+            log.trace("signup - request params: " + logString);
+        }
+    }
 
 }
