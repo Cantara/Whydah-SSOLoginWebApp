@@ -22,7 +22,7 @@
             <form method="POST" class="new_user_session">
 
                 <h4><label for="user">Email:</label></h4>
-                <input id="user" name="email" size="30" type="text" placeholder="Email"/>
+                <input id="email" email="email" size="30" type="text" placeholder="Email"/>
 
                 <h4><label for="username">Username:</label></h4>
                 <input id="username" name="username" size="30" type="text" placeholder="Username"/>

@@ -60,6 +60,7 @@ public class NewUserController {
         String firstName = request.getParameter("firstname");
         String lastName = request.getParameter("lastname");
         String cellPhone = request.getParameter("cellphone");
+        log.trace("signup requested user - email: {} and username: {}", email, username);
         if (email != null && username != null) {
             log.info("Requested signup - email: " + email + "  username: " + username + "  firstname: " + firstName + "  lastname: " + lastName + "  cellphone: " + cellPhone + " ");
             String userJson = "{\"username\":\"" + username +
