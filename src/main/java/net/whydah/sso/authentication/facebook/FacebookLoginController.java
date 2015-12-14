@@ -31,6 +31,8 @@ import java.util.UUID;
 public class FacebookLoginController {
     private static final Logger log = LoggerFactory.getLogger(FacebookLoginController.class);
     private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
+    private String LOGOURL = "/sso/images/site-logo.png";
+
 
     // set this to your servlet URL for the authentication servlet/filter
     private final String fbauthURI;
@@ -39,23 +41,18 @@ public class FacebookLoginController {
         Properties properties = AppConfig.readProperties();
         String MY_APP_URI = properties.getProperty("myuri");
         fbauthURI = MY_APP_URI + "fbauth";
+        LOGOURL = properties.getProperty("logourl");
     }
 
 
     @RequestMapping("/fblogin")
     public String facebookLogin(HttpServletRequest request, Model model) throws MalformedURLException {
+        if (!ModelHelper.isEnabled(ModelHelper.FACEBOOKLOGINENABLED)) {
+            return "login";
+        }
         String clientRedirectURI = request.getParameter("redirectURI");
         String facebookLoginUrl = FacebookHelper.getFacebookLoginUrl(clientRedirectURI, fbauthURI);
-        String LOGOURL="/sso/images/site-logo.png";
-        try {
-            Properties properties = AppConfig.readProperties();
-            LOGOURL = properties.getProperty("logourl");
-
-        } catch (Exception e){
-
-        }
-        model.addAttribute("logoURL", LOGOURL);
-
+        model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute("redirect", facebookLoginUrl);
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         log.info("Redirecting to {}", facebookLoginUrl);
@@ -64,30 +61,23 @@ public class FacebookLoginController {
 
     @RequestMapping("/fbauth")
     public String facebookAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+        if (!ModelHelper.isEnabled(ModelHelper.FACEBOOKLOGINENABLED)) {
+            return "login";
+        }
         String code = request.getParameter("code");
-
         log.trace("fbauth got code: {}",code);
         log.trace("fbauth - got state: {}",request.getParameter("state"));
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         Map.Entry<String, User> pair = FacebookHelper.loginAndCreateFacebookUser(code, fbauthURI);
         if (pair == null) {
             log.error("Could not fetch facebok user.");
             //TODO Do we need to add client redirect URI here?
             ModelHelper.setEnabledLoginTypes(model);
-            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
         String fbAccessToken = pair.getKey();
         User fbUser = pair.getValue();
-
-        String LOGOURL="/sso/images/site-logo.png";
-        try {
-            Properties properties = AppConfig.readProperties();
-            LOGOURL = properties.getProperty("logourl");
-        } catch (Exception e){
-
-        }
-        model.addAttribute("logoURL", LOGOURL);
-        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         ModelHelper.setEnabledLoginTypes(model);
 
 

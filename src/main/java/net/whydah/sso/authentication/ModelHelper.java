@@ -17,6 +17,11 @@ public class ModelHelper {
     public static final String EMAIL = "email";
     public static final String DEFCON = "defcon";
 
+    public static final String FACEBOOKLOGINENABLED = "facebookLoginEnabled";
+    public static final String NETIQLOGINENABLED = "netIQLoginEnabled";
+    public static final String OPENIDLOGINENABLED = "openidLoginEnabled";
+    public static final String SIGNUPENABLED = "signupEnabled";
+
     static {
         try {
             enabledLoginTypes = new LoginTypes(AppConfig.readProperties());
@@ -39,6 +44,24 @@ public class ModelHelper {
         }
     }
 
+    public static boolean isEnabled(String loginType) {
+        if (loginType.equalsIgnoreCase(FACEBOOKLOGINENABLED)) {
+            return enabledLoginTypes.isFacebookLoginEnabled();
+        }
+        if (loginType.equalsIgnoreCase("openidLoginEnabled")) {
+            return enabledLoginTypes.isOpenIdLoginEnabled();
+        }
+        if (loginType.equalsIgnoreCase("omniLoginEnabled")) {
+            return enabledLoginTypes.isOmniLoginEnabled();
+        }
+        if (loginType.equalsIgnoreCase(NETIQLOGINENABLED)) {
+            return enabledLoginTypes.isNetIQLoginEnabled();
+        }
+        if (loginType.equalsIgnoreCase(SIGNUPENABLED)) {
+            return enabledLoginTypes.isSignupEnabled();
+        }
+        return false;
+    }
     private static void setNetIQOverrides(Model model) {
         try {
             model.addAttribute("netIQtext", AppConfig.readProperties().getProperty("logintype.netiq.text"));

@@ -53,6 +53,9 @@ public class NewUserController {
 
     @RequestMapping("/signup")
     public String signup(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+        if (!ModelHelper.isEnabled(ModelHelper.SIGNUPENABLED)) {
+            return "login";
+        }
         log.trace("/signup entry");
         printParams(request);
         model.addAttribute("logoURL", LOGOURL);
@@ -108,6 +111,9 @@ public class NewUserController {
 
     @RequestMapping("/createnewuser")
     public String createNewUser(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+        if (!ModelHelper.isEnabled(ModelHelper.SIGNUPENABLED)) {
+            return "login";
+        }
         log.trace("/createnewuser entry");
         model.addAttribute("logoURL", LOGOURL);
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());

@@ -41,6 +41,10 @@ public class NetIQLoginController {
 
         @RequestMapping("/netiqlogin")
         public String netIQLogin(HttpServletRequest request, Model model) throws MalformedURLException {
+            if (!ModelHelper.isEnabled(ModelHelper.NETIQLOGINENABLED)) {
+                return "login";
+            }
+
             String clientRedirectURI = request.getParameter("redirectURI");
             model.addAttribute("logoURL", LOGOURL);
 
@@ -52,6 +56,9 @@ public class NetIQLoginController {
 
         @RequestMapping("/netiqauth")
         public String netiqAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+            if (!ModelHelper.isEnabled(ModelHelper.NETIQLOGINENABLED)) {
+                return "login";
+            }
             ModelHelper.setEnabledLoginTypes(model);
 
             model.addAttribute("logoURL", LOGOURL);
