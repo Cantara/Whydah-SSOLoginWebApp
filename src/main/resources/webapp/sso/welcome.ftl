@@ -94,10 +94,16 @@
         var roleTableContent = '';
         $.each(apps, function(index, app){
             var $app = $(app);
+            console.log(appLinks);
             var a = {};
             a.applicationName = $app.find('applicationName').text();
             var appInfo = appLinks.filter(function(app){
                 if(a.applicationName === app.name){
+
+                    if(app.tags.indexOf('HIDDEN') !== -1){
+                        //if hidden, return
+                        return;
+                    }
                     return app;
                 }
             });
