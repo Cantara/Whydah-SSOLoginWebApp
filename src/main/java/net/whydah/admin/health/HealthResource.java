@@ -3,6 +3,8 @@ package net.whydah.admin.health;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,7 +15,7 @@ import javax.ws.rs.core.Response;
 /**
  * Endpoint for health check, copied from UIB.
  */
-@Component
+@Controller
 @Path("/health")
 public class HealthResource {
     private static final Logger log = LoggerFactory.getLogger(HealthResource.class);
@@ -22,7 +24,7 @@ public class HealthResource {
     }
 
     @GET
-    @Path("/")
+    @RequestMapping("/login")
     @Produces(MediaType.TEXT_PLAIN)
     public Response isHealthy() {
         boolean ok = true;
