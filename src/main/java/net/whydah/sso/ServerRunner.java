@@ -40,7 +40,7 @@ public class ServerRunner {
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
-        //context.addServlet(new ServletHolder(new AdminServlet()),"/metrics/*");
+        context.addServlet(new ServletHolder(new AdminServlet()), "/metrics/*");
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextConfigLocation("classpath:webapp/sso/mvc-config.xml");
