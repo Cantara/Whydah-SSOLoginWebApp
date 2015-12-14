@@ -5,6 +5,7 @@ import net.whydah.sso.authentication.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.CookieManager;
 import net.whydah.sso.authentication.whydah.SSOLoginController;
+import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.usertoken.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
@@ -56,6 +57,7 @@ public class FacebookLoginController {
         model.addAttribute("logoURL", LOGOURL);
 
         model.addAttribute("redirect", facebookLoginUrl);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         log.info("Redirecting to {}", facebookLoginUrl);
         return "action";
     }
@@ -71,6 +73,7 @@ public class FacebookLoginController {
             log.error("Could not fetch facebok user.");
             //TODO Do we need to add client redirect URI here?
             ModelHelper.setEnabledLoginTypes(model);
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
         String fbAccessToken = pair.getKey();
@@ -84,6 +87,7 @@ public class FacebookLoginController {
 
         }
         model.addAttribute("logoURL", LOGOURL);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         ModelHelper.setEnabledLoginTypes(model);
 
 
@@ -107,6 +111,7 @@ public class FacebookLoginController {
             userCredential = new FacebookUserCredential(fbUser.getId(), username);
         } catch(IllegalArgumentException iae) {
             log.error("fbauth - unable to build usercredential for facebook token.",iae.getLocalizedMessage());
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             //TODO Do we need to add client redirect URI here?
             return "login";
         }
@@ -128,6 +133,7 @@ public class FacebookLoginController {
                 model.addAttribute("redirectURI", redirectURI);
                 model.addAttribute("loginError", "Login error: Could not create or authenticate user.");
                 ModelHelper.setEnabledLoginTypes(model);
+                model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
                 return "login";
             }
         }
@@ -141,6 +147,7 @@ public class FacebookLoginController {
         clientRedirectURI = tokenServiceClient.appendTicketToRedirectURI(clientRedirectURI, userticket);
         log.info("Redirecting to {}", clientRedirectURI);
         model.addAttribute("redirect", clientRedirectURI);
+        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         return "action";
     }
 

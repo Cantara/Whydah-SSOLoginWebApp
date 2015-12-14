@@ -3,6 +3,7 @@ package net.whydah.sso.authentication.netiq;
 import net.whydah.sso.authentication.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.CookieManager;
+import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.usertoken.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
@@ -45,6 +46,7 @@ public class NetIQLoginController {
 
             model.addAttribute("redirect", hetIQauthURI+"?redirectURI="+clientRedirectURI);
             log.info("Redirecting to {}", hetIQauthURI+"?redirectURI="+clientRedirectURI);
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "action";
         }
 
@@ -53,6 +55,7 @@ public class NetIQLoginController {
             ModelHelper.setEnabledLoginTypes(model);
 
             model.addAttribute("logoURL", LOGOURL);
+            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
 
 
             try {
