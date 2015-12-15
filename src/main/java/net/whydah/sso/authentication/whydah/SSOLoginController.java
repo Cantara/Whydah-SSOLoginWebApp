@@ -1,11 +1,13 @@
 package net.whydah.sso.authentication.whydah;
 
 import net.whydah.sso.ServerRunner;
-import net.whydah.sso.authentication.ModelHelper;
+import net.whydah.sso.authentication.UnauthorizedException;
+import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
-import net.whydah.sso.usertoken.TokenServiceClient;
+import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +21,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 

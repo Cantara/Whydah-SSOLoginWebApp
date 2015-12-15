@@ -1,13 +1,13 @@
 package net.whydah.sso.authentication.facebook;
 
 import com.restfb.types.User;
-import net.whydah.sso.authentication.ModelHelper;
+import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.CookieManager;
 import net.whydah.sso.authentication.whydah.SSOLoginController;
 import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.usertoken.TokenServiceClient;
+import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,12 +108,12 @@ public class FacebookLoginController {
 
 
         //Check om fbToken har session i lokal cache i TokenService
-        // Hvis ja, hent whydah user usertoken og legg ticket på model eller på returURL.
+        // Hvis ja, hent whydah user tokenservice og legg ticket på model eller på returURL.
         String userTokenXml = tokenServiceClient.getUserToken(userCredential, userticket);
         if (userTokenXml == null) {
             log.warn("getUserToken failed. Try to create new user using facebook credentials.");
             // Hvis nei, hent brukerinfo fra FB, kall tokenService. med user credentials for ny bruker (lag tjenesten i TokenService).
-            // Success etter ny bruker er laget = usertoken. Alltid ticket id som skal sendes.
+            // Success etter ny bruker er laget = tokenservice. Alltid ticket id som skal sendes.
 
 
             userTokenXml = tokenServiceClient.createAndLogonUser(fbUser, fbAccessToken, userCredential, userticket);

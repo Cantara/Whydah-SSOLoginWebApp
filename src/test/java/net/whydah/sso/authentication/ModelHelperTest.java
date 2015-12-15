@@ -1,6 +1,7 @@
 package net.whydah.sso.authentication;
 
 import net.whydah.sso.config.ApplicationMode;
+import net.whydah.sso.config.ModelHelper;
 import org.junit.Test;
 
 import java.util.Arrays;

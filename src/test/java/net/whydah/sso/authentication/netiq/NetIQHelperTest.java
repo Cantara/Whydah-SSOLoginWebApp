@@ -16,7 +16,7 @@ public class NetIQHelperTest {
 
     /**
      * Manual test.
-     * Update access usertoken and run.
+     * Update access tokenservice and run.
      */
     @Ignore
     @Test

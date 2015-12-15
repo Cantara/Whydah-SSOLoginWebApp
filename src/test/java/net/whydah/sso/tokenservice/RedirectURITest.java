@@ -1,4 +1,4 @@
-package net.whydah.sso.usertoken;
+package net.whydah.sso.tokenservice;
 
 import net.whydah.sso.config.ApplicationMode;
 import org.junit.BeforeClass;

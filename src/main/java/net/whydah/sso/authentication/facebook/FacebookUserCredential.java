@@ -6,6 +6,7 @@ import net.whydah.sso.authentication.UserCredential;
  * @author <a href="mailto:erik.drolshammer@altran.com">Erik Drolshammer</a>
  * @since 3/10/12
  */
+@Deprecated //  Use UserCredential in Typelib
 public class FacebookUserCredential implements UserCredential {
     private final String fbId;
     private final String username;

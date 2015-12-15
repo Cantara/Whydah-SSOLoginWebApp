@@ -1,7 +1,8 @@
-package net.whydah.sso.authentication.whydah;
+package net.whydah.sso.authentication;
 
 import net.whydah.sso.authentication.UserCredential;
 
+@Deprecated //  Use UserCredential in Typelib
 public class UserNameAndPasswordCredential implements UserCredential {
     private String userName;
     private String password;

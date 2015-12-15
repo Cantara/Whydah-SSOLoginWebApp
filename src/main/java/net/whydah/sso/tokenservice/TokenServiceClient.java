@@ -1,4 +1,4 @@
-package net.whydah.sso.usertoken;
+package net.whydah.sso.tokenservice;
 
 import com.restfb.types.User;
 import com.sun.jersey.api.client.Client;
@@ -7,17 +7,12 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.application.mappers.ApplicationCredentialMapper;
 import net.whydah.sso.application.types.ApplicationCredential;
-import net.whydah.sso.authentication.ModelHelper;
+import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.authentication.whydah.SessionHelper;
 import net.whydah.sso.user.helpers.UserHelper;
-import net.whydah.sso.user.mappers.UserTokenMapper;
-import net.whydah.sso.application.mappers.ApplicationMapper;
-import net.whydah.sso.commands.adminapi.application.CommandListApplications;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
-import net.whydah.sso.authentication.whydah.SSOLoginController;
-import net.whydah.sso.authentication.whydah.SSOLogoutController;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
@@ -76,7 +71,7 @@ public class TokenServiceClient {
         logonApplication();
         log.debug("getUserToken - Application logon OK. applicationTokenId={}. Log on with user credentials {}.", myAppTokenId, user.toString());
 
-        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/usertoken");
+        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/tokenservice");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("apptoken", myAppTokenXml);
         formData.add("usercredential", user.toXML());

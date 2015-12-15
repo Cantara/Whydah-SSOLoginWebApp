@@ -1,15 +1,16 @@
-package net.whydah.sso.authentication;
+package net.whydah.sso.config;
 
 import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.config.LoginTypes;
 import org.springframework.ui.Model;
 
 import java.io.IOException;
 
 public class ModelHelper {
 
-    static LoginTypes enabledLoginTypes;
+    public static LoginTypes enabledLoginTypes;
     public static final String USERTICKET = "userticket";
-    public static final String USERTOKEN = "usertoken";
+    public static final String USERTOKEN = "tokenservice";
     public static final String REALNAME = "realname";
     public static final String USER_TOKEN_ID = "usertokenid";
     public static final String PHONE_NUMBER = "phonenumber";

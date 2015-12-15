@@ -2,6 +2,7 @@ package net.whydah.sso.authentication.netiq;
 
 import net.whydah.sso.authentication.UserCredential;
 
+@Deprecated //  Use UserCredential in Typelib
 public class NetIQUserCredential implements UserCredential {
     private final String netiqId;
     private final String username;
