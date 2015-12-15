@@ -8,6 +8,7 @@ import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.user.types.UserTokenID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -59,14 +60,14 @@ public class SSOLoginController {
         String userTokenIdFromCookie = CookieManager.getUserTokenIdFromCookie(request);
         log.trace("login: redirectURI={}, SessionCheck={}, userTokenIdFromCookie={}", redirectURI, sessionCheckOnly, userTokenIdFromCookie);
 
-        WhydahUserTokenId whydahUserTokenId = WhydahUserTokenId.invalidTokenId();
+        UserTokenID whydahUserTokenId = UserTokenID.invalidTokenID();
         if ("logout".equalsIgnoreCase(userTokenIdFromCookie)) {
             log.info("userTokenId={} from cookie. TODO: should probably clear the logout cookie here?", userTokenIdFromCookie);
             CookieManager.clearUserTokenCookies(request, response);
             //usertokenId = WhydahUserTokenId.invalidTokenId();
         } else if (userTokenIdFromCookie != null && tokenServiceClient.verifyUserTokenId(userTokenIdFromCookie)) {
             log.trace("userTokenId={} from cookie verified OK.", userTokenIdFromCookie);
-            whydahUserTokenId = WhydahUserTokenId.fromTokenId(userTokenIdFromCookie);
+            whydahUserTokenId = UserTokenID.fromUserTokenID(userTokenIdFromCookie);
         } else {
             CookieManager.clearUserTokenCookies(request, response);
         }
