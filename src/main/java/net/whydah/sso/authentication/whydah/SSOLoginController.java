@@ -116,11 +116,12 @@ public class SSOLoginController {
                 log.trace("Welcome - Using userTicket");
                 userToken = tokenServiceClient.getUserTokenByUserTicket(userTicket);
                 model.addAttribute(ModelHelper.USERTICKET, userTicket);
-                model.addAttribute(ModelHelper.USER_TOKEN_ID, UserTokenXpathHelper.getUserTokenId(userToken));
+                model.addAttribute(ModelHelper.USERTOKEN, userToken);
             } else if (userTokenId != null && userTokenId.length() > 3) {
                 log.trace("Welcome - No userTicket, using userTokenID from cookie");
                 userToken = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
                 model.addAttribute(ModelHelper.USERTICKET, "No userTicket, using userTokenID");
+                model.addAttribute(ModelHelper.USERTOKEN, userToken);
                 model.addAttribute(ModelHelper.USER_TOKEN_ID, userTokenId);
             } else {
                 // TODO cleanup - this messes up the log for a normal case
