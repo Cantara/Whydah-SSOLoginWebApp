@@ -124,7 +124,8 @@ public class SSOLoginController {
                 model.addAttribute(ModelHelper.USER_TOKEN_ID, userTokenId);
             } else {
                 // TODO cleanup - this messes up the log for a normal case
-                throw new UnauthorizedException();
+                //throw new UnauthorizedException();
+                log.trace("Welcome - no session found");
             }
         } catch (Exception e){
             log.warn("welcome redirect - SecurityTokenException exception: ",e);
