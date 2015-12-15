@@ -6,6 +6,7 @@ import net.whydah.sso.user.mappers.UserTokenMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class SessionHelper {
     public static final String WHYDAH_VERSION = "version";
     public static final String CSRFtoken = "CSRFtoken";
 
+    public static final String DEFAULT_REDIRECT = "welcome";
 
     public static String getAppLinks() {
         return myAppLinks;
@@ -68,6 +70,22 @@ public class SessionHelper {
         }
     }
 
+    public static String getRedirectURI(HttpServletRequest request) {
+        String redirectURI = request.getParameter(SessionHelper.REDIRECT_URI);
+        //log.trace("getRedirectURI - redirectURI from request: {}", redirectURI);
+        if (redirectURI == null || redirectURI.length() < 1) {
+            log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
+            return DEFAULT_REDIRECT;
+        }
+        try {
+            // TODO  Implement RedirectURI verification/swap here (from AppLinks)
+
+            URI redirect = new URI(redirectURI);
+            return redirectURI;
+        } catch (Exception e) {
+            return DEFAULT_REDIRECT;
+        }
+    }
 
     public static boolean shouldUpdate() {
         int max = 100;
