@@ -5,6 +5,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.session.WhydahApplicationSession;
@@ -64,8 +66,10 @@ public class TokenServiceClient {
         if (ApplicationMode.DEV.equals(ApplicationMode.getApplicationMode())){
             return getDummyToken();
         }
-        log.debug("getUserToken - Application logon OK. applicationTokenId={}. Log on with user credentials {}.", was.getActiveApplicationTokenId(), user.toString());
-
+        if (true) {  // Command replacement
+            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, was.getActiveApplicationTokenId(), was.getActiveApplicationToken(), user.toXML(), userticket).execute();
+            return userToken;
+        }
         WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/tokenservice");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("apptoken", was.getActiveApplicationToken());
