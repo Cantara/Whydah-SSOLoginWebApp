@@ -36,7 +36,7 @@ public class TokenServiceClient {
     private final URI tokenServiceUri;
     private final URI userAdminServiceUri;
     private final Client tokenServiceClient = Client.create();
-    private static WhydahApplicationSession was;
+    private static WhydahApplicationSession was = null;
 
     public TokenServiceClient() {
 
@@ -52,7 +52,7 @@ public class TokenServiceClient {
             String applicationname = properties.getProperty("applicationname");
             String applicationsecret = properties.getProperty("applicationsecret");
 
-            if (was != null) {
+            if (was == null) {
                 was = new WhydahApplicationSession(properties.getProperty("securitytokenservice"), applicationid, applicationname, applicationsecret);
             }
         } catch (IOException e) {
