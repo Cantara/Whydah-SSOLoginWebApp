@@ -106,7 +106,7 @@ public class SSOLoginController {
     public String welcome(HttpServletRequest request, HttpServletResponse response,Model model) {
         String userTicket = request.getParameter(ModelHelper.USERTICKET);
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
-        String userToken;
+        String userToken = "";
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
         model.addAttribute(SessionHelper.WHYDAH_VERSION, whydahVersion);
