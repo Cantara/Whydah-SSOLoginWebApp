@@ -145,8 +145,8 @@ public class FacebookLoginController {
         String redirectURI = request.getParameter("fbauthURI");
         log.debug("fbauthURI from request: {}", redirectURI);
         if (redirectURI == null || redirectURI.length() < 4) {
-            log.warn("No fbauthURI found, setting to {}", SSOLoginController.DEFAULT_REDIRECT);
-            return SSOLoginController.DEFAULT_REDIRECT;
+            log.warn("No fbauthURI found, setting to {}", SessionHelper.DEFAULT_REDIRECT);
+            return SessionHelper.DEFAULT_REDIRECT;
         }
         return redirectURI;
     }
