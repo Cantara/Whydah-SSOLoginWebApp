@@ -1,4 +1,4 @@
-package net.whydah.sso.authentication.whydah;
+package net.whydah.sso.authentication;
 
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;

@@ -2,8 +2,8 @@ package net.whydah.sso.authentication.netiq;
 
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
-import net.whydah.sso.authentication.whydah.CookieManager;
-import net.whydah.sso.authentication.whydah.SessionHelper;
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;

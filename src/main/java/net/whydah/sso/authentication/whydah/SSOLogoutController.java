@@ -1,6 +1,8 @@
 package net.whydah.sso.authentication.whydah;
 
+import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.tokenservice.TokenServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

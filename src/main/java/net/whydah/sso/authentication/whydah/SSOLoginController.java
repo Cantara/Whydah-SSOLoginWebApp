@@ -1,12 +1,11 @@
 package net.whydah.sso.authentication.whydah;
 
 import net.whydah.sso.ServerRunner;
-import net.whydah.sso.authentication.UnauthorizedException;
-import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.authentication.*;
 import net.whydah.sso.config.ModelHelper;
-import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
+import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;

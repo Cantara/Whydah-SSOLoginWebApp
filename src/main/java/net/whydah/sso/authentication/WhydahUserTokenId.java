@@ -1,5 +1,6 @@
-package net.whydah.sso.authentication.whydah;
+package net.whydah.sso.authentication;
 
+@Deprecated  // use UserTokenID from TypeLib
 public class WhydahUserTokenId {
     private final String usertokenid;
 

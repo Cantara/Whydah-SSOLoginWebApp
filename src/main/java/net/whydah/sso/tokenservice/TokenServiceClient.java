@@ -8,7 +8,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.application.mappers.ApplicationCredentialMapper;
 import net.whydah.sso.application.types.ApplicationCredential;
 import net.whydah.sso.config.ModelHelper;
-import net.whydah.sso.authentication.whydah.SessionHelper;
+import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.user.helpers.UserHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;

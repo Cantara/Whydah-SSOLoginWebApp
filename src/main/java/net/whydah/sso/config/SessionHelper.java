@@ -1,4 +1,4 @@
-package net.whydah.sso.authentication.whydah;
+package net.whydah.sso.config;
 
 import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.commands.adminapi.application.CommandListApplications;

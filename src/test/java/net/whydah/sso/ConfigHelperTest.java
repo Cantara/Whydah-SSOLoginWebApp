@@ -1,6 +1,6 @@
 package net.whydah.sso;
 
-import net.whydah.sso.authentication.whydah.CookieManager;
+import net.whydah.sso.authentication.CookieManager;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
