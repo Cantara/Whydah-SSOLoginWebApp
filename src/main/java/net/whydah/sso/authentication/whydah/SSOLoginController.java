@@ -25,7 +25,6 @@ import java.util.UUID;
 
 @Controller
 public class SSOLoginController {
-    public static final String DEFAULT_REDIRECT = "welcome";
 
     private final static Logger log = LoggerFactory.getLogger(SSOLoginController.class);
     private final TokenServiceClient tokenServiceClient;
@@ -45,7 +44,7 @@ public class SSOLoginController {
 
     @RequestMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response,Model model) {
-        String redirectURI = getRedirectURI(request);
+        String redirectURI = SessionHelper.getRedirectURI(request);
         boolean sessionCheckOnly = isSessionCheckOnly(request);
 
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
@@ -75,7 +74,7 @@ public class SSOLoginController {
         if (whydahUserTokenId.isValid()) {
             log.trace("login - whydahUserTokenId={} is valid", whydahUserTokenId);
 
-            if (DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)){
+            if (SessionHelper.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)) {
                 log.trace("login - Did not find any sensible redirectURI, using /welcome");
                 model.addAttribute(SessionHelper.REDIRECT, redirectURI);
                 model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
@@ -152,7 +151,7 @@ public class SSOLoginController {
 
     @RequestMapping("/action")
     public String action(HttpServletRequest request, HttpServletResponse response, Model model) {
-        String redirectURI = getRedirectURI(request);
+        String redirectURI = SessionHelper.getRedirectURI(request);
         log.trace("action: redirectURI: {}", redirectURI);
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
@@ -222,22 +221,6 @@ public class SSOLoginController {
         }
         return true;
     }
-
-    private String getRedirectURI(HttpServletRequest request) {
-        String redirectURI = request.getParameter(SessionHelper.REDIRECT_URI);
-        //log.trace("getRedirectURI - redirectURI from request: {}", redirectURI);
-        if (redirectURI == null || redirectURI.length() < 1) {
-            log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
-            return DEFAULT_REDIRECT;
-        }
-        try {
-            URI redirect = new URI(redirectURI);
-            return redirectURI;
-        } catch (Exception e){
-            return  DEFAULT_REDIRECT;
-        }
-    }
-
 
 
     public static String trim(String input) {
