@@ -126,6 +126,10 @@ public class SSOLoginController {
                 // TODO cleanup - this messes up the log for a normal case
                 //throw new UnauthorizedException();
                 log.trace("Welcome - no session found");
+                CookieManager.clearUserTokenCookies(request, response);
+                ModelHelper.setEnabledLoginTypes(model);
+                model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+                return "login";
             }
         } catch (Exception e){
             log.warn("welcome redirect - SecurityTokenException exception: ",e);
