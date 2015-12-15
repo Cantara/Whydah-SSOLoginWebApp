@@ -68,6 +68,10 @@ public class TokenServiceClient {
         }
         if (true) {  // Command replacement
             String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, was.getActiveApplicationTokenId(), was.getActiveApplicationToken(), user.toXML(), userticket).execute();
+            log.debug("getUserToken - Log on returned with userToken {}", userToken);
+            if (userToken == null || userToken.length() < 7) {
+                return null;
+            }
             return userToken;
         }
         WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/tokenservice");
