@@ -5,10 +5,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import net.whydah.sso.application.mappers.ApplicationCredentialMapper;
-import net.whydah.sso.application.types.ApplicationCredential;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
+import net.whydah.sso.session.WhydahApplicationSession;
 import net.whydah.sso.user.helpers.UserHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
@@ -34,31 +33,26 @@ public class TokenServiceClient {
 
     private static final Logger log = LoggerFactory.getLogger(TokenServiceClient.class);
 
-    private final Client tokenServiceClient = Client.create();
-    private final URI userAdminServiceUri;
     private final URI tokenServiceUri;
-    private final String applicationid;
-    private final String applicationname;
-    private final String applicationsecret;
-
-    private String myAppTokenXml;
-    private String myAppTokenId;
+    private final URI userAdminServiceUri;
+    private final Client tokenServiceClient = Client.create();
+    private static WhydahApplicationSession was;
 
     public TokenServiceClient() {
 
         try {
             Properties properties = AppConfig.readProperties();
-
             // Property-overwrite of SSL verification to support weak ssl certificates
             if ("disabled".equalsIgnoreCase(properties.getProperty("sslverification"))) {
                 SSLTool.disableCertificateValidation();
-
             }
             this.tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
             this.userAdminServiceUri = UriBuilder.fromUri(properties.getProperty("useradminservice")).build();
-            this.applicationid = properties.getProperty("applicationid");
-            this.applicationname = properties.getProperty("applicationname");
-            this.applicationsecret= properties.getProperty("applicationsecret");
+            String applicationid = properties.getProperty("applicationid");
+            String applicationname = properties.getProperty("applicationname");
+            String applicationsecret = properties.getProperty("applicationsecret");
+
+            was = new WhydahApplicationSession(properties.getProperty("securitytokenservice"), applicationid, applicationname, applicationsecret);
         } catch (IOException e) {
             throw new IllegalArgumentException("Error constructing SSOHelper.", e);
         }
@@ -68,12 +62,11 @@ public class TokenServiceClient {
         if (ApplicationMode.DEV.equals(ApplicationMode.getApplicationMode())){
             return getDummyToken();
         }
-        logonApplication();
-        log.debug("getUserToken - Application logon OK. applicationTokenId={}. Log on with user credentials {}.", myAppTokenId, user.toString());
+        log.debug("getUserToken - Application logon OK. applicationTokenId={}. Log on with user credentials {}.", was.getActiveApplicationTokenId(), user.toString());
 
-        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/tokenservice");
+        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/tokenservice");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", myAppTokenXml);
+        formData.add("apptoken", was.getActiveApplicationToken());
         formData.add("usercredential", user.toXML());
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -84,7 +77,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
-            SessionHelper.updateApplinks(userAdminServiceUri, myAppTokenId, responseXML);
+            SessionHelper.updateApplinks(userAdminServiceUri, was.getActiveApplicationTokenId(), responseXML);
             return responseXML;
         }
 
@@ -105,13 +98,12 @@ public class TokenServiceClient {
 
 
     public boolean createTicketForUserTokenID(String userticket, String userTokenID){
-        logonApplication();
-        log.debug("createTicketForUserTokenID - apptokenid: {}", myAppTokenId);
+        log.debug("createTicketForUserTokenID - apptokenid: {}", was.getActiveApplicationTokenId());
         log.debug("createTicketForUserTokenID - userticket: {} userTokenID: {}", userticket, userTokenID);
 
-        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId  + "/create_userticket_by_usertokenid");
+        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/create_userticket_by_usertokenid");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", myAppTokenXml);
+        formData.add("apptoken", was.getActiveApplicationToken());
         formData.add("userticket", userticket);
         formData.add("usertokenid", userTokenID);
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
@@ -133,12 +125,11 @@ public class TokenServiceClient {
         if (ApplicationMode.DEV.equals(ApplicationMode.getApplicationMode())){
             return getDummyToken();
         }
-        logonApplication();
 
-        WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/get_usertoken_by_userticket");
+        WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/get_usertoken_by_userticket");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        log.trace("getUserTokenByUserTicket - ticket: {} apptoken: {}",userticket,myAppTokenXml);
-        formData.add("apptoken", myAppTokenXml);
+        log.trace("getUserTokenByUserTicket - ticket: {} apptoken: {}", userticket, was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationToken());
         formData.add("userticket", userticket);
         ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -148,7 +139,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("Response OK with XML: {}", responseXML);
-            SessionHelper.updateApplinks(userAdminServiceUri, myAppTokenId, responseXML);
+            SessionHelper.updateApplinks(userAdminServiceUri, was.getActiveApplicationTokenId(), responseXML);
             return responseXML;
         }
         //retry
@@ -167,11 +158,10 @@ public class TokenServiceClient {
         if (ApplicationMode.DEV.equals(ApplicationMode.getApplicationMode())) {
             return getDummyToken();
         }
-        logonApplication();
 
-        WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/get_usertoken_by_usertokenid");
+        WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/get_usertoken_by_usertokenid");
         MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", myAppTokenXml);
+        formData.add("apptoken", was.getActiveApplicationToken());
         formData.add("usertokenid", usertokenId);
         ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -180,7 +170,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("Response OK with XML: {}", responseXML);
-            SessionHelper.updateApplinks(userAdminServiceUri, myAppTokenId, responseXML);
+            SessionHelper.updateApplinks(userAdminServiceUri, was.getActiveApplicationTokenId(), responseXML);
             return responseXML;
         }
         //retry
@@ -197,8 +187,7 @@ public class TokenServiceClient {
 
     public void releaseUserToken(String userTokenId) {
         log.trace("Releasing userTokenId={}", userTokenId);
-        logonApplication();
-        WebResource releaseResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/release_usertoken");
+        WebResource releaseResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/release_usertoken");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add(ModelHelper.USER_TOKEN_ID, userTokenId);
         ClientResponse response = releaseResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
@@ -214,8 +203,7 @@ public class TokenServiceClient {
             log.trace("verifyUserTokenId - Called with bogus usertokenid={}. return false",usertokenid);
             return false;
         }
-        logonApplication();
-        WebResource verifyResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid);
+        WebResource verifyResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/validate_usertokenid/" + usertokenid);
         ClientResponse response = verifyResource.get(ClientResponse.class);
         if (response.getStatus() == OK.getStatusCode()) {
             log.debug("verifyUserTokenId - usertokenid validated OK");
@@ -227,23 +215,21 @@ public class TokenServiceClient {
         }
         //retry
         log.info("verifyUserTokenId - retrying usertokenid ");
-        logonApplication();
         response = verifyResource.get(ClientResponse.class);
         boolean bolRes = response.getStatus() == OK.getStatusCode();
-        log.debug("verifyUserTokenId - validate_usertokenid {}  result {}","user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid, response);
+        log.debug("verifyUserTokenId - validate_usertokenid {}  result {}", "user/" + was.getActiveApplicationTokenId() + "/validate_usertokenid/" + usertokenid, response);
         return bolRes;
     }
 
     public String createAndLogonUser(User fbUser, String fbAccessToken, UserCredential userCredential, String userticket) {
-        logonApplication();
-        log.debug("apptokenid: {}", myAppTokenId);
+        log.debug("apptokenid: {}", was.getActiveApplicationTokenId());
 
 
-        WebResource createUserResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId +"/"+ userticket + "/create_user");
+        WebResource createUserResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/create_user");
         log.trace("createUserResource:"+createUserResource.toString());
 
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", myAppTokenXml);
+        formData.add("apptoken", was.getActiveApplicationToken());
         formData.add("usercredential", userCredential.toXML());
         String facebookUserAsXml = FacebookHelper.getFacebookUserAsXml(fbUser, fbAccessToken);
         formData.add("fbuser", facebookUserAsXml);
@@ -260,7 +246,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
-            SessionHelper.updateApplinks(userAdminServiceUri, myAppTokenId, responseXML);
+            SessionHelper.updateApplinks(userAdminServiceUri, was.getActiveApplicationTokenId(), responseXML);
             return responseXML;
         }
 
@@ -278,15 +264,14 @@ public class TokenServiceClient {
     }
 
     public String createAndLogonUser(String netiqUserName, String netiqAccessToken, UserCredential userCredential, String userticket,HttpServletRequest request) {
-        logonApplication();
-        log.debug("createAndLogonUser - apptokenid: {}", myAppTokenId);
+        log.debug("createAndLogonUser - apptokenid: {}", was.getActiveApplicationTokenId());
 
-        WebResource createUserResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId +"/"+ userticket + "/create_user");
+        WebResource createUserResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/create_user");
         log.debug("createUserResource:"+createUserResource.toString());
 
 
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", myAppTokenXml);
+        formData.add("apptoken", was.getActiveApplicationToken());
         formData.add("usercredential", userCredential.toXML());
         NetIQHelper helper = new NetIQHelper();
         String netIQUserAsXml = helper.getNetIQUserAsXml(request);
@@ -304,7 +289,7 @@ public class TokenServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
-            SessionHelper.updateApplinks(userAdminServiceUri, myAppTokenId, responseXML);
+            SessionHelper.updateApplinks(userAdminServiceUri, was.getActiveApplicationTokenId(), responseXML);
             return responseXML;
         }
 
@@ -321,32 +306,6 @@ public class TokenServiceClient {
         //throw new RuntimeException("createAndLogonUser failed with status code " + response.getStatus());
     }
 
-    private void logonApplication() {
-        //todo sjekke om myAppTokenXml er gyldig før reauth
-        WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        ApplicationCredential appCredential = new ApplicationCredential(applicationid, applicationname, applicationsecret);
-
-
-        formData.add("applicationcredential", ApplicationCredentialMapper.toXML(appCredential));
-        ClientResponse response;
-        try {
-            response = logonResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
-        } catch (RuntimeException e) {
-            log.error("logonApplication - Problem connecting to {}", logonResource.toString());
-            throw(e);
-        }
-        //todo håndtere feil i statuskode + feil ved app-pålogging (retry etc)
-        if (response.getStatus() != 200) {
-            log.error("Application authentication failed with {} {}. applicationid={}, path={}",
-                    response.getClientResponseStatus().getStatusCode(), response.getClientResponseStatus().getReasonPhrase(), applicationid, logonResource.getURI());
-            throw new RuntimeException("Application authentication failed");
-        }
-        myAppTokenXml = response.getEntity(String.class);
-        myAppTokenId = UserTokenXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
-        log.debug("Applogon ok: apptokenxml: {}", myAppTokenXml);
-        log.debug("myAppTokenId: {}", myAppTokenId);
-    }
 
     public static  String getDummyToken(){
         return UserHelper.getDummyUserToken();
@@ -366,13 +325,10 @@ public class TokenServiceClient {
         return sb.toString();
     }
 
-    public String getMyAppTokenID(){
-        if (myAppTokenId == null){
-            logonApplication();
-        }
-        return myAppTokenId;
-    }
 
+    public static String getMyAppTokenID() {
+        return was.getActiveApplicationTokenId();
+    }
 
     public static Integer calculateTokenRemainingLifetimeInSeconds(String userTokenXml) {
         Integer tokenLifespanMs = UserTokenXpathHelper.getLifespan(userTokenXml);
