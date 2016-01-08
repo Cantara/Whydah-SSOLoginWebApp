@@ -95,6 +95,16 @@ public class SSOLoginController {
                 return "action";
             }
         }
+
+        // Added return is sessioncheck only and no cookie found
+        if (isSessionCheckOnly(request)) {
+            // Action use redirect - not redirectURI
+            model.addAttribute(SessionHelper.REDIRECT, redirectURI);
+            log.info("login - isSessionCheckOnly - Redirecting to {}", redirectURI);
+            return "action";
+
+        } 
+
         ModelHelper.setEnabledLoginTypes(model);
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         return "login";
