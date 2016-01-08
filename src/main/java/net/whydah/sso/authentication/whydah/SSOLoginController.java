@@ -47,10 +47,12 @@ public class SSOLoginController {
     public String login(HttpServletRequest request, HttpServletResponse response,Model model) {
         String redirectURI = SessionHelper.getRedirectURI(request);
         boolean sessionCheckOnly = isSessionCheckOnly(request);
+        model.addAttribute(SessionHelper.SESSIONCHECK, sessionCheckOnly);
 
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
         model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+
 
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         CookieManager.addSecurityHTTPHeaders(response);

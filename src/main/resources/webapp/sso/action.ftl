@@ -11,10 +11,17 @@
 </head>
 <body>
     <div id="page-content">
+    <#if SessionCheck != true>
+
         <div id="logo">
             <img src="${logoURL}" alt="Site logo"/>
             <h2>Redirecting to ${redirect!"/sso/welcome"}</h2>
         </div>
+    </#if>
+    <#if SessionCheck == true>
+    </#if>
+
+    </div>
     </div>
 </body>
 </html>
