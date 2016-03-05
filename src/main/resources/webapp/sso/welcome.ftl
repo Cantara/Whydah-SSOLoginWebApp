@@ -54,11 +54,11 @@
                  <tr/>
                   <tr>
                        <td> <strong>CRM Customer data:</strong> </td>
-                       <td> ${CRMcustomer!No referenced customer found or no CRMService confugured} </td>
+                       <td> ${CRMcustomer!"No referenced customer found or no CRMService confugured"} </td>
                   <tr/>
                   <tr>
                        <td> <strong>Whydah activity data:</strong> </td>
-                       <td> ${useractivities!No statistics service configured} </td>
+                       <td> ${useractivities!"No statistics service configured"} </td>
                   <tr/>
              </table>
             <br/>
