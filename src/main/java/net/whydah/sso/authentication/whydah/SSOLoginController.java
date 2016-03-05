@@ -254,7 +254,7 @@ public class SSOLoginController {
         if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
             try {
                 URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
-                String userid = UserTokenXpathHelper.getEmail(userToken);
+                String userid = UserTokenXpathHelper.getUserID(userToken);
                 String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
                 model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
             } catch (Exception e) {
