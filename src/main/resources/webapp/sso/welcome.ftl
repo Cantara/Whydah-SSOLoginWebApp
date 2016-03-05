@@ -51,12 +51,21 @@
                       <td> <strong>Email:</strong> </td>
                       <td> ${email!"Whydah email"} </td>
                  <tr/>
-            </table>
+                 <tr/>
+                  <tr>
+                       <td> <strong>CRM Customer data:</strong> </td>
+                       <td> ${CRMcustomer!No referenced customer found or no CRMService confugured} </td>
+                  <tr/>
+                  <tr>
+                       <td> <strong>Whydah activity data:</strong> </td>
+                       <td> ${useractivities!No statistics service configured} </td>
+                  <tr/>
+             </table>
             <br/>
             <br/>
             <br/>
 
-            <h3>Your session</h3>
+            <h3>Your whydah session</h3>
             <table id="profile">
                  <tr>
                       <td> <strong>User session security level:</strong> </td>
@@ -65,15 +74,6 @@
                  <tr>
                       <td> <strong>Whydah threat level:</strong> </td>
                       <td> ${defcon!} </td>
-                 <tr/>
-                 <tr>
-                      <td> <strong>CRM Customer data:</strong> </td>
-                      <td> ${CRMcustomer!No referenced customer found or no CRMService confugured} </td>
-                 <tr/>
-                 <tr>
-                      <td> <strong>Whydah activity data:</strong> </td>
-                      <td> ${useractivities!No statistics service configured} </td>
-                 <tr/>
             </table>
             <br/>
             <br/>
