@@ -68,7 +68,7 @@
                  <tr/>
                  <tr>
                       <td> <strong>CRM Customer data:</strong> </td>
-                      <td> ${CRMcustomer!Not referenced customer found or no CRMService confugured} </td>
+                      <td> ${CRMcustomer!No referenced customer found or no CRMService confugured} </td>
                  <tr/>
                  <tr>
                       <td> <strong>Whydah activity data:</strong> </td>
