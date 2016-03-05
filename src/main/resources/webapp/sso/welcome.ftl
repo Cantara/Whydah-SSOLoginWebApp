@@ -59,7 +59,7 @@
             <h3>Your session</h3>
             <table id="profile">
                  <tr>
-                      <td> <strong>Session security level:</strong> </td>
+                      <td> <strong>User session security level:</strong> </td>
                       <td> ${securitylevel!} </td>
                  <tr/>
                  <tr>
@@ -67,12 +67,12 @@
                       <td> ${defcon!} </td>
                  <tr/>
                  <tr>
-                      <td> <strong>CRM Custemer data:</strong> </td>
-                      <td> ${CRMcustomer!} </td>
+                      <td> <strong>CRM Customer data:</strong> </td>
+                      <td> ${CRMcustomer!Not referenced customer found or no CRMService confugured} </td>
                  <tr/>
                  <tr>
                       <td> <strong>Whydah activity data:</strong> </td>
-                      <td> ${useractivities!} </td>
+                      <td> ${useractivities!No statistics service configured} </td>
                  <tr/>
             </table>
             <br/>
