@@ -1,7 +1,9 @@
 package net.whydah.sso.authentication.whydah;
 
+import com.sun.jndi.toolkit.url.Uri;
 import net.whydah.sso.ServerRunner;
 import net.whydah.sso.authentication.*;
+import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -32,6 +35,9 @@ public class SSOLoginController {
     private String LOGOURL = "/sso/images/site-logo.png";
     private String whydahVersion = ServerRunner.version;
 
+    private String crmservice;
+    private String reportservice;
+
     //private final int MIN_REDIRECT_SIZE=4;
     //private final ModelHelper modelHelper = new ModelHelper(this);
 
@@ -39,6 +45,8 @@ public class SSOLoginController {
     public SSOLoginController() throws IOException {
         Properties properties = AppConfig.readProperties();
         LOGOURL = properties.getProperty("logourl");
+        crmservice = properties.getProperty("crmservice");
+        reportservice = properties.getProperty("reportservice");
         this.tokenServiceClient = new TokenServiceClient();
     }
 
@@ -159,7 +167,21 @@ public class SSOLoginController {
         model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userToken));
         model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userToken));
         model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userToken));
+        addCrmCustomer(model, userToken);
         return "welcome";
+    }
+
+    private void addCrmCustomer(Model model, String userToken) {
+        if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
+            try {
+                URI crmServiceUri = UriBuilder.fromUri(crmservice).build();
+                String personref = UserTokenXpathHelper.getPersonref(userToken);
+                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, "", "", personref).execute();
+                model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
+            } catch (Exception e) {
+
+            }
+        }
     }
 
     @RequestMapping("/action")
@@ -203,6 +225,7 @@ public class SSOLoginController {
             model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
             model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
             model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userTokenXml));
+            addCrmCustomer(model, userTokenXml);
             return "welcome";
         }
 

@@ -11,6 +11,8 @@ public class ModelHelper {
     public static LoginTypes enabledLoginTypes;
     public static final String USERTICKET = "userticket";
     public static final String USERTOKEN = "usertoken";
+    public static final String CRMCUSTOMER = "CRMcustomer";
+    public static final String CUSTOMERACTIVITIES = "customeractivities";
     public static final String REALNAME = "realname";
     public static final String USER_TOKEN_ID = "usertokenid";
     public static final String PHONE_NUMBER = "phonenumber";
