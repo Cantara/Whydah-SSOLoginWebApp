@@ -66,6 +66,14 @@
                       <td> <strong>Whydah threat level:</strong> </td>
                       <td> ${defcon!} </td>
                  <tr/>
+                 <tr>
+                      <td> <strong>CRM Custemer data:</strong> </td>
+                      <td> ${CRMcustomer!} </td>
+                 <tr/>
+                 <tr>
+                      <td> <strong>Whydah activity data:</strong> </td>
+                      <td> ${customeractivities!} </td>
+                 <tr/>
             </table>
             <br/>
             <br/>
