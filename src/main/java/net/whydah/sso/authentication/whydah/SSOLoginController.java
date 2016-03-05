@@ -1,9 +1,9 @@
 package net.whydah.sso.authentication.whydah;
 
-import com.sun.jndi.toolkit.url.Uri;
 import net.whydah.sso.ServerRunner;
 import net.whydah.sso.authentication.*;
 import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
+import net.whydah.sso.commands.extensions.statistics.CommandListUserLogins;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
@@ -168,21 +168,10 @@ public class SSOLoginController {
         model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userToken));
         model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userToken));
         addCrmCustomer(model, userToken);
+        addUserActivities(model, userToken);
         return "welcome";
     }
 
-    private void addCrmCustomer(Model model, String userToken) {
-        if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
-            try {
-                URI crmServiceUri = UriBuilder.fromUri(crmservice).build();
-                String personref = UserTokenXpathHelper.getPersonref(userToken);
-                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, "", "", personref).execute();
-                model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
-            } catch (Exception e) {
-
-            }
-        }
-    }
 
     @RequestMapping("/action")
     public String action(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -226,6 +215,7 @@ public class SSOLoginController {
             model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
             model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userTokenXml));
             addCrmCustomer(model, userTokenXml);
+            addUserActivities(model, userTokenXml);
             return "welcome";
         }
 
@@ -245,6 +235,32 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         log.info("action - Redirecting to {}", redirectURI);
         return "action";
+    }
+
+    private void addCrmCustomer(Model model, String userToken) {
+        if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
+            try {
+                URI crmServiceUri = UriBuilder.fromUri(crmservice).build();
+                String personref = UserTokenXpathHelper.getPersonref(userToken);
+                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, "", "", personref).execute();
+                model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    private void addUserActivities(Model model, String userToken) {
+        if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
+            try {
+                URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
+                String userid = UserTokenXpathHelper.getEmail(userToken);
+                String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
+                model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
+            } catch (Exception e) {
+
+            }
+        }
     }
 
 

@@ -72,7 +72,7 @@
                  <tr/>
                  <tr>
                       <td> <strong>Whydah activity data:</strong> </td>
-                      <td> ${customeractivities!} </td>
+                      <td> ${useractivities!} </td>
                  <tr/>
             </table>
             <br/>
