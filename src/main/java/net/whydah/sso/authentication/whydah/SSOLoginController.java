@@ -251,7 +251,7 @@ public class SSOLoginController {
     }
 
     private void addUserActivities(Model model, String userToken) {
-        if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
+        if (UserTokenXpathHelper.getUserID(userToken).length() > 2) {
             try {
                 URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
                 String userid = UserTokenXpathHelper.getUserID(userToken);
