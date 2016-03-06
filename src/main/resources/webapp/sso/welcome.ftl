@@ -58,7 +58,7 @@
                   <tr/>
                   <tr>
                        <td> <strong>Whydah activity data:</strong> </td>
-                       <td> ${useractivities!"No Whydah StatisticsService configured"} </td>
+                       <td> ${useractivities!"No Whydah StatisticsService configured or StatisticsService is down. "} </td>
                   <tr/>
              </table>
             <br/>
