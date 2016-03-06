@@ -3,6 +3,7 @@ package net.whydah.sso.authentication.whydah;
 import net.whydah.sso.ServerRunner;
 import net.whydah.sso.authentication.*;
 import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
+import net.whydah.sso.commands.extensions.statistics.CommandListUserActivities;
 import net.whydah.sso.commands.extensions.statistics.CommandListUserLogins;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.AppConfig;
@@ -255,7 +256,8 @@ public class SSOLoginController {
             try {
                 URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
                 String userid = UserTokenXpathHelper.getUserID(userToken);
-                String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
+                String userActivitiesJson = new CommandListUserActivities(reportServiceUri, "", "", userid).execute();
+//                String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
                 model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
             } catch (Exception e) {
 
