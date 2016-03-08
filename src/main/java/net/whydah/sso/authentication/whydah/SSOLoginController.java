@@ -257,10 +257,11 @@ public class SSOLoginController {
             try {
                 URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
                 String userid = UserTokenXpathHelper.getUserID(userToken);
+
                 String userActivitiesJson = new CommandListUserActivities(reportServiceUri, "", "", userid).execute();
 //                String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
                 model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
-                model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson));
+                model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
             } catch (Exception e) {
 
             }
