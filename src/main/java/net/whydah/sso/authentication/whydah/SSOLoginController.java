@@ -9,6 +9,7 @@ import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.SessionHelper;
+import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
 import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserTokenID;
@@ -259,6 +260,7 @@ public class SSOLoginController {
                 String userActivitiesJson = new CommandListUserActivities(reportServiceUri, "", "", userid).execute();
 //                String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
                 model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
+                model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson));
             } catch (Exception e) {
 
             }
