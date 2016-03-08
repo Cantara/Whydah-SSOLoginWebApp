@@ -57,7 +57,7 @@
                        <td> ${CRMcustomer!"No referenced customer found or no Whydah CRMService configured"} </td>
                   <tr/>
                   <tr>
-                       <td> <strong>Whydah activity data:</strong> </td>
+                       <td> <strong>Your latest Whydah application activity:</strong> </td>
                        <td> ${useractivities_simple!"No Whydah StatisticsService configured or StatisticsService is down. "} </td>
                   <tr/>
              </table>
