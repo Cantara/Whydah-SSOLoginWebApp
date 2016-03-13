@@ -51,18 +51,18 @@ public class PasswordChangeController {
         log.trace("resetpassword was called");
         resetPasswordRequests.mark();
         model.addAttribute("logoURL", LOGOURL);
-        String user = request.getParameter("username");
-        if (user == null) {
+        String username = request.getParameter("username");
+        if (username == null) {
             return "resetpassword";
         }
 
         model.addAttribute("logoURL", LOGOURL);
-        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + user);
+        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + username);
         ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
             String error = response.getEntity(String.class);
             log.error(error);
-            model.addAttribute("error", error + "\nusername:" + user);
+            model.addAttribute("error", error + "\nusername:" + username);
             return "resetpassword";
         }
         return "resetpassworddone";
