@@ -22,8 +22,8 @@
 
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah-typelib-version>1.2.1</whydah-typelib-version>
-        <whydah-sdk-version>2.1.64</whydah-sdk-version>
+        <whydah-typelib-version>1.2.2</whydah-typelib-version>
+        <whydah-sdk-version>2.1.65</whydah-sdk-version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.0.6.RELEASE</spring.version>
         <org.springframework.security-version>3.2.0.RELEASE</org.springframework.security-version>
