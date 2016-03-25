@@ -50,7 +50,7 @@ public class FacebookLoginController {
         if (!ModelHelper.isEnabled(ModelHelper.FACEBOOKLOGINENABLED)) {
             return "login";
         }
-        String clientRedirectURI = request.getParameter("redirectURI");
+        String clientRedirectURI = sanitize(request.getParameter("redirectURI"));
         String facebookLoginUrl = FacebookHelper.getFacebookLoginUrl(clientRedirectURI, fbauthURI);
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute("redirect", facebookLoginUrl);
@@ -150,4 +150,14 @@ public class FacebookLoginController {
         }
         return redirectURI;
     }
+
+    public static String sanitize(String string) {
+        return string
+                .replaceAll("%3c%2fnoscript%3e", "")   // case 1
+                .replaceAll("%2fscript%3e", "")   // case 1
+                .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
+                .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
+                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
+    }
+
 }
