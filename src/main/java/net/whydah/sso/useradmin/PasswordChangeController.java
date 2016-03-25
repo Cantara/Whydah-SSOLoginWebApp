@@ -51,7 +51,7 @@ public class PasswordChangeController {
         log.trace("resetpassword was called");
         resetPasswordRequests.mark();
         model.addAttribute("logoURL", LOGOURL);
-        String username = request.getParameter("username");
+        String username = sanitize(request.getParameter("username"));
         if (username == null) {
             return "resetpassword";
         }
@@ -113,6 +113,15 @@ public class PasswordChangeController {
         String path = request.getPathInfo();
         String tokenString = path.substring(path.lastIndexOf('/') + 1);
         return new PasswordChangeToken(tokenString);
+    }
+
+    public static String sanitize(String string) {
+        return string
+                .replaceAll("%3c%2fnoscript%3e", "")   // case 1
+                .replaceAll("%2fscript%3e", "")   // case 1
+                .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
+                .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
+                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
     }
 
 }
