@@ -153,8 +153,8 @@ public class FacebookLoginController {
 
     public static String sanitize(String string) {
         return string
-                .replaceAll("%3c%2fnoscript%3e", "")   // case 1
-                .replaceAll("%2fscript%3e", "")   // case 1
+                .replaceAll("(?i)%3c%2fnoscript%3e", "")   // case 1
+                .replaceAll("(?i)%2fscript%3e", "")   // case 1
                 .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
                 .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
                 .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
