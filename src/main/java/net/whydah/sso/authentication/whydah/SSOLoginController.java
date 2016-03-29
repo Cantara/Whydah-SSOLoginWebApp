@@ -265,7 +265,7 @@ public class SSOLoginController {
                 String userid = UserTokenXpathHelper.getUserID(userToken);
 
                 String userActivitiesJson = new CommandListUserActivities(reportServiceUri, "", "", userid).execute();
-                model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
+                //    model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
                 model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
             } catch (Exception e) {
 
