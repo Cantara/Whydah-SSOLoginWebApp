@@ -13,6 +13,7 @@ import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
 import net.whydah.sso.tokenservice.TokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserTokenID;
+import net.whydah.sso.util.SSLTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -239,12 +240,17 @@ public class SSOLoginController {
         return "action";
     }
 
+
     private void addCrmCustomer(Model model, String userToken) {
         if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
             try {
                 URI crmServiceUri = UriBuilder.fromUri(crmservice).build();
-                String personref = UserTokenXpathHelper.getPersonref(userToken);
-                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, "", "", personref).execute();
+                String personRef = net.whydah.sso.user.helpers.UserTokenXpathHelper.getPersonref(userToken);
+                Properties properties = AppConfig.readProperties();
+                String appTokenId = properties.getProperty("applicationid");
+                String adminUserTokenId = properties.getProperty("applicationsecret");
+
+                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, appTokenId, adminUserTokenId, personRef).execute();
                 model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
             } catch (Exception e) {
 
@@ -259,7 +265,6 @@ public class SSOLoginController {
                 String userid = UserTokenXpathHelper.getUserID(userToken);
 
                 String userActivitiesJson = new CommandListUserActivities(reportServiceUri, "", "", userid).execute();
-//                String userActivitiesJson = new CommandListUserLogins(reportServiceUri, "", "", userid).execute();
                 model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
                 model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
             } catch (Exception e) {
