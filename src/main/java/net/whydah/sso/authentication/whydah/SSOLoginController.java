@@ -129,7 +129,7 @@ public class SSOLoginController {
     public String welcome(HttpServletRequest request, HttpServletResponse response,Model model) {
         String userTicket = request.getParameter(ModelHelper.USERTICKET);
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
-        String userToken = "";
+        String userTokenXml = "";
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
         model.addAttribute(SessionHelper.WHYDAH_VERSION, whydahVersion);
@@ -137,14 +137,14 @@ public class SSOLoginController {
         try {
             if (userTicket != null && userTicket.length() > 3) {
                 log.trace("Welcome - Using userTicket");
-                userToken = tokenServiceClient.getUserTokenByUserTicket(userTicket);
+                userTokenXml = tokenServiceClient.getUserTokenByUserTicket(userTicket);
                 model.addAttribute(ModelHelper.USERTICKET, userTicket);
-                model.addAttribute(ModelHelper.USERTOKEN, userToken);
+                model.addAttribute(ModelHelper.USERTOKEN, userTokenXml);
             } else if (userTokenId != null && userTokenId.length() > 3) {
                 log.trace("Welcome - No userTicket, using userTokenID from cookie");
-                userToken = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
+                userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
                 model.addAttribute(ModelHelper.USERTICKET, "No userTicket, using userTokenID");
-                model.addAttribute(ModelHelper.USERTOKEN, userToken);
+                model.addAttribute(ModelHelper.USERTOKEN, userTokenXml);
                 model.addAttribute(ModelHelper.USER_TOKEN_ID, userTokenId);
             } else {
                 // TODO cleanup - this messes up the log for a normal case
@@ -162,16 +162,17 @@ public class SSOLoginController {
             model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
-        model.addAttribute(ModelHelper.USERTOKEN, trim(userToken));
+        model.addAttribute(ModelHelper.USERTOKEN, trim(userTokenXml));
         model.addAttribute(SessionHelper.APP_LINKS, SessionHelper.getAppLinks());
         log.trace("embedded applinks: " + SessionHelper.getAppLinks());
-        model.addAttribute(ModelHelper.REALNAME, UserTokenXpathHelper.getRealName(userToken));
-        model.addAttribute(ModelHelper.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userToken));
-        model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userToken));
-        model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userToken));
-        model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userToken));
-        addCrmCustomer(model, userToken);
-        addUserActivities(model, userToken);
+        model.addAttribute(ModelHelper.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
+        model.addAttribute(ModelHelper.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
+        model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
+        model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
+        model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userTokenXml));
+        model.addAttribute(ModelHelper.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
+        addCrmCustomer(model, userTokenXml);
+        addUserActivities(model, userTokenXml);
         return "welcome";
     }
 
@@ -217,6 +218,7 @@ public class SSOLoginController {
             model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
             model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
             model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userTokenXml));
+            model.addAttribute(ModelHelper.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
             addCrmCustomer(model, userTokenXml);
             addUserActivities(model, userTokenXml);
             return "welcome";
