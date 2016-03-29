@@ -260,13 +260,13 @@ public class SSOLoginController {
         }
     }
 
-    private void addUserActivities(Model model, String userToken) {
-        if (UserTokenXpathHelper.getUserID(userToken).length() > 2) {
+    private void addUserActivities(Model model, String userTokenXml) {
+        if (UserTokenXpathHelper.getUserID(userTokenXml).length() > 2) {
             try {
                 URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
-                String userid = UserTokenXpathHelper.getUserID(userToken);
-
-                String userActivitiesJson = new CommandListUserActivities(reportServiceUri, "", "", userid).execute();
+                String userid = UserTokenXpathHelper.getUserID(userTokenXml);
+                String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
+                String userActivitiesJson = new CommandListUserActivities(reportServiceUri, TokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
                 //    model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
                 model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
             } catch (Exception e) {
