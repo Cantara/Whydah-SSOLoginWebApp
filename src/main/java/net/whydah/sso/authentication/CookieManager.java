@@ -43,7 +43,7 @@ public class CookieManager {
         response.setHeader("X-Permitted-Cross-Domain-Policies", "master-only");
     }
 
-        public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds,HttpServletRequest request, HttpServletResponse response) {
+    public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds, HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = new Cookie(USER_TOKEN_REFERENCE_NAME, userTokenId);
         cookie.setValue(userTokenId);
 
@@ -55,7 +55,7 @@ public class CookieManager {
         if (cookiedomain != null && !cookiedomain.isEmpty()) {
             cookie.setDomain(cookiedomain);
         }
-        cookie.setPath("/");
+        cookie.setPath("/ ; HttpOnly;");
         if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
             cookie.setSecure(true);
         }
@@ -80,7 +80,8 @@ public class CookieManager {
             if (cookiedomain != null && !cookiedomain.isEmpty()) {
                 cookie.setDomain(cookiedomain);
             }
-            cookie.setPath("/");
+            cookie.setPath("/ ; HttpOnly;");
+
             if ("https".equalsIgnoreCase(request.getScheme())) {
                 cookie.setSecure(true);
             } else {
