@@ -67,7 +67,7 @@ public class TokenServiceClient {
             return getDummyToken();
         }
         if (true) {  // Command replacement
-            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, was.getActiveApplicationTokenId(), was.getActiveApplicationToken(), user.toXML(), userticket).execute();
+            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, was.getActiveApplicationTokenId(), was.getActiveApplicationTokenXML(), user.toXML(), userticket).execute();
             log.debug("getUserToken - Log on returned with userToken {}", userToken);
             if (userToken == null || userToken.length() < 7) {
                 return null;
@@ -76,7 +76,7 @@ public class TokenServiceClient {
         }
         WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/tokenservice");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("usercredential", user.toXML());
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -113,7 +113,7 @@ public class TokenServiceClient {
 
         WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/create_userticket_by_usertokenid");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("userticket", userticket);
         formData.add("usertokenid", userTokenID);
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
@@ -139,7 +139,7 @@ public class TokenServiceClient {
         WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/get_usertoken_by_userticket");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         log.trace("getUserTokenByUserTicket - ticket: {} apptoken: {}", userticket, was.getActiveApplicationToken());
-        formData.add("apptoken", was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("userticket", userticket);
         ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -171,7 +171,7 @@ public class TokenServiceClient {
 
         WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/get_usertoken_by_usertokenid");
         MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("usertokenid", usertokenId);
         ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -239,7 +239,7 @@ public class TokenServiceClient {
         log.trace("createUserResource:"+createUserResource.toString());
 
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("usercredential", userCredential.toXML());
         String facebookUserAsXml = FacebookHelper.getFacebookUserAsXml(fbUser, fbAccessToken);
         formData.add("fbuser", facebookUserAsXml);
@@ -281,7 +281,7 @@ public class TokenServiceClient {
 
 
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", was.getActiveApplicationToken());
+        formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("usercredential", userCredential.toXML());
         NetIQHelper helper = new NetIQHelper();
         String netIQUserAsXml = helper.getNetIQUserAsXml(request);
