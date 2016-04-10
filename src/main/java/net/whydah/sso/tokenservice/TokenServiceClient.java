@@ -6,6 +6,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.commands.userauth.CommandGetUsertokenByUserticket;
 import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
@@ -138,7 +139,7 @@ public class TokenServiceClient {
 
         WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/get_usertoken_by_userticket");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        log.trace("getUserTokenByUserTicket - ticket: {} apptoken: {}", userticket, was.getActiveApplicationToken());
+        log.trace("getUserTokenByUserTicket - ticket: {} apptoken: {}", userticket, was.getActiveApplicationTokenXML());
         formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("userticket", userticket);
         ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
