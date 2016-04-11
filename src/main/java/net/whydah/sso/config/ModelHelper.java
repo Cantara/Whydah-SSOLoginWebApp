@@ -22,6 +22,7 @@ public class ModelHelper {
     public static final String EMAIL = "email";
     public static final String DEFCON = "defcon";
     public static final String PERSON_REF = "personRef";
+    public static final String JSON_DATA = "jsondata";
 
     public static final String FACEBOOKLOGINENABLED = "facebookLoginEnabled";
     public static final String NETIQLOGINENABLED = "netIQLoginEnabled";

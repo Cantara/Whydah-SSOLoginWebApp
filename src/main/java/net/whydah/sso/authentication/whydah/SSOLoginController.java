@@ -254,6 +254,7 @@ public class SSOLoginController {
 
                 String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, appTokenId, adminUserTokenId, personRef).execute();
                 model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
+                model.addAttribute(ModelHelper.JSON_DATA, crmCustomerJson);
             } catch (Exception e) {
 
             }
