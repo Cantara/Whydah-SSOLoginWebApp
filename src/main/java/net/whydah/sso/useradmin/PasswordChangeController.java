@@ -116,6 +116,9 @@ public class PasswordChangeController {
     }
 
     public static String sanitize(String string) {
+        if (string == null || string.length() < 3) {
+            return string;
+        }
         return string
                 .replaceAll("(?i)%3c%2fnoscript%3e", "")   // case 1
                 .replaceAll("(?i)%2fscript%3e", "")   // case 1
