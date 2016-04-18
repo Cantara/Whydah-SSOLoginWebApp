@@ -59,15 +59,15 @@
 
                                     <label>Telefon</label>
                                     <ol class="list-group">
-                                    <#list customer.phonenumbers?keys as phoneKey>
+                                    <#list CRMcustomer.phonenumbers?keys as phoneKey>
                                         <li class="list-group-item">
                                             <label for="${phoneKey}_defaultPhoneLabel"><span class="label label-info">${phoneKey}</span></label>
-                                            <#if !customer.phonenumbers[phoneKey].verified><span class="glyphicon glyphicon-warning-sign text-danger" title="Ikke bekreftet"></span></#if>
+                                            <#if !CRMcustomer.phonenumbers[phoneKey].verified><span class="glyphicon glyphicon-warning-sign text-danger" title="Ikke bekreftet"></span></#if>
                                             <input id="phone" name="${phoneKey}_phone" type="text" value="${CRMcustomer.phonenumbers[phoneKey].phonenumber!}">
                                             <input name="phoneLabel" type="hidden" value="${phoneKey}">
                                             <input type="hidden" value="${CRMcustomer.phonenumbers[phoneKey].verified?string}">
                                             <div>Bruk som standardnummer:
-                                                <input id="${phoneKey}_defaultPhoneLabel" name="defaultphone" type="radio" value="${phoneKey}" <#if phoneKey == customer.defaultPhoneLabel!>checked</#if>  >
+                                                <input id="${phoneKey}_defaultPhoneLabel" name="defaultphone" type="radio" value="${phoneKey}" <#if phoneKey == CRMcustomer.defaultPhoneLabel!>checked</#if>  >
                                             </div>
 
                                         </li>
@@ -80,16 +80,16 @@
 
                                     <label>Epost</label>
                                     <ol class="list-group">
-                                    <#list customer.emailaddresses?keys as emailKey>
+                                    <#list CRMcustomer.emailaddresses?keys as emailKey>
                                         <li class="list-group-item">
                                             <label for="${emailKey}_defaultEmailLabel"><span class="label label-info">${emailKey}</span></label>
-                                            <#if !customer.emailaddresses[emailKey].verified><span class="glyphicon glyphicon-warning-sign text-danger" title="Ikke bekreftet"></span></#if>
+                                            <#if !CRMcustomer.emailaddresses[emailKey].verified><span class="glyphicon glyphicon-warning-sign text-danger" title="Ikke bekreftet"></span></#if>
                                             <input name="emailLabel" type="hidden" value="${emailKey}">
                                             <input id="${emailKey}_email" name="${emailKey}_email" type="text" value="${CRMcustomer.emailaddresses[emailKey].emailaddress!}">
                                             <input type="hidden" value="${CRMcustomer.emailaddresses[emailKey].verified?string}">
                                             <div class="">Bruk som standardadresse <input id="${emailKey}_defaultEmailLabel"
                                                                                           name="defaultEmail" type="radio" value="${emailKey}"
-                                                <#if emailKey == customer.defaultEmailLabel> checked</#if>  ></div>
+                                                <#if emailKey == CRMcustomer.defaultEmailLabel> checked</#if>  ></div>
                                         </li>
                                     </#list>
                                     </ol>
@@ -99,7 +99,7 @@
 
                                     <ol class="list-group">
                                     <label >Leveringsadresse</label>
-                                    <#list customer.deliveryaddresses?keys as adr>
+                                    <#list CRMcustomer.deliveryaddresses?keys as adr>
                                         <li class="list-group-item">
                                             <span class="label label-info">${adr}</span> <br />
                                             <input name="addressLabel" type="hidden" value="${adr}">
@@ -107,7 +107,7 @@
                                             <input name="${adr}_addressLine2" value="${CRMcustomer.deliveryaddresses[adr].addressLine2!}" placeholder="Adresselinje 2">
                                             <input name="${adr}_postalCode" value="${CRMcustomer.deliveryaddresses[adr].postalcode!}" placeholder="Postnummer">
                                             <input name="${adr}_postalCity" value="${CRMcustomer.deliveryaddresses[adr].postalcity!}" placeholder="Poststed">
-                                            <div class="">Lever varene til denne adressen <input id="${adr}_defaultAddressLabel" name="defaultAddress" type="radio" value="${adr}" <#if adr == customer.defaultAddressLabel> checked</#if>  ></div>
+                                            <div class="">Lever varene til denne adressen <input id="${adr}_defaultAddressLabel" name="defaultAddress" type="radio" value="${adr}" <#if adr == CRMcustomer.defaultAddressLabel> checked</#if>  ></div>
                                         </li>
                                     </#list>
                                     </ol>
@@ -123,7 +123,7 @@
 
                     </div>
                     <div class="col-xs-5 ">
-
+                        
                     </div>
             </div>
             <div class="col-xs-1 ">
