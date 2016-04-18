@@ -248,11 +248,9 @@ public class SSOLoginController {
             try {
                 URI crmServiceUri = UriBuilder.fromUri(crmservice).build();
                 String personRef = net.whydah.sso.user.helpers.UserTokenXpathHelper.getPersonref(userToken);
-                Properties properties = AppConfig.readProperties();
-                String appTokenId = properties.getProperty("applicationid");
-                String adminUserTokenId = properties.getProperty("applicationsecret");
+                String userTokenId = UserTokenXpathHelper.getUserTokenId(userToken);
 
-                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, appTokenId, adminUserTokenId, personRef).execute();
+                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef).execute();
                 model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
                 model.addAttribute(ModelHelper.JSON_DATA, crmCustomerJson);
             } catch (Exception e) {
