@@ -54,7 +54,7 @@
                  <tr/>
                   <tr>
                        <td> <strong>CRM Customer data:</strong> </td>
-                       <td> ${CRMcustomer!"No referenced customer found or no Whydah CRMService configured"}   <br/><br/>       <a href="/oidsso/crmdata" title="Edit my CRM Customer date">Edit CRM-Profile</a>
+                       <td> ${CRMcustomer!"No referenced customer found or no Whydah CRMService configured"}   <br/><br/>       <a href="crmdata" title="Edit my CRM Customer data">Edit CRM-Profile</a>
  </td>
                   <tr/>
                   <tr>

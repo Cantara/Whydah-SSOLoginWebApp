@@ -340,6 +340,9 @@ public class TokenServiceClient {
     public static String getMyAppTokenID() {
         return was.getActiveApplicationTokenId();
     }
+    public static String getMyAppTokenXml() {
+        return was.getActiveApplicationTokenXML();
+    }
 
     public static Integer calculateTokenRemainingLifetimeInSeconds(String userTokenXml) {
         Integer tokenLifespanMs = UserTokenXpathHelper.getLifespan(userTokenXml);
