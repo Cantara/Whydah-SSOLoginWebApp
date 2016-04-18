@@ -43,15 +43,15 @@
                             <div class="form-inline">
                                 <div class="form-group">
                                     <label class="sr-only" for="inputFirstname">Fornavn</label>
-                                    <input type="text" class="form-control" id="inputFirstname" name="firstname" placeholder="Fornavn" value="${customer.firstname!}">
+                                    <input type="text" class="form-control" id="inputFirstname" name="firstname" placeholder="Fornavn" value="${CRMcustomer.firstname!}">
                                 </div>
                                 <div class="form-group">
                                     <label class="sr-only" for="inputMiddlename">Mellomnavn</label>
-                                    <input type="text" class="form-control" id="inputMiddlename" name="middlename" placeholder="Mellomnavn" value="${customer.middlename!}">
+                                    <input type="text" class="form-control" id="inputMiddlename" name="middlename" placeholder="Mellomnavn" value="${CRMcustomer.middlename!}">
                                 </div>
                                 <div class="form-group">
                                     <label class="sr-only" for="inputLastname">Etternavn</label>
-                                    <input type="text" class="form-control" id="inputLastname" name="lastname" placeholder="Etternavn" value="${customer.lastname!}">
+                                    <input type="text" class="form-control" id="inputLastname" name="lastname" placeholder="Etternavn" value="${CRMcustomer.lastname!}">
                                 </div>
                             </div>
 
@@ -63,9 +63,9 @@
                                         <li class="list-group-item">
                                             <label for="${phoneKey}_defaultPhoneLabel"><span class="label label-info">${phoneKey}</span></label>
                                             <#if !customer.phonenumbers[phoneKey].verified><span class="glyphicon glyphicon-warning-sign text-danger" title="Ikke bekreftet"></span></#if>
-                                            <input id="phone" name="${phoneKey}_phone" type="text" value="${customer.phonenumbers[phoneKey].phonenumber!}">
+                                            <input id="phone" name="${phoneKey}_phone" type="text" value="${CRMcustomer.phonenumbers[phoneKey].phonenumber!}">
                                             <input name="phoneLabel" type="hidden" value="${phoneKey}">
-                                            <input type="hidden" value="${customer.phonenumbers[phoneKey].verified?string}">
+                                            <input type="hidden" value="${CRMcustomer.phonenumbers[phoneKey].verified?string}">
                                             <div>Bruk som standardnummer:
                                                 <input id="${phoneKey}_defaultPhoneLabel" name="defaultphone" type="radio" value="${phoneKey}" <#if phoneKey == customer.defaultPhoneLabel!>checked</#if>  >
                                             </div>
@@ -85,8 +85,8 @@
                                             <label for="${emailKey}_defaultEmailLabel"><span class="label label-info">${emailKey}</span></label>
                                             <#if !customer.emailaddresses[emailKey].verified><span class="glyphicon glyphicon-warning-sign text-danger" title="Ikke bekreftet"></span></#if>
                                             <input name="emailLabel" type="hidden" value="${emailKey}">
-                                            <input id="${emailKey}_email" name="${emailKey}_email" type="text" value="${customer.emailaddresses[emailKey].emailaddress!}">
-                                            <input type="hidden" value="${customer.emailaddresses[emailKey].verified?string}">
+                                            <input id="${emailKey}_email" name="${emailKey}_email" type="text" value="${CRMcustomer.emailaddresses[emailKey].emailaddress!}">
+                                            <input type="hidden" value="${CRMcustomer.emailaddresses[emailKey].verified?string}">
                                             <div class="">Bruk som standardadresse <input id="${emailKey}_defaultEmailLabel"
                                                                                           name="defaultEmail" type="radio" value="${emailKey}"
                                                 <#if emailKey == customer.defaultEmailLabel> checked</#if>  ></div>
@@ -103,10 +103,10 @@
                                         <li class="list-group-item">
                                             <span class="label label-info">${adr}</span> <br />
                                             <input name="addressLabel" type="hidden" value="${adr}">
-                                            <input name="${adr}_addressLine1" value="${customer.deliveryaddresses[adr].addressLine1!}" placeholder="Adresselinje 1">
-                                            <input name="${adr}_addressLine2" value="${customer.deliveryaddresses[adr].addressLine2!}" placeholder="Adresselinje 2">
-                                            <input name="${adr}_postalCode" value="${customer.deliveryaddresses[adr].postalcode!}" placeholder="Postnummer">
-                                            <input name="${adr}_postalCity" value="${customer.deliveryaddresses[adr].postalcity!}" placeholder="Poststed">
+                                            <input name="${adr}_addressLine1" value="${CRMcustomer.deliveryaddresses[adr].addressLine1!}" placeholder="Adresselinje 1">
+                                            <input name="${adr}_addressLine2" value="${CRMcustomer.deliveryaddresses[adr].addressLine2!}" placeholder="Adresselinje 2">
+                                            <input name="${adr}_postalCode" value="${CRMcustomer.deliveryaddresses[adr].postalcode!}" placeholder="Postnummer">
+                                            <input name="${adr}_postalCity" value="${CRMcustomer.deliveryaddresses[adr].postalcity!}" placeholder="Poststed">
                                             <div class="">Lever varene til denne adressen <input id="${adr}_defaultAddressLabel" name="defaultAddress" type="radio" value="${adr}" <#if adr == customer.defaultAddressLabel> checked</#if>  ></div>
                                         </li>
                                     </#list>
@@ -123,7 +123,6 @@
 
                     </div>
                     <div class="col-xs-5 ">
-                        <p class="header-text">Mine nettsteder</p>
 
                     </div>
             </div>
