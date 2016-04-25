@@ -2,6 +2,7 @@ package net.whydah.sso.tokenservice;
 
 import net.whydah.sso.config.ApplicationMode;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -9,7 +10,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertTrue;
 
 public class RedirectURITest {
-    private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
 
     @BeforeClass
     public static void setup() {
@@ -17,8 +17,10 @@ public class RedirectURITest {
     }
 
 
+    @Ignore
     @Test
     public void testRedirectLogic(){
+        TokenServiceClient tokenServiceClient = new TokenServiceClient();
         String redirectURI = "http://demo.getwhydah.com/test/hello";
         String userTicket = UUID.randomUUID().toString();
         // ticket on redirect

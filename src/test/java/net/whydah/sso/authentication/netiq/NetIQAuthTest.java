@@ -3,6 +3,7 @@ package net.whydah.sso.authentication.netiq;
 import net.whydah.sso.config.ApplicationMode;
 import org.apache.commons.httpclient.HttpClient;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -38,6 +39,7 @@ public class NetIQAuthTest {
     /**
      * Manual test.
      */
+    @Ignore
     @Test
     public void testAuthUserFromNetIQRedirect() throws Exception  {
         NetIQHelper netIQ = new NetIQHelper();
@@ -64,6 +66,7 @@ public class NetIQAuthTest {
     /**
      * Manual test.
      */
+    @Ignore
     @Test
     public void testCreateUserFromNetIQRedirect() throws Exception  {
 
