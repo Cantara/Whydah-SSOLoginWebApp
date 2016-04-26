@@ -51,7 +51,7 @@ public class PasswordChangeController {
         log.trace("resetpassword was called");
         resetPasswordRequests.mark();
         model.addAttribute("logoURL", LOGOURL);
-        String username = sanitize(request.getParameter("username"));
+        String username = sanitizeUsername(request.getParameter("username"));
         if (username == null) {
             return "resetpassword";
         }
@@ -124,6 +124,19 @@ public class PasswordChangeController {
                 .replaceAll("(?i)%2fscript%3e", "")   // case 1
                 .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
                 .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
+                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
+    }
+
+    public static String sanitizeUsername(String string) {
+        if (string == null || string.length() < 3) {
+            return string;
+        }
+        return string
+                .replaceAll("(?i)%3c%2fnoscript%3e", "")   // case 1
+                .replaceAll("(?i)%2fscript%3e", "")   // case 1
+                .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
+                .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
+                .replaceAll("(?i)<.*?script:.*?>.*?</.*?>", "") // case 2
                 .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
     }
 
