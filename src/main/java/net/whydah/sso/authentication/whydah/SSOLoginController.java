@@ -263,11 +263,9 @@ public class SSOLoginController {
     private void addCrmCustomer(Model model, String userToken) {
         if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
             try {
-                URI crmServiceUri = UriBuilder.fromUri(crmservice).build();
                 String personRef = net.whydah.sso.user.helpers.UserTokenXpathHelper.getPersonref(userToken);
                 String userTokenId = UserTokenXpathHelper.getUserTokenId(userToken);
-
-                String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef).execute();
+                String crmCustomerJson = new CommandGetCRMCustomer(URI.create(crmservice), tokenServiceClient.getMyAppTokenID(), userTokenId, personRef).execute();
                 model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
                 model.addAttribute(ModelHelper.JSON_DATA, crmCustomerJson);
             } catch (Exception e) {
@@ -279,12 +277,15 @@ public class SSOLoginController {
     private void addUserActivities(Model model, String userTokenXml) {
         if (UserTokenXpathHelper.getUserID(userTokenXml).length() > 2) {
             try {
-                URI reportServiceUri = UriBuilder.fromUri(reportservice).build();
                 String userid = UserTokenXpathHelper.getUserID(userTokenXml);
                 String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-                String userActivitiesJson = new CommandListUserActivities(reportServiceUri, TokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
+                log.warn(">==================== 1 ");
+
+                String userActivitiesJson = new CommandListUserActivities(URI.create(reportservice), TokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
                 //    model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
+                log.warn(">==================== 2 ");
                 model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
+                log.warn(">==================== 3 ");
             } catch (Exception e) {
 
             }
