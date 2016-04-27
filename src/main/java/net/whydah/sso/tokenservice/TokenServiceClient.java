@@ -56,7 +56,7 @@ public class TokenServiceClient {
             String applicationsecret = properties.getProperty("applicationsecret");
 
             if (was == null) {
-                was = new WhydahApplicationSession(properties.getProperty("securitytokenservice"), applicationid, applicationname, applicationsecret);
+                was = WhydahApplicationSession.getInstance(properties.getProperty("securitytokenservice"), applicationid, applicationname, applicationsecret);
             }
         } catch (IOException e) {
             throw new IllegalArgumentException("Error constructing SSOHelper.", e);
