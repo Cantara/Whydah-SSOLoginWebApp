@@ -174,6 +174,7 @@ public class CRMCustomerController {
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
         String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
+        log.info("CRMCustomer - looking for personRef found {}", personRef);
 
         if (personRef == null) {
             return createCrmdata(request, model);
@@ -201,6 +202,7 @@ public class CRMCustomerController {
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
 
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
+        log.info("CRMCustomer - looking for userTokenId in Cookie, found {}", userTokenId);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
         String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
 
