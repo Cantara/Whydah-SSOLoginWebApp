@@ -34,6 +34,8 @@ public class CRMHelper {
 
                 model.addAttribute(ModelHelper.PERSON_REF, personRef);
                 model.addAttribute(ModelHelper.CRMCUSTOMER, crmCustomerJson);
+                model.addAttribute(ModelHelper.JSON_DATA, crmCustomerJson);
+
             } catch (Exception e) {
 
             }
