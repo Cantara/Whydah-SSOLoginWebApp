@@ -1,28 +1,5 @@
-package net.whydah.sso.authentication.whydah;
+package net.whydah.sso.extensions.crmcustomer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.commands.extensions.crmapi.*;
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.config.ModelHelper;
-import net.whydah.sso.extensions.crmcustomer.mappers.CustomerMapper;
-import net.whydah.sso.extensions.crmcustomer.types.Customer;
-import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
-import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
-import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
-import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.util.SSLTool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -30,17 +7,50 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Properties;
 
-@Controller
-public class UserdataController {
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
-    private static final Logger log = LoggerFactory.getLogger(UserdataController.class);
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.commands.extensions.crmapi.CommandCreateCRMCustomer;
+import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
+import net.whydah.sso.commands.extensions.crmapi.CommandSendEmailVerificationToken;
+import net.whydah.sso.commands.extensions.crmapi.CommandSendPhoneVerificationPin;
+import net.whydah.sso.commands.extensions.crmapi.CommandUpdateCRMCustomer;
+import net.whydah.sso.commands.extensions.crmapi.CommandVerifyEmailByToken;
+import net.whydah.sso.commands.extensions.crmapi.CommandVerifyPhoneByPin;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.config.ModelHelper;
+import net.whydah.sso.config.SessionHelper;
+import net.whydah.sso.extensions.crmcustomer.mappers.CustomerMapper;
+import net.whydah.sso.extensions.crmcustomer.types.Customer;
+import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
+import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
+import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
+import net.whydah.sso.util.SSLTool;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Controller
+public class CRMCustomerController {
+
+    private static final Logger log = LoggerFactory.getLogger(CRMCustomerController.class);
 
     private final SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
     private URI crmServiceUri;
     private final String emailVerificationLink;
     String LOGOURL = "/sso/images/site-logo.png";
 
-    public UserdataController() throws IOException {
+    public CRMCustomerController() throws IOException {
         Properties properties = AppConfig.readProperties();
         LOGOURL = properties.getProperty("logourl");
         crmServiceUri = UriBuilder.fromUri(AppConfig.readProperties().getProperty("crmservice")).build();
@@ -50,7 +60,7 @@ public class UserdataController {
     @RequestMapping(value = "/crmdata", method = RequestMethod.POST)
     public String createCrmdata(HttpServletRequest request, Model model) {
         log.trace("updateCrmdata was called");
-        model.addAttribute("logoURL", LOGOURL);
+        model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
 
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
@@ -103,7 +113,7 @@ public class UserdataController {
 
         for (int i = 0; i < emailLabels.length; i++) {
             String label = emailLabels[i];
-            String emailAddress = request.getParameter(label +"_email");
+            String emailAddress = request.getParameter(label + "_email");
 
             EmailAddress email = new EmailAddress(emailAddress, null, isEmailVerified(existingCustomer, label));
             customer.getEmailaddresses().put(label, email);
@@ -115,7 +125,7 @@ public class UserdataController {
         for (int i = 0; i < phoneLabels.length; i++) {
             String label = phoneLabels[i];
             String phone = request.getParameter(label + "_phone");
-            PhoneNumber phoneNumber = new PhoneNumber(phone, null,  isPhoneVerified(existingCustomer, label));
+            PhoneNumber phoneNumber = new PhoneNumber(phone, null, isPhoneVerified(existingCustomer, label));
             customer.getPhonenumbers().put(label, phoneNumber);
         }
 
@@ -157,7 +167,7 @@ public class UserdataController {
     @RequestMapping(value = "/crmdata", method = RequestMethod.PUT)
     public String updateCrmdata(HttpServletRequest request, Model model) {
         log.trace("updateCrmdata was called");
-        model.addAttribute("logoURL", LOGOURL);
+        model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
 
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
@@ -186,7 +196,7 @@ public class UserdataController {
     public String getCrmdata(HttpServletRequest request, Model model) {
         log.trace("getCrmdata was called");
 
-        model.addAttribute("logoURL", LOGOURL);
+        model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
 
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
@@ -246,7 +256,6 @@ public class UserdataController {
     }
 
 
-
     @RequestMapping(value = "/verify/phone_send_pin", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public String sendPhoneVerificationPin(HttpServletRequest request, Model model) {
 
@@ -258,7 +267,7 @@ public class UserdataController {
 
         Boolean pinSent = new CommandSendPhoneVerificationPin(crmServiceUri, tokenServiceClient.getMyAppTokenXml(), userTokenId, personRef, phoneNo).execute();
 
-        model.addAttribute(ModelHelper.JSON_DATA, ""+pinSent);
+        model.addAttribute(ModelHelper.JSON_DATA, "" + pinSent);
 
         return "json";
     }
@@ -276,7 +285,7 @@ public class UserdataController {
 
         Boolean pinSent = new CommandVerifyPhoneByPin(crmServiceUri, tokenServiceClient.getMyAppTokenXml(), userTokenId, personRef, phoneNo, pin).execute();
 
-        model.addAttribute(ModelHelper.JSON_DATA, ""+pinSent);
+        model.addAttribute(ModelHelper.JSON_DATA, "" + pinSent);
 
         return "json";
     }
@@ -293,7 +302,7 @@ public class UserdataController {
 
         Boolean tokenSent = new CommandSendEmailVerificationToken(crmServiceUri, tokenServiceClient.getMyAppTokenXml(), userTokenId, personRef, email, emailVerificationLink).execute();
 
-        model.addAttribute(ModelHelper.JSON_DATA, ""+tokenSent);
+        model.addAttribute(ModelHelper.JSON_DATA, "" + tokenSent);
 
         return "json";
     }
@@ -311,7 +320,7 @@ public class UserdataController {
 
         Boolean tokenVerified = new CommandVerifyEmailByToken(crmServiceUri, tokenServiceClient.getMyAppTokenXml(), userTokenId, personRef, email, token).execute();
 
-        model.addAttribute(ModelHelper.JSON_DATA, ""+tokenVerified);
+        model.addAttribute(ModelHelper.JSON_DATA, "" + tokenVerified);
 
         return "json";
     }
@@ -361,9 +370,9 @@ public class UserdataController {
 
         customer.setDefaultPhoneLabel("mobile");
 
-        customer.getPhonenumbers().put("mobile", new PhoneNumber("44556677", null,  true));
-        customer.getPhonenumbers().put("work-mobile", new PhoneNumber("98765432", null,  false));
-        customer.getPhonenumbers().put("home-mobile", new PhoneNumber("43215678", null,  true));
+        customer.getPhonenumbers().put("mobile", new PhoneNumber("44556677", null, true));
+        customer.getPhonenumbers().put("work-mobile", new PhoneNumber("98765432", null, false));
+        customer.getPhonenumbers().put("home-mobile", new PhoneNumber("43215678", null, true));
 
         customer.setDefaultAddressLabel("home");
         customer.getDeliveryaddresses().put("home", new DeliveryAddress("Karl Johans gate 6", null, "0154", "Oslo"));

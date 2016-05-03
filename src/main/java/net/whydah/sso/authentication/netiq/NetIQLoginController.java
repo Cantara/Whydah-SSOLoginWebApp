@@ -5,7 +5,7 @@ import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.tokenservice.TokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @Controller
 public class NetIQLoginController {
         private static final Logger log = LoggerFactory.getLogger(NetIQLoginController.class);
-        private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
+    private final SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
 
         // set this to your servlet URL for the authentication servlet/filter
         private final String hetIQauthURI;
@@ -107,14 +107,14 @@ public class NetIQLoginController {
             String ticket = UUID.randomUUID().toString();
 
             //Check om fbToken har session i lokal cache i TokenService
-            // Hvis ja, hent whydah user tokenservice og legg ticket på model eller på returURL.
+            // Hvis ja, hent whydah user clients og legg ticket på model eller på returURL.
             String userTokenXml = tokenServiceClient.getUserToken(userCredential, ticket);
 
             log.debug("NetIQ respsonse:" + userTokenXml);
             if (userTokenXml == null) {
                 log.info("getUserToken failed. Try to create new user using netiq credentials.");
                 // Hvis nei, hent brukerinfo fra FB, kall tokenService. med user credentials for ny bruker (lag tjenesten i TokenService).
-                // Success etter ny bruker er laget = tokenservice. Alltid ticket id som skal sendes.
+                // Success etter ny bruker er laget = clients. Alltid ticket id som skal sendes.
 
 
                 userTokenXml = tokenServiceClient.createAndLogonUser(netIQUser, netiqAccessToken, userCredential, ticket,request);
@@ -130,7 +130,7 @@ public class NetIQLoginController {
 
 
             String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-            Integer tokenRemainingLifetimeSeconds = TokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+            Integer tokenRemainingLifetimeSeconds = SecurityTokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
             CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
 
             String clientRedirectURI = request.getParameter("redirectURI");

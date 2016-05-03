@@ -4,10 +4,9 @@ import com.restfb.types.User;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.whydah.SSOLoginController;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.tokenservice.TokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ import java.util.UUID;
 @Controller
 public class FacebookLoginController {
     private static final Logger log = LoggerFactory.getLogger(FacebookLoginController.class);
-    private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
+    private final SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
     private String LOGOURL = "/sso/images/site-logo.png";
 
 
@@ -108,12 +107,12 @@ public class FacebookLoginController {
 
 
         //Check om fbToken har session i lokal cache i TokenService
-        // Hvis ja, hent whydah user tokenservice og legg ticket på model eller på returURL.
+        // Hvis ja, hent whydah user clients og legg ticket på model eller på returURL.
         String userTokenXml = tokenServiceClient.getUserToken(userCredential, userticket);
         if (userTokenXml == null) {
             log.warn("getUserToken failed. Try to create new user using facebook credentials.");
             // Hvis nei, hent brukerinfo fra FB, kall tokenService. med user credentials for ny bruker (lag tjenesten i TokenService).
-            // Success etter ny bruker er laget = tokenservice. Alltid ticket id som skal sendes.
+            // Success etter ny bruker er laget = clients. Alltid ticket id som skal sendes.
 
 
             userTokenXml = tokenServiceClient.createAndLogonUser(fbUser, fbAccessToken, userCredential, userticket);
@@ -130,7 +129,7 @@ public class FacebookLoginController {
 
 
         String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-        Integer tokenRemainingLifetimeSeconds = TokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+        Integer tokenRemainingLifetimeSeconds = SecurityTokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
         CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
 
         String clientRedirectURI = request.getParameter("state");

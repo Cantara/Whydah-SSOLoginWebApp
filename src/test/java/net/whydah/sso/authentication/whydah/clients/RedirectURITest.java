@@ -1,4 +1,4 @@
-package net.whydah.sso.tokenservice;
+package net.whydah.sso.authentication.whydah.clients;
 
 import net.whydah.sso.config.ApplicationMode;
 import org.junit.BeforeClass;
@@ -20,7 +20,7 @@ public class RedirectURITest {
     @Ignore
     @Test
     public void testRedirectLogic(){
-        TokenServiceClient tokenServiceClient = new TokenServiceClient();
+        SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
         String redirectURI = "http://demo.getwhydah.com/test/hello";
         String userTicket = UUID.randomUUID().toString();
         // ticket on redirect

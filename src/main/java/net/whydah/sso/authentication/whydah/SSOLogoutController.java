@@ -3,7 +3,7 @@ package net.whydah.sso.authentication.whydah;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.SessionHelper;
-import net.whydah.sso.tokenservice.TokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,7 +18,7 @@ import java.util.Properties;
 @Controller
 public class SSOLogoutController {
     private static final Logger log = LoggerFactory.getLogger(SSOLogoutController.class);
-    private final TokenServiceClient tokenServiceClient;
+    private final SecurityTokenServiceClient tokenServiceClient;
     private String MY_APP_URI;
     private String LOGOUT_ACTION_URI;
     private String LOGIN_URI;
@@ -26,7 +26,7 @@ public class SSOLogoutController {
 
 
     public SSOLogoutController() {
-        this.tokenServiceClient = new TokenServiceClient();
+        this.tokenServiceClient = new SecurityTokenServiceClient();
         try {
             MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
             LOGOUT_ACTION_URI = MY_APP_URI + "logoutaction";
@@ -71,7 +71,7 @@ public class SSOLogoutController {
     }
 
     /**
-     * This endpoint is only used for performing a redirect to fetch the tokenservice cookie.
+     * This endpoint is only used for performing a redirect to fetch the clients cookie.
      */
     @RequestMapping("/logoutaction")
     public String logoutAction(HttpServletRequest request, HttpServletResponse response, Model model) {

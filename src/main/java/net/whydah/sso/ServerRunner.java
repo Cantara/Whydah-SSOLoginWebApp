@@ -2,7 +2,7 @@ package net.whydah.sso;
 
 import com.codahale.metrics.servlets.AdminServlet;
 import net.whydah.sso.config.ApplicationMode;
-import net.whydah.sso.tokenservice.TokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import net.whydah.sso.util.SSLTool;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -34,7 +34,7 @@ public class ServerRunner {
         int port = serverRunner.server.getConnectors()[0].getLocalPort();
         serverRunner.join();
         SSLTool.disableCertificateValidation();
-        TokenServiceClient tc = new TokenServiceClient();
+        SecurityTokenServiceClient tc = new SecurityTokenServiceClient();
         log.info("SSOLoginWebApp started OK. Version = {},IAM_MODE = {}, url: http://localhost:{}{}/login",
                 version, ApplicationMode.getApplicationMode(), String.valueOf(port), CONTEXT);
 

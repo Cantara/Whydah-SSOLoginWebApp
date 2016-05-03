@@ -4,7 +4,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.tokenservice.TokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -30,7 +30,7 @@ public class PasswordChangeController {
     private final Meter resetPasswordRequests = metrics.meter("requests");
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
-    private final TokenServiceClient tokenServiceClient = new TokenServiceClient();
+    private final SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
     String LOGOURL = "/sso/images/site-logo.png";
 
 

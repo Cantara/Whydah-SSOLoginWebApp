@@ -35,7 +35,7 @@ public class FacebookHelperTest {
 
     /**
      * Manual test.
-     * Update access tokenservice and run.
+     * Update access clients and run.
      * https://graph.facebook.com/me?access_token=
      */
     @Ignore

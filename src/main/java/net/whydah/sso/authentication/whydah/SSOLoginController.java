@@ -4,16 +4,14 @@ import net.whydah.sso.ServerRunner;
 import net.whydah.sso.authentication.*;
 import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
 import net.whydah.sso.commands.extensions.statistics.CommandListUserActivities;
-import net.whydah.sso.commands.extensions.statistics.CommandListUserLogins;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
-import net.whydah.sso.tokenservice.TokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserTokenID;
-import net.whydah.sso.util.SSLTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -34,7 +31,7 @@ import java.util.UUID;
 public class SSOLoginController {
 
     private final static Logger log = LoggerFactory.getLogger(SSOLoginController.class);
-    private final TokenServiceClient tokenServiceClient;
+    private final SecurityTokenServiceClient tokenServiceClient;
     private String LOGOURL = "/sso/images/site-logo.png";
     private String whydahVersion = ServerRunner.version;
 
@@ -50,7 +47,7 @@ public class SSOLoginController {
         LOGOURL = properties.getProperty("logourl");
         crmservice = properties.getProperty("crmservice");
         reportservice = properties.getProperty("reportservice");
-        this.tokenServiceClient = new TokenServiceClient();
+        this.tokenServiceClient = new SecurityTokenServiceClient();
     }
 
 
@@ -242,7 +239,7 @@ public class SSOLoginController {
         }
 
         String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-        Integer tokenRemainingLifetimeSeconds = TokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+        Integer tokenRemainingLifetimeSeconds = SecurityTokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
         CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
 
         // ticket on redirect
@@ -281,7 +278,7 @@ public class SSOLoginController {
                 String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
                 log.warn(">==================== 1 ");
 
-                String userActivitiesJson = new CommandListUserActivities(URI.create(reportservice), TokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
+                String userActivitiesJson = new CommandListUserActivities(URI.create(reportservice), SecurityTokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
                 //    model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
                 log.warn(">==================== 2 ");
                 model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));

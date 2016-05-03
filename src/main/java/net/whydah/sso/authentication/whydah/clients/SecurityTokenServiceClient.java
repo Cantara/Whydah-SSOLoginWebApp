@@ -1,12 +1,10 @@
-package net.whydah.sso.tokenservice;
+package net.whydah.sso.authentication.whydah.clients;
 
 import com.restfb.types.User;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import net.whydah.sso.authentication.UserNameAndPasswordCredential;
-import net.whydah.sso.commands.userauth.CommandGetUsertokenByUserticket;
 import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
@@ -32,16 +30,16 @@ import java.util.Properties;
 
 import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
-public class TokenServiceClient {
+public class SecurityTokenServiceClient {
 
-    private static final Logger log = LoggerFactory.getLogger(TokenServiceClient.class);
+    private static final Logger log = LoggerFactory.getLogger(SecurityTokenServiceClient.class);
 
     private final URI tokenServiceUri;
     private final URI userAdminServiceUri;
     private final Client tokenServiceClient = Client.create();
     private static WhydahApplicationSession was = null;
 
-    public TokenServiceClient() {
+    public SecurityTokenServiceClient() {
 
         try {
             Properties properties = AppConfig.readProperties();
@@ -75,7 +73,7 @@ public class TokenServiceClient {
             }
             return userToken;
         }
-        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/tokenservice");
+        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + was.getActiveApplicationTokenId() + "/" + userticket + "/clients");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("apptoken", was.getActiveApplicationTokenXML());
         formData.add("usercredential", user.toXML());
