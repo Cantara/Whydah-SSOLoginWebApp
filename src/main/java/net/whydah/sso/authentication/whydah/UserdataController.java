@@ -47,7 +47,7 @@ public class UserdataController {
         emailVerificationLink = AppConfig.readProperties().getProperty("email.verification.link");
     }
 
-    @RequestMapping(value = "/crmdata", method = RequestMethod.POST)
+    @RequestMapping(value = "/userdata", method = RequestMethod.POST)
     public String createCrmdata(HttpServletRequest request, Model model) {
         log.trace("updateCrmdata was called");
         model.addAttribute("logoURL", LOGOURL);
