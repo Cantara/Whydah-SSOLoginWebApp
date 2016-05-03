@@ -75,7 +75,7 @@ public class CRMCustomerController {
 
         String completeCustomerJson = CustomerMapper.toJson(customer);
 
-        log.warn("FOR TESTING ONLY");
+        log.warn("FOR TESTING ONLY POST");
         SSLTool.disableCertificateValidation();
         personRef = new CommandCreateCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef, completeCustomerJson).execute();
 
@@ -88,6 +88,7 @@ public class CRMCustomerController {
     private Customer createCustomerFromRequest(HttpServletRequest request) {
 
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
+        log.info("CRMCustomer - looking for userTokenId in Cookie, found {}", userTokenId);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
         String uid = UserTokenXpathHelper.getUserID(userTokenXml);
 
@@ -182,7 +183,7 @@ public class CRMCustomerController {
         Customer customer = createCustomerFromRequest(request);
         String completeCustomerJson = CustomerMapper.toJson(customer);
 
-        log.warn("FOR TESTING ONLY");
+        log.warn("FOR TESTING ONLY PUT");
         SSLTool.disableCertificateValidation();
         String location = new CommandUpdateCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef, completeCustomerJson).execute();
 
@@ -205,8 +206,9 @@ public class CRMCustomerController {
         log.info("CRMCustomer - looking for userTokenId in Cookie, found {}", userTokenId);
         String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
         String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
+        log.info("CRMCustomer - looking personRef, found {}", personRef);
 
-        log.warn("FOR TESTING ONLY");
+        log.warn("FOR TESTING ONLY GET");
         SSLTool.disableCertificateValidation();
         if (personRef == null || personRef.isEmpty()) {
             personRef = "1234";
