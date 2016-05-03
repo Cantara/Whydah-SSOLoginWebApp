@@ -54,8 +54,9 @@
                  <tr/>
                   <tr>
                        <td> <strong>CRM Customer data:</strong> </td>
-                       <td> ${CRMcustomer!"No referenced customer found or no Whydah CRMService configured"}   <br/><br/>       <a href="crmdata" title="Edit my CRM Customer data">Edit CRM-Profile</a>
- </td>
+                       <td> ${CRMcustomer!"No referenced customer found or no Whydah CRMService configured"}   <br/><br/>
+                            <a href="crmdata" title="Vien and Edit my CRM-Profile data">View and Edit CRM-Profile</a>
+                       </td>
                   <tr/>
                   <tr>
                        <td> <strong>Your latest Whydah application activity:</strong> </td>
