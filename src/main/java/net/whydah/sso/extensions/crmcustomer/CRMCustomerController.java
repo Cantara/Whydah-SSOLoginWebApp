@@ -203,30 +203,34 @@ public class CRMCustomerController {
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
 
         String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
-        log.info("CRMCustomer - looking for userTokenId in Cookie, found {}", userTokenId);
-        String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
-        String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
-        log.info("CRMCustomer - looking personRef, found {}", personRef);
+        try {
+            log.info("CRMCustomer - looking for userTokenId in Cookie, found {}", userTokenId);
+            String userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
+            String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
+            log.info("CRMCustomer - looking personRef, found {}", personRef);
 
-        log.warn("FOR TESTING ONLY GET");
-        SSLTool.disableCertificateValidation();
-        if (personRef == null || personRef.isEmpty()) {
-            personRef = "1234";
+            log.warn("FOR TESTING ONLY GET");
+            SSLTool.disableCertificateValidation();
+            if (personRef == null || personRef.isEmpty()) {
+                personRef = "1234";
+            }
+
+            CRMHelper.addCrmdataToModel(crmServiceUri, tokenServiceClient.getMyAppTokenID(), model, userTokenXml);
+            /**
+             String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef).execute();
+
+             if (crmCustomerJson != null) {
+             Customer customer = CustomerMapper.fromJson(crmCustomerJson);
+
+             model.addAttribute(ModelHelper.PERSON_REF, personRef);
+             model.addAttribute(ModelHelper.CRMCUSTOMER, customer);
+             model.addAttribute(ModelHelper.USERTOKEN, trim(userTokenXml));
+             }
+             */
+            return "editdata";
+        } catch (Exception e) {
+            return "welcome";
         }
-
-        CRMHelper.addCrmdataToModel(crmServiceUri, tokenServiceClient.getMyAppTokenID(), model, userTokenXml);
-        /**
-        String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef).execute();
-
-        if (crmCustomerJson != null) {
-            Customer customer = CustomerMapper.fromJson(crmCustomerJson);
-
-            model.addAttribute(ModelHelper.PERSON_REF, personRef);
-            model.addAttribute(ModelHelper.CRMCUSTOMER, customer);
-            model.addAttribute(ModelHelper.USERTOKEN, trim(userTokenXml));
-        }
-         */
-        return "editdata";
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
