@@ -1,4 +1,4 @@
-package net.whydah.sso.authentication;
+package net.whydah.sso.extensions.crmcustomer;
 
 import java.net.URI;
 
