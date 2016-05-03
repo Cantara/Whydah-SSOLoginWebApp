@@ -22,12 +22,12 @@ public class CRMHelper {
 
 
     static void addCrmdataToModel(URI crmServiceUri, String appTokenID, Model model, String userTokenXml) {
-        String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
+        String personRef = net.whydah.sso.user.helpers.UserTokenXpathHelper.getPersonref(userTokenXml);
 
         if (personRef.length() > 2) {
             try {
-                String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
                 SSLTool.disableCertificateValidation();
+                String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
 
                 String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, appTokenID, userTokenId, personRef).execute();
                 log.trace("Got CRMrecord for user - used personRef={}", personRef);

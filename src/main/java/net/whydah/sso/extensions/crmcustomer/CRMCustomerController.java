@@ -214,6 +214,8 @@ public class CRMCustomerController {
             personRef = "1234";
         }
 
+        CRMHelper.addCrmdataToModel(crmServiceUri, tokenServiceClient.getMyAppTokenID(), model, userTokenXml);
+        /**
         String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef).execute();
 
         if (crmCustomerJson != null) {
@@ -223,6 +225,7 @@ public class CRMCustomerController {
             model.addAttribute(ModelHelper.CRMCUSTOMER, customer);
             model.addAttribute(ModelHelper.USERTOKEN, trim(userTokenXml));
         }
+         */
         return "editdata";
     }
 

@@ -1,7 +1,9 @@
 package net.whydah.sso.authentication.whydah;
 
 import net.whydah.sso.ServerRunner;
-import net.whydah.sso.authentication.*;
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
 import net.whydah.sso.commands.extensions.statistics.CommandListUserActivities;
 import net.whydah.sso.config.ModelHelper;
@@ -255,7 +257,6 @@ public class SSOLoginController {
         log.info("action - Redirecting to {}", redirectURI);
         return "action";
     }
-
 
     private void addCrmCustomer(Model model, String userToken) {
         if (UserTokenXpathHelper.getPersonref(userToken).length() > 2) {
