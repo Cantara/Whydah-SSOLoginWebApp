@@ -47,6 +47,7 @@ public class UserdataController {
         emailVerificationLink = AppConfig.readProperties().getProperty("email.verification.link");
     }
 
+    /*
     @RequestMapping(value = "/userdata", method = RequestMethod.POST)
     public String createCrmdata(HttpServletRequest request, Model model) {
         log.trace("updateCrmdata was called");
@@ -384,5 +385,5 @@ public class UserdataController {
             throw new RuntimeException(e);
         }
     }
-
+*/
 }
