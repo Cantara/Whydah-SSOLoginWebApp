@@ -22,8 +22,7 @@
 
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah-typelib-version>1.2.8</whydah-typelib-version>
-        <whydah-sdk-version>2.1.171</whydah-sdk-version>
+        <whydah-sdk-version>2.1.172</whydah-sdk-version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.0.6.RELEASE</spring.version>
         <org.springframework.security-version>3.2.0.RELEASE</org.springframework.security-version>
@@ -71,12 +70,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>net.whydah.sso</groupId>
-            <artifactId>Whydah-TypeLib</artifactId>
-            <version>${whydah-typelib-version}</version>
-        </dependency>
-
         <dependency>
             <groupId>net.whydah.sso</groupId>
             <artifactId>Whydah-Java-SDK</artifactId>
