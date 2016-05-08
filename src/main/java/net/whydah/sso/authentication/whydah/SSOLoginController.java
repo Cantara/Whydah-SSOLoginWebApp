@@ -133,26 +133,17 @@ public class SSOLoginController {
         model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
         model.addAttribute(SessionHelper.WHYDAH_VERSION, whydahVersion);
         CookieManager.addSecurityHTTPHeaders(response);
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 1 ");
         try {
             if (userTicket != null && userTicket.length() > 3) {
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 2 ");
                 log.trace("Welcome - Using userTicket");
                 userTokenXml = tokenServiceClient.getUserTokenByUserTicket(userTicket);
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 3 ");
                 model.addAttribute(ModelHelper.USERTICKET, userTicket);
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 4 ");
                 model.addAttribute(ModelHelper.USERTOKEN, userTokenXml);
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 5 ");
             } else if (userTokenId != null && userTokenId.length() > 3) {
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 6 ");
                 log.trace("Welcome - No userTicket, using userTokenID from cookie");
                 userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 7 ");
                 model.addAttribute(ModelHelper.USERTICKET, "No userTicket, using userTokenID");
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 8 ");
                 model.addAttribute(ModelHelper.USERTOKEN, userTokenXml);
-                log.warn("=>>>>>>>>>>>>>>>>>>>> 9 ");
                 model.addAttribute(ModelHelper.USER_TOKEN_ID, userTokenId);
             } else {
                 // TODO cleanup - this messes up the log for a normal case
@@ -170,25 +161,17 @@ public class SSOLoginController {
             model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 11 ");
         model.addAttribute(ModelHelper.USERTOKEN, trim(userTokenXml));
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 11 ");
         model.addAttribute(SessionHelper.APP_LINKS, SessionHelper.getAppLinks());
         log.trace("embedded applinks: " + SessionHelper.getAppLinks());
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 12 ");
         model.addAttribute(ModelHelper.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 13 ");
         model.addAttribute(ModelHelper.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
         model.addAttribute(ModelHelper.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
         model.addAttribute(ModelHelper.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 14 ");
         model.addAttribute(ModelHelper.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userTokenXml));
         model.addAttribute(ModelHelper.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 15 ");
         addCrmCustomer(model, userTokenXml);
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 16 ");
         addUserActivities(model, userTokenXml);
-        log.warn("=>>>>>>>>>>>>>>>>>>>> 17 ");
         return "welcome";
     }
 
@@ -273,7 +256,8 @@ public class SSOLoginController {
     }
 
     private void addUserActivities(Model model, String userTokenXml) {
-        if (UserTokenXpathHelper.getUserID(userTokenXml).length() > 2) {
+        model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, "{}");
+        if (false && UserTokenXpathHelper.getUserID(userTokenXml).length() > 2) {
             try {
                 String userid = UserTokenXpathHelper.getUserID(userTokenXml);
                 String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
