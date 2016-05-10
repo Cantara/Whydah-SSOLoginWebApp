@@ -27,6 +27,9 @@ public class CookieManager {
         try {
             cookiedomain = AppConfig.readProperties().getProperty("cookiedomain");
             MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
+            if((cookiedomain==null || cookiedomain.isEmpty()) && MY_APP_URI!=null){
+            	cookiedomain = MY_APP_URI;
+            }
         } catch (IOException e) {
             log.warn("AppConfig.readProperties failed. cookiedomain was set to {}", cookiedomain, e);
         }
@@ -55,17 +58,18 @@ public class CookieManager {
         if (cookiedomain != null && !cookiedomain.isEmpty()) {
             cookie.setDomain(cookiedomain);
         }
-        cookie.setPath("/ ; HttpOnly;");
+        cookie.setPath("/");
+       //cookie.setPath("/ ; HttpOnly;");
         if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
             cookie.setSecure(true);
         }
-        if ("https".equalsIgnoreCase(request.getScheme())) {
-            cookie.setSecure(true);
-        } else {
-            log.warn("Unsecure session detected, using myuri to define coocie security");
-            cookie.setSecure(secureCookie(MY_APP_URI));
-
-        }
+//        if ("https".equalsIgnoreCase(request.getScheme())) {
+//            cookie.setSecure(true);
+//        } else {
+//            log.warn("Unsecure session detected, using myuri to define coocie security");
+//            cookie.setSecure(secureCookie(MY_APP_URI));
+//
+//        }
 
         log.debug("Created cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                 cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
@@ -80,15 +84,18 @@ public class CookieManager {
             if (cookiedomain != null && !cookiedomain.isEmpty()) {
                 cookie.setDomain(cookiedomain);
             }
-            cookie.setPath("/ ; HttpOnly;");
-
-            if ("https".equalsIgnoreCase(request.getScheme())) {
+            //cookie.setPath("/ ; HttpOnly;");
+            cookie.setPath("/");
+            if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
                 cookie.setSecure(true);
-            } else {
-                log.warn("Unsecure session detected, using myuri to define coocie security");
-                cookie.setSecure(secureCookie(MY_APP_URI));
-
             }
+//            if ("https".equalsIgnoreCase(request.getScheme())) {
+//                cookie.setSecure(true);
+//            } else {
+//                log.warn("Unsecure session detected, using myuri to define coocie security");
+//                cookie.setSecure(secureCookie(MY_APP_URI));
+//
+//            }
             response.addCookie(cookie);
             log.trace("Cleared cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                     cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
