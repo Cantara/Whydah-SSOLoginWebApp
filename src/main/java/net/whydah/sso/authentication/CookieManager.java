@@ -2,13 +2,18 @@ package net.whydah.sso.authentication;
 
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 
 public class CookieManager {
@@ -28,7 +33,15 @@ public class CookieManager {
             cookiedomain = AppConfig.readProperties().getProperty("cookiedomain");
             MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
             if((cookiedomain==null || cookiedomain.isEmpty()) && MY_APP_URI!=null){
-            	cookiedomain = MY_APP_URI;
+            	URI uri;
+            	try {
+            		uri = new URI(MY_APP_URI);
+            		String domain = uri.getHost();
+            		domain = domain.startsWith("www.") ? domain.substring(4) : domain;
+            		cookiedomain = domain;
+            	} catch (URISyntaxException e) {
+            		e.printStackTrace();
+            	}
             }
         } catch (IOException e) {
             log.warn("AppConfig.readProperties failed. cookiedomain was set to {}", cookiedomain, e);
@@ -61,7 +74,7 @@ public class CookieManager {
         cookie.setPath("/");
        //cookie.setPath("/ ; HttpOnly;");
         if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
-            //cookie.setSecure(true);
+            cookie.setSecure(true);
         }
 //        if ("https".equalsIgnoreCase(request.getScheme())) {
 //            cookie.setSecure(true);
@@ -87,7 +100,7 @@ public class CookieManager {
             //cookie.setPath("/ ; HttpOnly;");
             cookie.setPath("/");
             if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
-               // cookie.setSecure(true);
+                cookie.setSecure(true);
             }
 //            if ("https".equalsIgnoreCase(request.getScheme())) {
 //                cookie.setSecure(true);

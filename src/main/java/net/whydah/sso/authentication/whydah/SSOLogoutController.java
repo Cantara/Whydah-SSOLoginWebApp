@@ -25,7 +25,7 @@ public class SSOLogoutController {
 
 
 
-    public SSOLogoutController() {
+    public SSOLogoutController() throws IOException {
         this.tokenServiceClient = new SecurityTokenServiceClient();
         try {
             MY_APP_URI = AppConfig.readProperties().getProperty("myuri");

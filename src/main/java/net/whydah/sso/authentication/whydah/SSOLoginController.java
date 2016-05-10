@@ -263,7 +263,7 @@ public class SSOLoginController {
                 String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
                 log.warn(">==================== 1 ");
 
-                String userActivitiesJson = new CommandListUserActivities(URI.create(reportservice), SecurityTokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
+                String userActivitiesJson = new CommandListUserActivities(URI.create(reportservice), tokenServiceClient.getMyAppTokenID(), userTokenId, userid).execute();
                 //    model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
                 log.warn(">==================== 2 ");
                 model.addAttribute(ModelHelper.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));

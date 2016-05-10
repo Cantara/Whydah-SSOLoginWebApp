@@ -1,10 +1,12 @@
 package net.whydah.sso.authentication.whydah.clients;
 
 import net.whydah.sso.config.ApplicationMode;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
@@ -19,7 +21,7 @@ public class RedirectURITest {
 
     @Ignore
     @Test
-    public void testRedirectLogic(){
+    public void testRedirectLogic() throws IOException{
         SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
         String redirectURI = "http://demo.getwhydah.com/test/hello";
         String userTicket = UUID.randomUUID().toString();
