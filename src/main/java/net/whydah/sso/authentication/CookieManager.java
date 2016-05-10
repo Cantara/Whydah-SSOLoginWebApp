@@ -61,7 +61,7 @@ public class CookieManager {
         cookie.setPath("/");
        //cookie.setPath("/ ; HttpOnly;");
         if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
-            cookie.setSecure(true);
+            //cookie.setSecure(true);
         }
 //        if ("https".equalsIgnoreCase(request.getScheme())) {
 //            cookie.setSecure(true);
@@ -87,7 +87,7 @@ public class CookieManager {
             //cookie.setPath("/ ; HttpOnly;");
             cookie.setPath("/");
             if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
-                cookie.setSecure(true);
+               // cookie.setSecure(true);
             }
 //            if ("https".equalsIgnoreCase(request.getScheme())) {
 //                cookie.setSecure(true);
