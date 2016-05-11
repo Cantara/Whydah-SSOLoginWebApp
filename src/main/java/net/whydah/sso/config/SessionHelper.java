@@ -59,7 +59,7 @@ public class SessionHelper {
     public static void updateApplinks(URI userAdminServiceUri, String myAppTokenId, String responseXML) {
         if (shouldUpdate() || getAppLinks() == null || myAppLinks.length() < 6) {
             String userTokenId = UserTokenMapper.fromUserTokenXml(responseXML).getTokenid();
-            String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId, userTokenId, "").execute();
+            String applicationsJson = new CommandListApplications(userAdminServiceUri, myAppTokenId).execute();
             log.debug("AppLications returned:" + applicationsJson);
             if (applicationsJson != null) {
                 if (applicationsJson.length() > 20) {
