@@ -4,14 +4,14 @@ import net.whydah.sso.ServerRunner;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
 import net.whydah.sso.commands.extensions.statistics.CommandListUserActivities;
-import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
+import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
-import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserTokenID;
 import org.slf4j.Logger;
@@ -182,6 +182,7 @@ public class SSOLoginController {
         log.trace("action: redirectURI: {}", redirectURI);
         model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         model.addAttribute(SessionHelper.WHYDAH_VERSION,whydahVersion);
+        model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
 
 
         if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
@@ -203,12 +204,11 @@ public class SSOLoginController {
             model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in.");
             ModelHelper.setEnabledLoginTypes(model);
             CookieManager.clearUserTokenCookies(request, response);
-            model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
             model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
             return "login";
         }
-        if (redirectURI.contains(ModelHelper.USERTICKET)) {
-            log.warn("action - redirectURI contain ticket. Redirecting to welcome.");
+        if (redirectURI.contains(ModelHelper.USERTICKET) && !redirectURI.toLowerCase().contains("http")) {
+            log.warn("action - redirectURI contain ticket and no URL. Redirecting to welcome.");
             model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
             ModelHelper.setEnabledLoginTypes(model);
             model.addAttribute(SessionHelper.REDIRECT_URI, "");
