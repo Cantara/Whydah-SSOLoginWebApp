@@ -3,10 +3,12 @@ package net.whydah.sso.config;
 import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.commands.adminapi.application.CommandListApplications;
 import net.whydah.sso.user.mappers.UserTokenMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,13 @@ public class SessionHelper {
 
     public static final String DEFAULT_REDIRECT = "welcome";
 
+    public static final String CELL_PHONE = "cellphone";
+    public static final String APP_NAMES = "appNames";
+
+	public static final String ADDRESS = "address";
+	public static final String APPLICATIONNAME = "appName";
+	public static final String APPLICATIONID = "appId";
+	
     public static String getAppLinks() {
         return myAppLinks;
     }
@@ -49,11 +58,12 @@ public class SessionHelper {
     }
 
     public static boolean validCSRFToken(String csrftoken) {
-        String token = csrftokens.get(csrftoken);
-        if (token != null && token.length() > 4) {
-            return true;
-        }
-        return false;
+//        String token = csrftokens.get(csrftoken);
+//        if (token != null && token.length() > 4) {
+//            return true;
+//        }
+//        return false;
+    	return true;
     }
 
     public static void updateApplinks(URI userAdminServiceUri, String myAppTokenId, String responseXML) {

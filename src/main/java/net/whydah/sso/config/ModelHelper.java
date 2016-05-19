@@ -2,6 +2,7 @@ package net.whydah.sso.config;
 
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.LoginTypes;
+
 import org.springframework.ui.Model;
 
 import java.io.IOException;
@@ -28,7 +29,8 @@ public class ModelHelper {
     public static final String NETIQLOGINENABLED = "netIQLoginEnabled";
     public static final String OPENIDLOGINENABLED = "openidLoginEnabled";
     public static final String SIGNUPENABLED = "signupEnabled";
-
+    public static String INN_ROLE="INNData";
+    
     static {
         try {
             enabledLoginTypes = new LoginTypes(AppConfig.readProperties());

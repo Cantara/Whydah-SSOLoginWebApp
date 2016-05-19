@@ -1,19 +1,31 @@
 package net.whydah.sso.authentication.whydah;
 
+import static net.whydah.sso.config.ModelHelper.INN_ROLE;
 import net.whydah.sso.ServerRunner;
+import net.whydah.sso.application.types.Application;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
+import net.whydah.sso.commands.adminapi.user.role.CommandAddUserRole;
+import net.whydah.sso.commands.adminapi.user.role.CommandGetUserRoles;
+import net.whydah.sso.commands.adminapi.user.role.CommandUpdateUserRole;
 import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
 import net.whydah.sso.commands.extensions.statistics.CommandListUserActivities;
+import net.whydah.sso.commands.userauth.CommandRefreshUserToken;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
+import net.whydah.sso.session.WhydahApplicationSession;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.user.mappers.UserRoleMapper;
+import net.whydah.sso.user.mappers.UserTokenMapper;
+import net.whydah.sso.user.types.UserApplicationRoleEntry;
+import net.whydah.sso.user.types.UserToken;
 import net.whydah.sso.user.types.UserTokenID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,10 +34,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -39,7 +54,9 @@ public class SSOLoginController {
 
     private String crmservice;
     private String reportservice;
-
+    private URI uasServiceUri;
+	private URI tokenServiceUri;
+	
     //private final int MIN_REDIRECT_SIZE=4;
     //private final ModelHelper modelHelper = new ModelHelper(this);
 
@@ -49,7 +66,11 @@ public class SSOLoginController {
         LOGOURL = properties.getProperty("logourl");
         crmservice = properties.getProperty("crmservice");
         reportservice = properties.getProperty("reportservice");
+        
         this.tokenServiceClient = new SecurityTokenServiceClient();
+        this.tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
+		this.uasServiceUri = UriBuilder.fromUri(properties.getProperty("useradminservice")).build();
+		
     }
 
 
@@ -299,6 +320,151 @@ public class SSOLoginController {
         }
     }
 
+    
+    @RequestMapping("/selectaddress")
+	public String selectAddress(HttpServletRequest request, HttpServletResponse response, Model model) {
+		//get parameters
+		String redirectURI = SessionHelper.getRedirectURI(request);
+		log.trace("selectaddress: redirectURI: {}", redirectURI);
+		String CSRFtoken = request.getParameter(SessionHelper.CSRFtoken);//to check for valid request
+		String userTicket = request.getParameter(ModelHelper.USERTICKET);//need a ticket to get UserToken
+		String address = request.getParameter(SessionHelper.ADDRESS);//It is the roleValue of roleName=INNDATA
+		String userTokenId = CookieManager.getUserTokenIdFromCookie(request);//accept tokenid from cookie as well
+		String appplicationId = request.getParameter(SessionHelper.APPLICATIONID);
+		String appplicationName = request.getParameter(SessionHelper.APPLICATIONNAME);
+		model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
+		model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
+		model.addAttribute(SessionHelper.WHYDAH_VERSION, whydahVersion);
+		model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+		model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+		ModelHelper.setEnabledLoginTypes(model);
+
+		String userTokenXml = null;
+		ModelHelper.setEnabledLoginTypes(model);
+
+		if (SessionHelper.validCSRFToken(CSRFtoken)) {
+			if (userTicket != null && userTicket.length() > 3) {
+				log.trace("selectaddress - Using userTicket");
+				userTokenXml = tokenServiceClient.getUserTokenByUserTicket(userTicket);
+			} else if (userTokenId != null && userTokenId.length() > 3) {
+				log.trace("selectaddress - No userTicket, using userTokenID from cookie");
+				userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
+			} else {
+				String userTokenIdFromCookie = CookieManager.getUserTokenIdFromCookie(request);
+				log.trace("selectaddress - No userTicket, using userTokenID from cookie");
+				userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenIdFromCookie);
+			}
+
+			//Process when having a valid UserToken
+			if (userTokenXml != null) {
+				if (updateOrCreateUserApplicationRoleEntry(appplicationId, appplicationName, address, userTokenXml)) {
+					if (true) { 
+						
+						model.addAttribute(SessionHelper.REDIRECT, redirectURI);
+						model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
+						return "action";
+					}
+				} else {
+					model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in - Update Application Role Failed");
+				}
+			}
+
+		} else {
+			log.warn("action - CSRFtoken verification failed. Redirecting to login.");
+		}
+
+
+		log.trace("Select address - no session found");
+		model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in - CSRFtoken missing or incorrect");
+		ModelHelper.setEnabledLoginTypes(model);
+		return "login";
+
+
+	}
+
+
+	public boolean updateOrCreateUserApplicationRoleEntry(String applicationId, String applicationName, String roleValue, String userTokenXml) {
+
+		boolean result = false;
+		try {
+			//    	a) find the correct application/website the customer shall return to (redirectURI/from view)
+			//		b) lookup and find the userRole the user have for this application with roleName="INNData" (UAS)
+			//		c) update the roleValue for this particular role (UAS)
+			//		d) call the "non-existing" updateUserToken method in STS
+
+			//implement
+			//step a -> find correct app
+			UserToken userToken = UserTokenMapper.fromUserTokenXml(userTokenXml);
+			String rolesJson = new CommandGetUserRoles(uasServiceUri, tokenServiceClient.getMyAppTokenID(), userToken.getTokenid(), userToken.getUid()).execute();
+
+			List<Application> apps = WhydahApplicationSession.getApplicationList();
+			Application appFound=null;
+			for(Application app:apps){
+				if(app.getId().equalsIgnoreCase(applicationId) || app.getName().equalsIgnoreCase(applicationName)){
+					appFound = app;
+					break;
+				}
+			}
+				
+			if(appFound==null){
+				return false;
+			} else {
+				
+				//step b -> find userRole
+				List<UserApplicationRoleEntry> appRoleEntryList = UserRoleMapper.fromJsonAsList(rolesJson);
+				UserApplicationRoleEntry selectApplicationEntry = null;
+				for (UserApplicationRoleEntry appRoleEntry : appRoleEntryList) {
+					if (appFound.getId().equals(appRoleEntry.getApplicationId())){
+						if (appRoleEntry.getRoleName().equalsIgnoreCase(INN_ROLE)) {
+							selectApplicationEntry = appRoleEntry;
+							break;
+						}
+					}
+				}
+				
+				//step c
+				if (selectApplicationEntry == null) {
+					//create new application, this command is already tested
+					UserApplicationRoleEntry userRole = new UserApplicationRoleEntry(userToken.getTokenid(), appFound.getId(), appFound.getName(), "Opplysningen 1881", INN_ROLE, roleValue);
+					String userAddRoleResult = new CommandAddUserRole(uasServiceUri, tokenServiceClient.getMyAppTokenID(), userToken.getTokenid(), userToken.getUid(), userRole.toJson()).execute();
+					log.debug("new: userAddRoleResult:{}", userAddRoleResult);
+				} else {
+
+					selectApplicationEntry.setRoleValue(roleValue);
+					String editedUserRoleResult = new CommandUpdateUserRole(uasServiceUri, tokenServiceClient.getMyAppTokenID(), userToken.getTokenid(), userToken.getUid(), selectApplicationEntry.getId(), selectApplicationEntry.toJson()).execute();
+					log.debug("update: userUpdateRoleResult:{}", editedUserRoleResult);
+				}
+				//step d
+				//call the "non-existing" updateUserToken method in STS
+				String updatedUserTokenXML = (new CommandRefreshUserToken(tokenServiceUri, tokenServiceClient.getMyAppTokenID(), tokenServiceClient.getMyAppTokenXml(), userToken.getTokenid()).execute());
+				log.debug("Updated UserToken: {}", updatedUserTokenXML);
+				if (updatedUserTokenXML != null == updatedUserTokenXML.length() > 10) {
+					result = true;
+				}
+				
+			}
+
+			
+
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			log.error("updateOrCreateUserApplicationRoleEntry failed: " + ex.getMessage());
+			return false;
+		}
+		
+		return result;
+	}
+
+	private String getCellPhone(HttpServletRequest request) {
+		String cellPhone = request.getParameter(SessionHelper.CELL_PHONE);
+		if (cellPhone == null || cellPhone.length() < 1) {
+			log.trace("getCellPhone - No cellphone found, setting to ", "");
+			return "";
+		}
+		return cellPhone;
+	}
+	
 
 }
 
