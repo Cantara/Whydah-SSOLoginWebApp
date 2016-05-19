@@ -1,24 +1,9 @@
 package net.whydah.sso.extensions.crmcustomer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.commands.extensions.crmapi.CommandCreateCRMCustomer;
-import net.whydah.sso.commands.extensions.crmapi.CommandGetCRMCustomer;
-import net.whydah.sso.commands.extensions.crmapi.CommandSendEmailVerificationToken;
-import net.whydah.sso.commands.extensions.crmapi.CommandSendPhoneVerificationPin;
-import net.whydah.sso.commands.extensions.crmapi.CommandUpdateCRMCustomer;
-import net.whydah.sso.commands.extensions.crmapi.CommandVerifyEmailByToken;
-import net.whydah.sso.commands.extensions.crmapi.CommandVerifyPhoneByPin;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.commands.extensions.crmapi.*;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ModelHelper;
 import net.whydah.sso.config.SessionHelper;
@@ -28,9 +13,7 @@ import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
 import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
 import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.authentication.whydah.clients.WhyDahServiceClient;
 import net.whydah.sso.util.SSLTool;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -38,14 +21,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Properties;
 
 @Controller
 public class CRMCustomerController {
 
     private static final Logger log = LoggerFactory.getLogger(CRMCustomerController.class);
 
-    private final WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
+    private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
     private URI crmServiceUri;
     private final String emailVerificationLink;
     String LOGOURL = "/sso/images/site-logo.png";

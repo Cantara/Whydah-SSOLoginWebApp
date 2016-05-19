@@ -1,7 +1,6 @@
 package net.whydah.sso.authentication.whydah.clients;
 
 import net.whydah.sso.config.ApplicationMode;
-
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,7 +21,7 @@ public class RedirectURITest {
     @Ignore
     @Test
     public void testRedirectLogic() throws IOException{
-        WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
+        WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
         String redirectURI = "http://demo.getwhydah.com/test/hello";
         String userTicket = UUID.randomUUID().toString();
         // ticket on redirect

@@ -1,22 +1,10 @@
 package net.whydah.sso.authentication.whydah.clients;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
-import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
-import static com.sun.jersey.api.client.ClientResponse.Status.OK;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
 import com.restfb.types.User;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-
-import net.minidev.json.writer.UpdaterMapper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
@@ -24,16 +12,23 @@ import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.SessionHelper;
-import net.whydah.sso.session.baseclasses.BaseWhyDahServiceClient;
+import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
 
-public class WhyDahServiceClient extends BaseWhyDahServiceClient {
-	   
-	//TODO: HUYDO will check, move all general functions to base
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import java.io.IOException;
+
+import static com.sun.jersey.api.client.ClientResponse.Status.*;
+
+public class WhydahServiceClient extends BaseWhydahServiceClient {
+
+    //TODO: HUYDO will check, move all general functions to base
 	
 	private final Client tokenServiceClient = Client.create();
-	 
-    public WhyDahServiceClient() throws IOException {
-    	super(AppConfig.readProperties());
+
+    public WhydahServiceClient() throws IOException {
+        super(AppConfig.readProperties());
     }
     
     public String getUserToken(UserCredential user, String userticket) {

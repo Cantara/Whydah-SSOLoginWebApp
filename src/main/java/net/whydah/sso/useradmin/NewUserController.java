@@ -3,12 +3,12 @@ package net.whydah.sso.useradmin;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import net.whydah.sso.config.ModelHelper;
-import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.config.SessionHelper;
+import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.authentication.whydah.clients.WhyDahServiceClient;
+import net.whydah.sso.config.ModelHelper;
+import net.whydah.sso.config.SessionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -32,7 +32,7 @@ public class NewUserController {
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
 
-    private final WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
+    private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
     String LOGOURL = "/sso/images/site-logo.png";
 
     public NewUserController() throws IOException {

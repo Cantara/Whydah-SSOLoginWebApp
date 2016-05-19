@@ -1,10 +1,12 @@
 package net.whydah.sso.useradmin;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.authentication.whydah.clients.WhyDahServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,8 +20,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 
-import com.codahale.metrics.*;
-
 /**
  * Password management self service.
  */
@@ -30,7 +30,7 @@ public class PasswordChangeController {
     private final Meter resetPasswordRequests = metrics.meter("requests");
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
-    private final WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
+    private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
     String LOGOURL = "/sso/images/site-logo.png";
 
 
