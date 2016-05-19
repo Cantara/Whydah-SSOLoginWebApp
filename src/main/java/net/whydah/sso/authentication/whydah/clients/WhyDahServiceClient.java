@@ -16,6 +16,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import net.minidev.json.writer.UpdaterMapper;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
@@ -23,13 +24,15 @@ import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.SessionHelper;
-import net.whydah.sso.session.baseclasses.BaseSecurityTokenServiceClient;
+import net.whydah.sso.session.baseclasses.BaseWhyDahServiceClient;
 
-public class SecurityTokenServiceClient extends BaseSecurityTokenServiceClient {
+public class WhyDahServiceClient extends BaseWhyDahServiceClient {
 	   
-	 private final Client tokenServiceClient = Client.create();
+	//TODO: HUYDO will check, move all general functions to base
+	
+	private final Client tokenServiceClient = Client.create();
 	 
-    public SecurityTokenServiceClient() throws IOException {
+    public WhyDahServiceClient() throws IOException {
     	super(AppConfig.readProperties());
     }
     
@@ -76,8 +79,7 @@ public class SecurityTokenServiceClient extends BaseSecurityTokenServiceClient {
         return null;
         //throw new RuntimeException("User authentication failed with status code " + response.getStatus());
     }
-
-    
+  
     public String createAndLogonUser(User fbUser, String fbAccessToken, UserCredential userCredential, String userticket) {
     	
         log.debug("apptokenid: {}", getMyAppTokenID());

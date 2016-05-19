@@ -28,7 +28,7 @@ import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
 import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
 import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.WhyDahServiceClient;
 import net.whydah.sso.util.SSLTool;
 
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class CRMCustomerController {
 
     private static final Logger log = LoggerFactory.getLogger(CRMCustomerController.class);
 
-    private final SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
+    private final WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
     private URI crmServiceUri;
     private final String emailVerificationLink;
     String LOGOURL = "/sso/images/site-logo.png";

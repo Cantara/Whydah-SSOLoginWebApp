@@ -5,7 +5,7 @@ import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.SessionHelper;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.authentication.whydah.clients.SecurityTokenServiceClient;
+import net.whydah.sso.authentication.whydah.clients.WhyDahServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @Controller
 public class NetIQLoginController {
         private static final Logger log = LoggerFactory.getLogger(NetIQLoginController.class);
-    private final SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
+    private final WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
 
         // set this to your servlet URL for the authentication servlet/filter
         private final String hetIQauthURI;
@@ -130,7 +130,7 @@ public class NetIQLoginController {
 
 
             String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-            Integer tokenRemainingLifetimeSeconds = SecurityTokenServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+            Integer tokenRemainingLifetimeSeconds = WhyDahServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
             CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
 
             String clientRedirectURI = request.getParameter("redirectURI");

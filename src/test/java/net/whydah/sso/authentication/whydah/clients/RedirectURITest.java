@@ -22,7 +22,7 @@ public class RedirectURITest {
     @Ignore
     @Test
     public void testRedirectLogic() throws IOException{
-        SecurityTokenServiceClient tokenServiceClient = new SecurityTokenServiceClient();
+        WhyDahServiceClient tokenServiceClient = new WhyDahServiceClient();
         String redirectURI = "http://demo.getwhydah.com/test/hello";
         String userTicket = UUID.randomUUID().toString();
         // ticket on redirect
