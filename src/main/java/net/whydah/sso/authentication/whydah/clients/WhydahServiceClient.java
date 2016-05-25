@@ -12,7 +12,7 @@ import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.SessionHelper;
-import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
+import net.whydah.sso.session.baseclasses.BaseDevelopmentWhydahServiceClient;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
-public class WhydahServiceClient extends BaseWhydahServiceClient {
+public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
     //TODO: HUYDO will check, move all general functions to base
 	
