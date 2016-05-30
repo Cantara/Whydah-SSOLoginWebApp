@@ -1,25 +1,30 @@
 package net.whydah.sso.authentication.whydah.clients;
 
-import com.restfb.types.User;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
+import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
+import static com.sun.jersey.api.client.ClientResponse.Status.OK;
+
+import java.io.IOException;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
 import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
-import net.whydah.sso.config.SessionHelper;
+import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.session.baseclasses.BaseDevelopmentWhydahServiceClient;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import java.io.IOException;
-
-import static com.sun.jersey.api.client.ClientResponse.Status.*;
+import com.restfb.types.User;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
@@ -29,6 +34,10 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
     public WhydahServiceClient() throws IOException {
         super(AppConfig.readProperties());
+    }
+    
+    public WhydahServiceClient(Properties pros) throws IOException {
+        super(pros);
     }
     
     public String getUserToken(UserCredential user, String userticket) {
@@ -56,7 +65,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
-            SessionHelper.updateApplinks(uri_useradmin_service, getMyAppTokenID(), responseXML);
+            SessionDao.instance.updateApplinks();
             return responseXML;
         }
 
@@ -101,7 +110,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
-            SessionHelper.updateApplinks(uri_useradmin_service, getMyAppTokenID(), responseXML);
+            SessionDao.instance.updateApplinks();
             return responseXML;
         }
 
@@ -144,7 +153,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
-            SessionHelper.updateApplinks(uri_useradmin_service, getMyAppTokenID(), responseXML);
+            SessionDao.instance.updateApplinks();
             return responseXML;
         }
 

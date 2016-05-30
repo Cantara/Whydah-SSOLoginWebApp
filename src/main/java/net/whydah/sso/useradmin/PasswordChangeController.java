@@ -1,24 +1,25 @@
 package net.whydah.sso.useradmin;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import java.io.IOException;
+import java.net.URI;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+
 import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Properties;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 /**
  * Password management self service.
@@ -26,18 +27,18 @@ import java.util.Properties;
 @Controller
 public class PasswordChangeController {
     private static final Logger log = LoggerFactory.getLogger(PasswordChangeController.class);
-    static final MetricRegistry metrics = new MetricRegistry();
-    private final Meter resetPasswordRequests = metrics.meter("requests");
+    //static final MetricRegistry metrics = new MetricRegistry();
+    //private final Meter resetPasswordRequests = metrics.meter("requests");
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
-    private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
-    String LOGOURL = "/sso/images/site-logo.png";
+    //private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
+    //String LOGOURL = "/sso/images/site-logo.png";
 
 
     public PasswordChangeController() throws IOException {
         uasServiceUri = UriBuilder.fromUri(AppConfig.readProperties().getProperty("useradminservice")).build();
-        Properties properties = AppConfig.readProperties();
-        LOGOURL = properties.getProperty("logourl");
+//        Properties properties = AppConfig.readProperties();
+//        LOGOURL = properties.getProperty("logourl");
     }
 
     @RequestMapping("/test/*")
@@ -49,20 +50,20 @@ public class PasswordChangeController {
     @RequestMapping("/resetpassword")
     public String resetpassword(HttpServletRequest request, Model model) {
         log.trace("resetpassword was called");
-        resetPasswordRequests.mark();
-        model.addAttribute("logoURL", LOGOURL);
+        SessionDao.instance.addModel_LOGO_URL(model);
+        SessionDao.instance.addModel_MYURI(model);
+        
         String username = sanitizeUsername(request.getParameter("username"));
         if (username == null) {
             return "resetpassword";
         }
 
-        model.addAttribute("logoURL", LOGOURL);
-        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + username);
+        WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()+"/auth/password/reset/username/" + username);
         ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
             String error = response.getEntity(String.class);
             log.error(error);
-            model.addAttribute("error", error + "\nusername:" + username);
+            model.addAttribute("error", error+"\nusername:"+username);
             return "resetpassword";
         }
         return "resetpassworddone";
@@ -71,8 +72,11 @@ public class PasswordChangeController {
     @RequestMapping("/changepassword/*")
     public String changePasswordFromLink(HttpServletRequest request, Model model) {
         log.warn("changePasswordFromLink was called");
-        model.addAttribute("logoURL", LOGOURL);
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
+      //model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
+        SessionDao.instance.addModel_LOGO_URL(model);
+        //model.addAttribute(ConstantValue.MYURI, properties.getProperty("myuri"));
+        SessionDao.instance.addModel_MYURI(model);
         model.addAttribute("username", passwordChangeToken.getUser());
         model.addAttribute("token", passwordChangeToken.getToken());
         if (!passwordChangeToken.isValid()) {
@@ -85,12 +89,12 @@ public class PasswordChangeController {
     @RequestMapping("/dochangepassword/*")
     public String doChangePasswordFromLink(HttpServletRequest request, Model model) {
         log.trace("doChangePasswordFromLink was called");
-        // +@Path("/password/{applciationtokenid}")   @Path("/reset/username/{username}")
-        model.addAttribute("logoURL", LOGOURL);
+        SessionDao.instance.addModel_LOGO_URL(model);
+        
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
         String newpassword = request.getParameter("newpassword");
 //        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
-        WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
+        WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
         log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
 
         ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
@@ -106,7 +110,12 @@ public class PasswordChangeController {
             model.addAttribute("token", passwordChangeToken.getToken());
             return "changepassword";
         }
-        return "changedpassword";
+        String redirectURI = "login";
+        model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+        log.info("login - Redirecting to {}", redirectURI);
+        //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        SessionDao.instance.addModel_CSRFtoken(model);
+        return "action";
     }
 
     private PasswordChangeToken getTokenFromPath(HttpServletRequest request) {

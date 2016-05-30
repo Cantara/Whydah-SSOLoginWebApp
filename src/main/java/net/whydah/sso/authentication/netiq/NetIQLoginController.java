@@ -1,27 +1,29 @@
 package net.whydah.sso.authentication.netiq;
 
-import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.UserCredential;
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.config.ModelHelper;
-import net.whydah.sso.config.SessionHelper;
-import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class NetIQLoginController {
@@ -42,7 +44,7 @@ public class NetIQLoginController {
 
         @RequestMapping("/netiqlogin")
         public String netIQLogin(HttpServletRequest request, Model model) throws MalformedURLException {
-            if (!ModelHelper.isEnabled(ModelHelper.NETIQLOGINENABLED)) {
+            if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.NETIQLOGIN_ENABLED)) {
                 return "login";
             }
 
@@ -51,19 +53,21 @@ public class NetIQLoginController {
 
             model.addAttribute("redirect", hetIQauthURI+"?redirectURI="+clientRedirectURI);
             log.info("Redirecting to {}", hetIQauthURI+"?redirectURI="+clientRedirectURI);
-            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+            //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+            SessionDao.instance.addModel_CSRFtoken(model);
             return "action";
         }
 
         @RequestMapping("/netiqauth")
         public String netiqAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
-            if (!ModelHelper.isEnabled(ModelHelper.NETIQLOGINENABLED)) {
-                return "login";
-            }
-            ModelHelper.setEnabledLoginTypes(model);
-
+        	if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.NETIQLOGIN_ENABLED)) {
+        		return "login";
+        	}
+            //ModelHelper.setEnabledLoginTypes(model);
+        	SessionDao.instance.addModel_LoginTypes(model);
             model.addAttribute("logoURL", LOGOURL);
-            model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+            //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+            SessionDao.instance.addModel_CSRFtoken(model);
 
 
             try {
@@ -124,7 +128,8 @@ public class NetIQLoginController {
                     String redirectURI = request.getParameter("redirectURI");
                     model.addAttribute("redirectURI", redirectURI);
                     model.addAttribute("loginError", "Login error: Could not create or authenticate user.");
-                    ModelHelper.setEnabledLoginTypes(model);
+                   // ModelHelper.setEnabledLoginTypes(model);
+                    SessionDao.instance.addModel_LoginTypes(model);
                     return "login";
                 }
             }

@@ -1,29 +1,27 @@
 package net.whydah.sso.authentication;
 
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.config.ApplicationMode;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import net.whydah.sso.config.AppConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CookieManager {
-    public static final String USER_TOKEN_REFERENCE_NAME = "whydahusertoken_sso";
+	public static final String USER_TOKEN_REFERENCE_NAME = "whydahusertoken_sso";
     //private static final String LOGOUT_COOKIE_VALUE = "logout";
     private static final Logger log = LoggerFactory.getLogger(CookieManager.class);
     private static final int DEFAULT_COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
     private static String cookiedomain = null;
     private static String MY_APP_URI;
+    private static boolean IS_MY_URI_SECURED = false;
 
     private CookieManager() {
     }
@@ -38,7 +36,7 @@ public class CookieManager {
         	if(MY_APP_URI!=null){
             
 				 uri = new URL(MY_APP_URI);
-				 
+				 IS_MY_URI_SECURED = MY_APP_URI.indexOf("https") >= 0;
 				 if(cookiedomain==null || cookiedomain.isEmpty()){
 					 String domain = uri.getHost();
 					 domain = domain.startsWith("www.") ? domain.substring(4) : domain;
@@ -52,7 +50,8 @@ public class CookieManager {
     }
 
     public static void addSecurityHTTPHeaders(HttpServletResponse response) {
-        response.setHeader("X-Frame-Options", "sameorigin");
+        //TODO Vi trenger en plan her.
+        //response.setHeader("X-Frame-Options", "sameorigin");
         response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
         response.setHeader("X-Content-Type-Options", "nosniff");
         response.setHeader("X-XSS-Protection", "1; mode=block");
@@ -61,6 +60,7 @@ public class CookieManager {
         response.setHeader("Expires", "-1");
         response.setHeader("X-Permitted-Cross-Domain-Policies", "master-only");
     }
+
 
     public static void createAndSetUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds, HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = new Cookie(USER_TOKEN_REFERENCE_NAME, userTokenId);
@@ -74,16 +74,17 @@ public class CookieManager {
         if (cookiedomain != null && !cookiedomain.isEmpty()) {
             cookie.setDomain(cookiedomain);
         }
-        cookie.setPath("/");
-  
-        if ("https".equalsIgnoreCase(request.getScheme())) {
-            cookie.setSecure(true);
-        } else {
-            log.warn("Unsecure session detected, using myuri to define coocie security");
-            //cookie.setSecure(secureCookie(MY_APP_URI));
-            cookie.setSecure(false);
-
-        }
+        //cookie.setPath("/; secure; HttpOnly");
+        cookie.setPath("; HttpOnly;");
+        cookie.setSecure(IS_MY_URI_SECURED);
+//        if ("https".equalsIgnoreCase(request.getScheme())) {
+//            cookie.setSecure(true);
+//        } else {
+//            log.warn("Unsecure session detected, using myuri to define coocie security");
+//            //cookie.setSecure(secureCookie(MY_APP_URI));
+//            cookie.setSecure(false);
+//
+//        }
 
         log.debug("Created cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                 cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
@@ -99,16 +100,15 @@ public class CookieManager {
                 cookie.setDomain(cookiedomain);
             }
             //cookie.setPath("/ ; HttpOnly;");
-            cookie.setPath("/");
-            if (!ApplicationMode.getApplicationMode().equals(ApplicationMode.TEST_L)) {
-                cookie.setSecure(true);
-            }
-            if ("https".equalsIgnoreCase(request.getScheme())) {
-                cookie.setSecure(true);
-            } else {
-                log.warn("Unsecure session detected, using myuri to define coocie security");
-                cookie.setSecure(secureCookie(MY_APP_URI));
-            }
+            //cookie.setPath("/; secure; HttpOnly");
+            cookie.setPath("; HttpOnly;");
+            cookie.setSecure(IS_MY_URI_SECURED);
+//            if ("https".equalsIgnoreCase(request.getScheme())) {
+//                cookie.setSecure(true);
+//            } else {
+//                log.warn("Unsecure session detected, using myuri to define coocie security");
+//                cookie.setSecure(secureCookie(MY_APP_URI));
+//            }
             response.addCookie(cookie);
             log.trace("Cleared cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                     cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
@@ -118,10 +118,10 @@ public class CookieManager {
     public static String getUserTokenId(HttpServletRequest request) {
         String userTokenId = request.getParameter(CookieManager.USER_TOKEN_REFERENCE_NAME);
         if (userTokenId != null && userTokenId.length() > 1) {
-            log.debug("getUserTokenId: userTokenIdFromRequest={}", userTokenId);
+            log.warn("getUserTokenId: userTokenIdFromRequest={}", userTokenId);
         } else {
             userTokenId = CookieManager.getUserTokenIdFromCookie(request);
-            log.debug("getUserTokenId: userTokenIdFromCookie={}", userTokenId);
+            log.warn("getUserTokenId: userTokenIdFromCookie={}", userTokenId);
         }
         return userTokenId;
     }
@@ -144,19 +144,4 @@ public class CookieManager {
         }
         return null;
     }
-
-    public static boolean secureCookie(String myuri) {
-        return myuri.indexOf("https") >= 0;
-    }
-
-    /*
-    public static void setLogoutUserTokenCookie(HttpServletRequest request, HttpServletResponse response) {
-        Cookie userTokenCookie = getUserTokenCookie(request);
-        if (userTokenCookie != null) {
-            log.debug("Setting logout value on userToken cookie.");
-            userTokenCookie.setValue(LOGOUT_COOKIE_VALUE);
-            response.addCookie(userTokenCookie);
-        }
-    }
-    */
 }

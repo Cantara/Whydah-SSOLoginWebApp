@@ -3,12 +3,14 @@ package net.whydah.sso.useradmin;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.config.ModelHelper;
-import net.whydah.sso.config.SessionHelper;
+import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -32,26 +35,28 @@ public class NewUserController {
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
 
-    private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
-    String LOGOURL = "/sso/images/site-logo.png";
+    //private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
+    //String LOGOURL = "/sso/images/site-logo.png";
 
     public NewUserController() throws IOException {
-        Properties properties = AppConfig.readProperties();
-        String MY_APP_URI = properties.getProperty("myuri");
-        LOGOURL = properties.getProperty("logourl");
+//        Properties properties = AppConfig.readProperties();
+//        String MY_APP_URI = properties.getProperty("myuri");
+//        LOGOURL = properties.getProperty("logourl");
         uasServiceUri = UriBuilder.fromUri(AppConfig.readProperties().getProperty("useradminservice")).build();
 
     }
 
     @RequestMapping("/signup")
     public String signup(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
-        if (!ModelHelper.isEnabled(ModelHelper.SIGNUPENABLED)) {
+        if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.SIGNUPENABLED)) {
             return "login";
         }
         log.trace("/signup entry");
         printParams(request);
-        model.addAttribute("logoURL", LOGOURL);
-        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        //model.addAttribute("logoURL", LOGOURL);
+        //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        SessionDao.instance.addModel_CSRFtoken(model);
+        SessionDao.instance.addModel_LOGO_URL(model);
         String username = request.getParameter("username");
         String email = request.getParameter("useremail");
         String firstName = request.getParameter("firstname");
@@ -65,15 +70,16 @@ public class NewUserController {
                     "\", \"lastName\":\"" + lastName +
                     "\", \"personRef\":\"\", \"email\":\"" + email +
                     "\", \"cellPhone\":\"" + cellPhone + "\"}";
-            if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
+            if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
                 log.warn("action - CSRFtoken verification failed. Redirecting to login.");
-                ModelHelper.setEnabledLoginTypes(model);
-                model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+                //ModelHelper.setEnabledLoginTypes(model);
+                SessionDao.instance.addModel_LoginTypes(model);
+                SessionDao.instance.addModel_CSRFtoken(model);
                 return "login";
             }
             ;
             try {
-                WebResource uasWR = uasClient.resource(uasServiceUri).path(tokenServiceClient.getMyAppTokenID()).path("signup");//.path("signup");
+                WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()).path("signup");//.path("signup");
                 log.trace("signup was called. Calling UAS with url " + uasWR.getURI());
 
                 ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
@@ -82,8 +88,10 @@ public class NewUserController {
                     log.error(error);
                     model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
                 } else {
-                    ModelHelper.setEnabledLoginTypes(model);
-                    model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+                   // ModelHelper.setEnabledLoginTypes(model);
+                    //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+                	SessionDao.instance.addModel_LoginTypes(model);
+                    SessionDao.instance.addModel_CSRFtoken(model);
                     return "login";
                 }
 
@@ -95,20 +103,25 @@ public class NewUserController {
 
         }
 
-        ModelHelper.setEnabledLoginTypes(model);
+        //ModelHelper.setEnabledLoginTypes(model);
+        SessionDao.instance.addModel_LoginTypes(model);
         CookieManager.clearUserTokenCookies(request, response);
-        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        SessionDao.instance.addModel_CSRFtoken(model);
         return "newuser";
     }
 
     @RequestMapping("/createnewuser")
     public String createNewUser(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
-        if (!ModelHelper.isEnabled(ModelHelper.SIGNUPENABLED)) {
+        if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.SIGNUPENABLED)) {
             return "login";
         }
         log.trace("/createnewuser entry");
-        model.addAttribute("logoURL", LOGOURL);
-        model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        //model.addAttribute("logoURL", LOGOURL);
+        //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+        SessionDao.instance.addModel_LOGO_URL(model);
+        SessionDao.instance.addModel_CSRFtoken(model);
+        
         //String fbId = "";
         //String username = "user";
         UserCredential userCredential = new UserCredential() {
@@ -125,17 +138,19 @@ public class NewUserController {
         };
 
 
-        String userTokenXml = tokenServiceClient.createAndLogonUser(null, "", userCredential, "");
+        String userTokenXml = SessionDao.instance.getServiceClient().createAndLogonUser(null, "", userCredential, "");
         if (userTokenXml == null) {
             log.error("createAndLogonUser failed. Redirecting to login page.");
             String redirectURI = "";
             model.addAttribute("redirectURI", redirectURI);
             model.addAttribute("loginError", "Login error: Could not create or authenticate user.");
-            ModelHelper.setEnabledLoginTypes(model);
+            //ModelHelper.setEnabledLoginTypes(model);
+            SessionDao.instance.addModel_LoginTypes(model);
             return "login";
         }
         String clientRedirectURI = request.getParameter("redirectURI");
-        model.addAttribute("logoURL", LOGOURL);
+        //model.addAttribute("logoURL", LOGOURL);
+        SessionDao.instance.addModel_LOGO_URL(model);
 
         if (clientRedirectURI == null || clientRedirectURI.length() < 3) {
             model.addAttribute("redirect", "welcome");
