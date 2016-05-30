@@ -450,7 +450,7 @@ public enum SessionDao {
 				//update cookie with a working usertokenid
 				String tokenid =  UserTokenXpathHelper.getUserTokenId(userTokenXml);
 				Integer tokenRemainingLifetimeSeconds = WhydahServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
-				CookieManager.createAndSetUserTokenCookie(tokenid, tokenRemainingLifetimeSeconds, request, response);
+				CookieManager.updateUserTokenCookie(tokenid, tokenRemainingLifetimeSeconds, request, response);
 				//fill in model
 				model.addAttribute(ConstantValue.USER_TOKEN_ID, tokenid);
 				if(userTicket!=null && isValidTicket){
