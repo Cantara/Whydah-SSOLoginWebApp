@@ -1,25 +1,22 @@
 package net.whydah.sso.useradmin;
 
-import java.io.IOException;
-import java.net.URI;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
 
 /**
  * Password management self service.
@@ -31,14 +28,10 @@ public class PasswordChangeController {
     //private final Meter resetPasswordRequests = metrics.meter("requests");
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
-    //private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
-    //String LOGOURL = "/sso/images/site-logo.png";
 
 
     public PasswordChangeController() throws IOException {
         uasServiceUri = UriBuilder.fromUri(AppConfig.readProperties().getProperty("useradminservice")).build();
-//        Properties properties = AppConfig.readProperties();
-//        LOGOURL = properties.getProperty("logourl");
     }
 
     @RequestMapping("/test/*")
@@ -110,7 +103,7 @@ public class PasswordChangeController {
             model.addAttribute("token", passwordChangeToken.getToken());
             return "changepassword";
         }
-        String redirectURI = "login";
+        String redirectURI = "/sso/welcome";
         model.addAttribute(ConstantValue.REDIRECT, redirectURI);
         log.info("login - Redirecting to {}", redirectURI);
         //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
