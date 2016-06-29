@@ -69,26 +69,27 @@ public class CookieManager {
         if (tokenRemainingLifetimeSeconds == null) {
             tokenRemainingLifetimeSeconds = DEFAULT_COOKIE_MAX_AGE;
         }
-        cookie.setMaxAge(tokenRemainingLifetimeSeconds);
-
-        if (cookiedomain != null && !cookiedomain.isEmpty()) {
-            cookie.setDomain(cookiedomain);
-        }
-        //cookie.setPath("/; secure; HttpOnly");
-        cookie.setPath("; HttpOnly;");
-        cookie.setSecure(IS_MY_URI_SECURED);
-//        if ("https".equalsIgnoreCase(request.getScheme())) {
-//            cookie.setSecure(true);
-//        } else {
-//            log.warn("Unsecure session detected, using myuri to define coocie security");
-//            //cookie.setSecure(secureCookie(MY_APP_URI));
-//            cookie.setSecure(false);
+//        cookie.setMaxAge(tokenRemainingLifetimeSeconds);
 //
+//        if (cookiedomain != null && !cookiedomain.isEmpty()) {
+//            cookie.setDomain(cookiedomain);
 //        }
-
-        log.debug("Created cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
-                cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
-        response.addCookie(cookie);
+//        //cookie.setPath("/; secure; HttpOnly");
+//        cookie.setPath("; HttpOnly;");
+//        cookie.setSecure(IS_MY_URI_SECURED);
+////        if ("https".equalsIgnoreCase(request.getScheme())) {
+////            cookie.setSecure(true);
+////        } else {
+////            log.warn("Unsecure session detected, using myuri to define coocie security");
+////            //cookie.setSecure(secureCookie(MY_APP_URI));
+////            cookie.setSecure(false);
+////
+////        }
+//
+//        log.debug("Created cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
+//                cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
+//        response.addCookie(cookie);
+        addCookie(cookie.getValue(), tokenRemainingLifetimeSeconds, response);
     }
 
     public static void updateUserTokenCookie(String userTokenId, Integer tokenRemainingLifetimeSeconds, HttpServletRequest request, HttpServletResponse response) {
@@ -105,43 +106,46 @@ public class CookieManager {
         }
         //Only name and value are sent back to the server from the browser. The other attributes are only used by the browser to determine of the cookie should be sent or not.
         //http://en.wikipedia.org/wiki/HTTP_cookie#Setting_a_cookie
-
+//
         if (tokenRemainingLifetimeSeconds == null) {
             tokenRemainingLifetimeSeconds = DEFAULT_COOKIE_MAX_AGE;
         }
-        cookie.setMaxAge(tokenRemainingLifetimeSeconds);
-
-        if (cookiedomain != null && !cookiedomain.isEmpty()) {
-            cookie.setDomain(cookiedomain);
-        }
-        cookie.setPath("; HttpOnly;");
-        cookie.setSecure(IS_MY_URI_SECURED);
-        log.debug("Created/updated cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
-                cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
-        response.addCookie(cookie);
+//        cookie.setMaxAge(tokenRemainingLifetimeSeconds);
+//
+//        if (cookiedomain != null && !cookiedomain.isEmpty()) {
+//            cookie.setDomain(cookiedomain);
+//        }
+//        cookie.setPath("; HttpOnly;");
+//        cookie.setSecure(IS_MY_URI_SECURED);
+//        log.debug("Created/updated cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
+//                cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
+//        response.addCookie(cookie);
+        
+        addCookie(cookie.getValue(), tokenRemainingLifetimeSeconds, response);
     }
     
     public static void clearUserTokenCookies(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = getUserTokenCookie(request);
         if (cookie != null) {
-            cookie.setValue("");
-            cookie.setMaxAge(0);
-            if (cookiedomain != null && !cookiedomain.isEmpty()) {
-                cookie.setDomain(cookiedomain);
-            }
-            //cookie.setPath("/ ; HttpOnly;");
-            //cookie.setPath("/; secure; HttpOnly");
-            cookie.setPath("; HttpOnly;");
-            cookie.setSecure(IS_MY_URI_SECURED);
-//            if ("https".equalsIgnoreCase(request.getScheme())) {
-//                cookie.setSecure(true);
-//            } else {
-//                log.warn("Unsecure session detected, using myuri to define coocie security");
-//                cookie.setSecure(secureCookie(MY_APP_URI));
+//            cookie.setValue("");
+//            cookie.setMaxAge(0);
+//            if (cookiedomain != null && !cookiedomain.isEmpty()) {
+//                cookie.setDomain(cookiedomain);
 //            }
-            response.addCookie(cookie);
-            log.trace("Cleared cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
-                    cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
+//            //cookie.setPath("/ ; HttpOnly;");
+//            //cookie.setPath("/; secure; HttpOnly");
+//            cookie.setPath("; HttpOnly;");
+//            cookie.setSecure(IS_MY_URI_SECURED);
+////            if ("https".equalsIgnoreCase(request.getScheme())) {
+////                cookie.setSecure(true);
+////            } else {
+////                log.warn("Unsecure session detected, using myuri to define coocie security");
+////                cookie.setSecure(secureCookie(MY_APP_URI));
+////            }
+//            response.addCookie(cookie);
+//            log.trace("Cleared cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
+//                    cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
+            addCookie("", 0, response);
         }
     }
 
@@ -174,4 +178,20 @@ public class CookieManager {
         }
         return null;
     }
+    
+    private static void addCookie(String userTokenId,
+			Integer tokenRemainingLifetimeSeconds, HttpServletResponse response) {
+		StringBuilder sb = new StringBuilder(USER_TOKEN_REFERENCE_NAME);
+        sb.append("=");
+        sb.append(userTokenId);
+        sb.append(";expires=");
+        sb.append(tokenRemainingLifetimeSeconds);
+        sb.append(";path=");
+        sb.append("/");
+        sb.append(";HttpOnly");
+        if(IS_MY_URI_SECURED){
+        	 sb.append(";secure");
+        }
+        response.setHeader("SET-COOKIE", sb.toString());
+	}
 }
