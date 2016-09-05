@@ -17,12 +17,11 @@
         <developerConnection>scm:git:ssh://git@github.com/cantara/Whydah-SSOLoginWebApp.git</developerConnection>
         <connection>scm:git:https://github.com/cantara/Whydah-SSOLoginWebApp.git</connection>
         <url>https://github.com/cantara/Whydah-SSOLoginWebApp</url>
-        <tag>SSOLoginWebApp-2.1-ALPHA-8</tag>
     </scm>
 
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah-sdk-version>2.2-alpha-41</whydah-sdk-version>
+        <whydah-sdk-version>2.2-beta-2</whydah-sdk-version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.0.6.RELEASE</spring.version>
         <org.springframework.security-version>3.2.0.RELEASE</org.springframework.security-version>
