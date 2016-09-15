@@ -56,9 +56,9 @@ public class HealthResource {
                 "  \"hasApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().getActiveApplicationTokenId() != null) + "\",\n" +
                 "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
                 "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().getApplicationList().size() > 2) + "\",\n" +
-                "  \"" + ConstantValue.SECURITYTOKENSERVICEHEALTH + "\": " + properties.getProperty("securitytokenservice") + "health" + ",\n" +
-                "  \"" + ConstantValue.USERADMINSERVICEHEALTH + "\": " + properties.getProperty("useradminservice") + "health/" + ",\n" +
-                "  \"" + ConstantValue.CRMSERVICEHEALTH + "\": " + properties.getProperty("crmservice") + "health" + "\n" +
+                "  \"" + ConstantValue.SECURITYTOKENSERVICEHEALTH + "\": \"" + properties.getProperty("securitytokenservice") + "health" + "\" ,\n" +
+                "  \"" + ConstantValue.USERADMINSERVICEHEALTH + "\": \"" + properties.getProperty("useradminservice") + "health/" + "\" ,\n" +
+                "  \"" + ConstantValue.CRMSERVICEHEALTH + "\": \"" + properties.getProperty("crmservice") + "health" + "\" \n" +
                 "}\n";
     }
 
