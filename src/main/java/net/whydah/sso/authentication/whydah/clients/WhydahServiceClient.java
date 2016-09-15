@@ -1,16 +1,10 @@
 package net.whydah.sso.authentication.whydah.clients;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
-import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
-import static com.sun.jersey.api.client.ClientResponse.Status.OK;
-
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
+import com.restfb.types.User;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
@@ -19,14 +13,21 @@ import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.session.baseclasses.BaseDevelopmentWhydahServiceClient;
+import net.whydah.sso.user.types.UserToken;
 
-import com.restfb.types.User;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import java.io.IOException;
+import java.util.Properties;
+
+import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
 public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
+
+
+    private UserToken.DEFCON defcon;
+
 
     //TODO: HUYDO will check, move all general functions to base
 	
@@ -183,6 +184,15 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         }
         return sb.toString();
     }
+
+    public UserToken.DEFCON getDefcon() {
+        return defcon;
+    }
+
+    public void setDefcon(UserToken.DEFCON defcon) {
+        this.defcon = defcon;
+    }
+
 }
 
 
