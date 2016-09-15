@@ -1,11 +1,5 @@
 package net.whydah.sso.authentication.whydah;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
@@ -15,12 +9,16 @@ import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserTokenID;
 import net.whydah.sso.utils.SignupHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.UUID;
 
 @Controller
 public class SSOLoginController {
@@ -175,6 +173,7 @@ public class SSOLoginController {
             SessionDao.instance.addModel_CSRFtoken(model);
             return "login";
         }
+        SessionDao.instance.getServiceClient().updateDefcon(userTokenXml);
         if (redirectURI.contains(ConstantValue.USERTICKET) && !redirectURI.toLowerCase().contains("http")) {
             log.warn("action - redirectURI contain ticket and no URL. Redirecting to welcome.");
             model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
@@ -185,7 +184,7 @@ public class SSOLoginController {
             model.addAttribute(ConstantValue.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
             model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
             model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
-            model.addAttribute(ConstantValue.DEFCON, UserTokenXpathHelper.getDEFCONLevel(userTokenXml));
+            model.addAttribute(ConstantValue.DEFCON, SessionDao.instance.getServiceClient().getDefcon());
             model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
             SessionDao.instance.getCRMHelper().getCrmdata_AddToModel(model, userTokenXml);
             SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
@@ -209,66 +208,6 @@ public class SSOLoginController {
         return "action";
     }
     
-//    @RequestMapping("/selectaddress")
-//	public String selectAddress(HttpServletRequest request, HttpServletResponse response, Model model) {
-//		//get parameters
-//		String redirectURI = SessionHelper.getRedirectURI(request);
-//		log.trace("selectaddress: redirectURI: {}", redirectURI);
-//		String CSRFtoken = request.getParameter(SessionHelper.CSRFtoken);//to check for valid request
-//		String userTicket = request.getParameter(ModelHelper.USERTICKET);//need a ticket to get UserToken
-//		String address = request.getParameter(SessionHelper.ADDRESS);//It is the roleValue of roleName=INNDATA
-//		String userTokenId = CookieManager.getUserTokenIdFromCookie(request);//accept tokenid from cookie as well
-//		String appplicationId = request.getParameter(SessionHelper.APPLICATIONID);
-//		String appplicationName = request.getParameter(SessionHelper.APPLICATIONNAME);
-//		model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
-//		model.addAttribute(SessionHelper.IAM_MODE, ApplicationMode.getApplicationMode());
-//		model.addAttribute(SessionHelper.WHYDAH_VERSION, whydahVersion);
-//		model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-//		model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
-//		ModelHelper.setEnabledLoginTypes(model);
-//
-//		String userTokenXml = null;
-//		ModelHelper.setEnabledLoginTypes(model);
-//
-//		if (SessionHelper.validCSRFToken(CSRFtoken)) {
-//			if (userTicket != null && userTicket.length() > 3) {
-//				log.trace("selectaddress - Using userTicket");
-//				userTokenXml = tokenServiceClient.getUserTokenByUserTicket(userTicket);
-//			} else if (userTokenId != null && userTokenId.length() > 3) {
-//				log.trace("selectaddress - No userTicket, using userTokenID from cookie");
-//				userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenId);
-//			} else {
-//				String userTokenIdFromCookie = CookieManager.getUserTokenIdFromCookie(request);
-//				log.trace("selectaddress - No userTicket, using userTokenID from cookie");
-//				userTokenXml = tokenServiceClient.getUserTokenByUserTokenID(userTokenIdFromCookie);
-//			}
-//
-//			//Process when having a valid UserToken
-//			if (userTokenXml != null) {
-//				if (tokenServiceClient.updateOrCreateUserApplicationRoleEntry(appplicationId, appplicationName, "WHYDAH", INN_ROLE, address, userTokenXml)) {
-//					if (true) { 
-//
-//						model.addAttribute(SessionHelper.REDIRECT, redirectURI);
-//						model.addAttribute(SessionHelper.REDIRECT_URI, redirectURI);
-//						return "action";
-//					}
-//				} else {
-//					model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in - Update Application Role Failed");
-//				}
-//			}
-//
-//		} else {
-//			log.warn("action - CSRFtoken verification failed. Redirecting to login.");
-//			model.addAttribute(SessionHelper.LOGIN_ERROR, "Could not log in - CSRFtoken missing or incorrect");
-//		}
-//
-//
-//		log.trace("Select address - no session found");
-//		ModelHelper.setEnabledLoginTypes(model);
-//		return "login";
-//
-//
-//	}
 }
 
 
