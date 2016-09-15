@@ -173,7 +173,7 @@ public class SSOLoginController {
             SessionDao.instance.addModel_CSRFtoken(model);
             return "login";
         }
-        SessionDao.instance.getServiceClient().updateDefcon(userTokenXml);
+        SessionDao.instance.getServiceClient().getWAS().updateDefcon(userTokenXml);
         if (redirectURI.contains(ConstantValue.USERTICKET) && !redirectURI.toLowerCase().contains("http")) {
             log.warn("action - redirectURI contain ticket and no URL. Redirecting to welcome.");
             model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
@@ -184,7 +184,7 @@ public class SSOLoginController {
             model.addAttribute(ConstantValue.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
             model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
             model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
-            model.addAttribute(ConstantValue.DEFCON, SessionDao.instance.getServiceClient().getDefcon());
+            model.addAttribute(ConstantValue.DEFCON, SessionDao.instance.getServiceClient().getWAS().getDefcon());
             model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
             SessionDao.instance.getCRMHelper().getCrmdata_AddToModel(model, userTokenXml);
             SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);

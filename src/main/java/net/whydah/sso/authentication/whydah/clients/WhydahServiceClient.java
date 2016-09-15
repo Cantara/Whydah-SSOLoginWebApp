@@ -13,8 +13,6 @@ import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.session.baseclasses.BaseDevelopmentWhydahServiceClient;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.user.types.UserToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
@@ -25,9 +23,6 @@ import java.util.Properties;
 import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
 public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
-
-
-    private UserToken.DEFCON defcon = UserToken.DEFCON.DEFCON5;
 
 
     //TODO: HUYDO will check, move all general functions to base
@@ -186,41 +181,6 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         return sb.toString();
     }
 
-    public UserToken.DEFCON getDefcon() {
-        return defcon;
-    }
-
-    public void setDefcon(UserToken.DEFCON defcon) {
-        this.defcon = defcon;
-    }
-
-    public void updateDefcon(String userTokenXml) {
-        defcon = UserToken.DEFCON.DEFCON5;
-        String tokendefcon = UserTokenXpathHelper.getDEFCONLevel(userTokenXml);
-        if (UserToken.DEFCON.DEFCON5.equals(tokendefcon)) {
-            defcon = UserToken.DEFCON.DEFCON5;
-        }
-        if (UserToken.DEFCON.DEFCON4.equals(tokendefcon)) {
-            log.warn("DEFCON lecel is now DEFCON4");
-            defcon = UserToken.DEFCON.DEFCON4;
-
-        }
-        if (UserToken.DEFCON.DEFCON3.equals(tokendefcon)) {
-            log.error("DEFCON lecel is now DEFCON3");
-            defcon = UserToken.DEFCON.DEFCON3;
-
-        }
-        if (UserToken.DEFCON.DEFCON2.equals(tokendefcon)) {
-            log.error("DEFCON lecel is now DEFCON2");
-            defcon = UserToken.DEFCON.DEFCON2;
-
-        }
-        if (UserToken.DEFCON.DEFCON1.equals(tokendefcon)) {
-            log.error("DEFCON lecel is now DEFCON1");
-            defcon = UserToken.DEFCON.DEFCON1;
-        }
-
-    }
 
 }
 

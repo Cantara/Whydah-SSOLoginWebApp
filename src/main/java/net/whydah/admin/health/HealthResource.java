@@ -37,7 +37,7 @@ public class HealthResource {
     @RequestMapping("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isHealthy(HttpServletRequest request, HttpServletResponse response, Model model) {
-        boolean ok = serviceClient.getDefcon().equals(UserToken.DEFCON.DEFCON5);
+        boolean ok = serviceClient.getWAS().getDefcon().equals(UserToken.DEFCON.DEFCON5);
 
         log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
         if (ok) {
@@ -52,7 +52,7 @@ public class HealthResource {
         return "{\n" +
                 "  \"Status\": \"OK\",\n" +
                 "  \"Version\": \"" + getVersion() + "\",\n" +
-                "  \"DEFCON\": \"" + serviceClient.getDefcon() + "\",\n" +
+                "  \"DEFCON\": \"" + serviceClient.getWAS().getDefcon() + "\",\n" +
                 "  \"hasApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().getActiveApplicationTokenId() != null) + "\",\n" +
                 "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
                 "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().getApplicationList().size() > 2) + "\",\n" +
