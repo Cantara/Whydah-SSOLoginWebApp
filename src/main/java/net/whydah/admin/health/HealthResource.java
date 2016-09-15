@@ -41,6 +41,7 @@ public class HealthResource {
 
         log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
         if (ok) {
+            model.addAttribute(ConstantValue.HEALTH, getHealthTextJson());
             return Response.ok(getHealthTextJson()).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
