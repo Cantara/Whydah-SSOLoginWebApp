@@ -3,8 +3,8 @@ package net.whydah.admin.health;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
-import net.whydah.sso.user.types.UserToken;
 import net.whydah.sso.util.WhydahUtil;
+import net.whydah.sso.whydah.DEFCON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -37,7 +37,7 @@ public class HealthResource {
     @RequestMapping("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isHealthy(HttpServletRequest request, HttpServletResponse response, Model model) {
-        boolean ok = serviceClient.getWAS().getDefcon().equals(UserToken.DEFCON.DEFCON5);
+        boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
         log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
         if (ok) {
