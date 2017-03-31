@@ -13,10 +13,9 @@
     </div>
 
     <div class="login-box">
-        <
-        #if error??>
+        <#if error??>
         <p class="error">${error!}</p>
-    </#if>
+         </#if>
     <form method="post" class="new_user_session">
         <p>Signup - You will receive an email containing a link you can follow to complete the signup process..</p>
         <h4><label for="username">Username</label></h4>
