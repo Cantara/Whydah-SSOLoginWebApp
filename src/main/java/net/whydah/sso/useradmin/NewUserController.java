@@ -3,14 +3,11 @@ package net.whydah.sso.useradmin;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -21,12 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Enumeration;
-import java.util.Properties;
 
 @Controller
 public class NewUserController {
@@ -90,9 +85,10 @@ public class NewUserController {
                 } else {
                    // ModelHelper.setEnabledLoginTypes(model);
                     //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-                	SessionDao.instance.addModel_LoginTypes(model);
+                    model.addAttribute("username", username);
+                    SessionDao.instance.addModel_LoginTypes(model);
                     SessionDao.instance.addModel_CSRFtoken(model);
-                    return "login";
+                    return "signup_result";
                 }
 
             } catch (IllegalStateException ise) {
