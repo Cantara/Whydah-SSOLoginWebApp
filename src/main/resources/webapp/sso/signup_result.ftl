@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Whydah Reset Password</title>
+    <title>Whydah User Signup</title>
     <link rel="stylesheet" href="css/whydah.css" TYPE="text/css"/>
     <meta charset="utf-8"/>
 </head>
@@ -14,14 +14,13 @@
 
     <div class="login-box">
         <#if error??>
-        <p class="error">${error!}</p>
-         </#if>
+            <p class="error">${error!}</p>
+        </#if>
     <form method="post" class="new_user_session">
-        <p>Signup - You will receive an email containing a link you can follow to complete the signup process..</p>
-        <h4><label for="username">Username</label></h4>
-        <input id="username" name="username" size="30" type="text" placeholder="Username"/>
+        <p>Signup - You will soon receive an email containing a link you can follow to complete the signup process..</p>
+        <h4>Username:  ${username!} </h4>
     </form>
 </div>
 </div>
 </body>
-        </html>
+</html>
