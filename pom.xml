@@ -72,7 +72,7 @@
     <dependencies>
         <dependency>
             <groupId>net.whydah.sso</groupId>
-            <artifactId>Whydah-Java-SDK</artifactId>
+            <artifactId>Whydah-Admin-SDK</artifactId>
             <version>${whydah.admin.sdk.version}</version>
         </dependency>
         <dependency>
