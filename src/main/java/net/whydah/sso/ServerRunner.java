@@ -2,6 +2,7 @@ package net.whydah.sso;
 
 import com.codahale.metrics.servlets.AdminServlet;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.util.SSLTool;
 import org.eclipse.jetty.server.Server;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import java.io.IOException;
+import java.util.Properties;
 
 public class ServerRunner {
     public static final int PORT_NO = 9997;
@@ -30,6 +32,8 @@ public class ServerRunner {
         ServerRunner serverRunner = new ServerRunner();
         serverRunner.start();
 
+
+        printConfiguration(AppConfig.readProperties());
 
         int port = serverRunner.server.getConnectors()[0].getLocalPort();
         serverRunner.join();
@@ -61,5 +65,11 @@ public class ServerRunner {
     }
     public void join() throws InterruptedException {
         server.join();
+    }
+
+    public static void printConfiguration(Properties properties) {
+        for (Object key : properties.keySet()) {
+            log.info("Using Property: {}, value: {}", key, properties.get(key));
+        }
     }
 }
