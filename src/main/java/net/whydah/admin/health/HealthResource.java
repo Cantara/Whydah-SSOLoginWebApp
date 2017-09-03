@@ -22,29 +22,47 @@ import java.util.Properties;
 
 @Controller
 public class HealthResource {
-    private final WhydahServiceClient serviceClient;
+    private static WhydahServiceClient serviceClient;
 
     private static final Logger log = LoggerFactory.getLogger(HealthResource.class);
-    protected Properties properties;
+    protected static Properties properties;
 
 
-    public HealthResource() throws Exception {
-        this.serviceClient = new WhydahServiceClient();
-        properties = AppConfig.readProperties();
+    public HealthResource()  {
+        try {
+            properties = AppConfig.readProperties();
+            this.serviceClient = new WhydahServiceClient();
+
+        } catch (Exception e){
+            log.warn("Unable to create WhydahServiceClient in constructor",e);
+        }
 
     }
 
     @RequestMapping("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isHealthy(HttpServletRequest request, HttpServletResponse response, Model model) {
-        boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
+        try {
+            boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
-        log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
-        if (ok) {
-            model.addAttribute(ConstantValue.HEALTH, getHealthTextJson());
-            return Response.ok(getHealthTextJson()).build();
-        } else {
+            log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
+            if (ok) {
+                model.addAttribute(ConstantValue.HEALTH, getHealthTextJson());
+                return Response.ok(getHealthTextJson()).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception e){
+            try {
+                properties = AppConfig.readProperties();
+                serviceClient = new WhydahServiceClient();
+
+            } catch (Exception f){
+                log.warn("Unable to create WhydahServiceClient",f);
+            }
+            log.warn("Initializing WhydahServiceClient",e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+
         }
     }
 
