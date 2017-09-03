@@ -46,9 +46,10 @@ public class ConstantValue {
     public static final String PHONE_NO = "phoneNo";
     public static final String TOKEN = "token";
     public static final String HEALTH = "health";
-    public static final String SECURITYTOKENSERVICEHEALTH = "securitytokenservice";
-    public static final String USERADMINSERVICEHEALTH = "useradminservice";
-    public static final String CRMSERVICEHEALTH = "crmservice";
+    public static final String SECURITYTOKENSERVICEHEALTH = "securitytokenservice_health";
+    public static final String USERADMINSERVICEHEALTH = "useradminservice_health";
+    public static final String CRMSERVICEHEALTH = "crmservice_health";
+    public static final String STATISTICSSERVICEHEALTH = "statisticsservice_health";
 
     public static final String FACEBOOKLOGIN_ENABLED = "facebookLoginEnabled";
     public static final String OPENIDLOGIN_ENABLED = "openidLoginEnabled";
