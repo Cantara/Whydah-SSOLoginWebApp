@@ -78,7 +78,7 @@ public class HealthResource {
                 "  \"DEFCON\": \"" + serviceClient.getWAS().getDefcon() + "\",\n" +
                 "  \"hasApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().getActiveApplicationTokenId() != null) + "\",\n" +
                 "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
-                "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().getApplicationList().size() > 2) + "\",\n" +
+                "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().hasApplicationMetaData()) + "\",\n" +
                 "  \"" + ConstantValue.SECURITYTOKENSERVICEHEALTH + "\": \"" + properties.getProperty("securitytokenservice") + "health" + "\" ,\n" +
                 "  \"" + ConstantValue.USERADMINSERVICEHEALTH + "\": \"" + properties.getProperty("useradminservice") + "health" + "\" ,\n" +
                 "  \"" + ConstantValue.STATISTICSSERVICEHEALTH + "\": \"" + properties.getProperty("reportservice") + "health" + "\" ,\n" +
