@@ -42,6 +42,16 @@ public class HealthResource {
     @RequestMapping("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isHealthy(HttpServletRequest request, HttpServletResponse response, Model model) {
+        if (serviceClient==null){
+            try {
+                properties = AppConfig.readProperties();
+                serviceClient = new WhydahServiceClient();
+
+            } catch (Exception f){
+                log.warn("Unable to create WhydahServiceClient",f);
+            }
+
+        }
         try {
             boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
@@ -50,17 +60,12 @@ public class HealthResource {
                 model.addAttribute(ConstantValue.HEALTH, getHealthTextJson());
                 return Response.ok(getHealthTextJson()).build();
             } else {
+                model.addAttribute(ConstantValue.HEALTH, "isHealthy={false}");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         } catch (Exception e){
-            try {
-                properties = AppConfig.readProperties();
-                serviceClient = new WhydahServiceClient();
-
-            } catch (Exception f){
-                log.warn("Unable to create WhydahServiceClient",f);
-            }
             log.warn("Initializing WhydahServiceClient",e);
+            model.addAttribute(ConstantValue.HEALTH, "Initializing WhydahServiceClient");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 
         }
