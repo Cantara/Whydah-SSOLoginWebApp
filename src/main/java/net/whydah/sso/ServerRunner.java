@@ -1,6 +1,5 @@
 package net.whydah.sso;
 
-import com.codahale.metrics.servlets.AdminServlet;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
@@ -49,7 +48,9 @@ public class ServerRunner {
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
-        context.addServlet(new ServletHolder(new AdminServlet()), "/metrics/*");
+//        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
+
+//        context.addServlet(new ServletHolder(new AdminServlet()), "/metrics/*");
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextConfigLocation("classpath:webapp/sso/mvc-config.xml");
