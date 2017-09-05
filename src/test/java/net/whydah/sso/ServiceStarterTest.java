@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ServiceStarterTest {
 
@@ -49,6 +50,8 @@ public class ServiceStarterTest {
             }
         } catch (Exception ioe) {
             ioe.printStackTrace();
+            fail("Error in initiating server");
+
             assertTrue("Unable to connect to server", true);
         }
     }
