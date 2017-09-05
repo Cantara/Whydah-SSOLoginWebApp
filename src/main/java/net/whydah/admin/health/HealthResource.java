@@ -53,6 +53,9 @@ public class HealthResource {
 
         }
         try {
+            if (serviceClient.getWAS()==null){
+                return Response.ok("Initializing").build();
+            }
             boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
             log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
