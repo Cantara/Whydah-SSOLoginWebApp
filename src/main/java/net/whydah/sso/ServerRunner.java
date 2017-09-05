@@ -53,7 +53,7 @@ public class ServerRunner {
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
-        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
+//        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
 
 //        context.addServlet(new ServletHolder(new AdminServlet()), "/metrics/*");
 
