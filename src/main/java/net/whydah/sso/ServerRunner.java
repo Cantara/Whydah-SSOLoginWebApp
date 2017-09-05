@@ -1,5 +1,6 @@
 package net.whydah.sso;
 
+import com.codahale.metrics.MetricRegistry;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ServerRunner {
-    public static final int PORT_NO = 9997;
+    public static int PORT_NO = 9997;
     public static final String CONTEXT = "/sso";
     public static final String ROOT_URL = "http://localhost:" + PORT_NO + CONTEXT;
     public static final String TESTURL = ROOT_URL + "/action";
@@ -44,11 +45,15 @@ public class ServerRunner {
     }
 
     public ServerRunner() throws IOException {
-        server = new Server(PORT_NO);
+        this(PORT_NO);
+    }
+    public ServerRunner(int portNo) throws IOException {
+        this.PORT_NO=portNo;
+        server=new Server(PORT_NO);
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
-//        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
+        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
 
 //        context.addServlet(new ServletHolder(new AdminServlet()), "/metrics/*");
 

@@ -35,7 +35,9 @@ public class CookieTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         System.setProperty(ApplicationMode.IAM_MODE_KEY, ApplicationMode.DEV);
-        serverRunner = new ServerRunner();
+        Random r = new Random( System.currentTimeMillis() );
+        serverRunner = new ServerRunner(10000 + r.nextInt(20000));
+
         serverRunner.start();
     }
 
