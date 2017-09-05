@@ -58,8 +58,8 @@ public class HealthResource {
             }
             boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
-            log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
-            if (ok) {
+            if (ok && serviceClient.getWAS().checkActiveSession()) {
+                log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
                 model.addAttribute(ConstantValue.HEALTH, getHealthTextJson());
                 return Response.ok(getHealthTextJson()).build();
             } else {

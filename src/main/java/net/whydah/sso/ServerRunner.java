@@ -18,8 +18,12 @@ import java.util.Properties;
 public class ServerRunner {
     public static int PORT_NO = 9997;
     public static final String CONTEXT = "/sso";
-    public static final String ROOT_URL = "http://localhost:" + PORT_NO + CONTEXT;
-    public static final String TESTURL = ROOT_URL + "/action";
+    public static String ROOT_URL = "http://localhost:" + PORT_NO + CONTEXT;
+    public static String TESTURL = ROOT_URL + "/action";
+
+    public static String getHEALTHURL() {
+        return "http://localhost:" + PORT_NO + CONTEXT + "/health";
+    }
 
     private static final Logger log = LoggerFactory.getLogger(ServerRunner.class);
 
@@ -53,7 +57,7 @@ public class ServerRunner {
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
-//        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
+        MetricRegistry metrics = (MetricRegistry) context.getAttribute("com.codahale.metrics.servlets.MetricsServlet.registry");
 
 //        context.addServlet(new ServletHolder(new AdminServlet()), "/metrics/*");
 
