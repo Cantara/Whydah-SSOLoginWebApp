@@ -1,15 +1,14 @@
 package net.whydah.sso.dao;
 
-import java.net.URI;
-
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.commands.extensions.statistics.CommandListUserActivities;
 import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
+
+import java.net.URI;
 
 public class ReportServiceHelper {
 
@@ -28,8 +27,8 @@ public class ReportServiceHelper {
 		String userTokenXml = serviceClient.getUserTokenByUserTokenID(userTokenId);
 		String userid = UserTokenXpathHelper.getUserID(userTokenXml);
 		String userActivitiesJson = new CommandListUserActivities(reportservice, serviceClient.getMyAppTokenID(), userTokenId, userid).execute();
-		return UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid);
-	}
+        return UserActivityHelper.getTimedUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid);
+    }
 
 	 public void addUserActivities(Model model, String userTokenXml) {
 	        model.addAttribute(ConstantValue.USERACTIVITIES_SIMPLIFIED, "{}");
@@ -42,8 +41,8 @@ public class ReportServiceHelper {
 	                String userActivitiesJson = new CommandListUserActivities(reportservice, serviceClient.getMyAppTokenID(), userTokenId, userid).execute();
 	                //    model.addAttribute(ModelHelper.USERACTIVITIES, userActivitiesJson);
 	                log.warn(">==================== 2 ");
-	                model.addAttribute(ConstantValue.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
-	                log.warn(">==================== 3 ");
+                    model.addAttribute(ConstantValue.USERACTIVITIES_SIMPLIFIED, UserActivityHelper.getTimedUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid));
+                    log.warn(">==================== 3 ");
 	            } catch (Exception e) {
 
 	            }
