@@ -1,17 +1,5 @@
 package net.whydah.sso.dao;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.UriBuilder;
-
 import net.whydah.sso.ServerRunner;
 import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.application.types.Application;
@@ -32,10 +20,16 @@ import net.whydah.sso.user.types.UserCredential;
 import net.whydah.sso.user.types.UserToken;
 import net.whydah.sso.utils.ServerUtil;
 import net.whydah.sso.utils.SignupHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
 
 public enum SessionDao {
 
@@ -45,7 +39,6 @@ public enum SessionDao {
 	protected final static Logger log = LoggerFactory.getLogger(SessionDao.class);
 	private WhydahServiceClient serviceClient=null;
 	protected String LOGOURL = "/sso/images/site-logo.png";
-	public String INN_ROLE="";
 	protected String whydahVersion = ServerRunner.version;
 	protected URI uasServiceUri;
 	protected URI tokenServiceUri;
