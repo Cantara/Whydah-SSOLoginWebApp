@@ -3,6 +3,7 @@ package net.whydah.sso.useradmin;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -24,8 +26,6 @@ import java.net.URI;
 @Controller
 public class PasswordChangeController {
     private static final Logger log = LoggerFactory.getLogger(PasswordChangeController.class);
-    //static final MetricRegistry metrics = new MetricRegistry();
-    //private final Meter resetPasswordRequests = metrics.meter("requests");
     private static final Client uasClient = Client.create();
     private URI uasServiceUri;
 
@@ -45,7 +45,9 @@ public class PasswordChangeController {
         log.trace("resetpassword was called");
         SessionDao.instance.addModel_LOGO_URL(model);
         SessionDao.instance.addModel_MYURI(model);
-        
+        SessionDao.instance.addModel_CSRFtoken(model);
+
+
         String username = sanitizeUsername(request.getParameter("username"));
         if (username == null) {
             return "resetpassword";
@@ -70,6 +72,8 @@ public class PasswordChangeController {
         SessionDao.instance.addModel_LOGO_URL(model);
         //model.addAttribute(ConstantValue.MYURI, properties.getProperty("myuri"));
         SessionDao.instance.addModel_MYURI(model);
+        SessionDao.instance.addModel_CSRFtoken(model);
+
         model.addAttribute("username", passwordChangeToken.getUser());
         model.addAttribute("token", passwordChangeToken.getToken());
         if (!passwordChangeToken.isValid()) {
@@ -80,22 +84,33 @@ public class PasswordChangeController {
     }
 
     @RequestMapping("/dochangepassword/*")
-    public String doChangePasswordFromLink(HttpServletRequest request, Model model) {
+    public String doChangePasswordFromLink(HttpServletRequest request, HttpServletResponse response, Model model) {
         log.trace("doChangePasswordFromLink was called");
         SessionDao.instance.addModel_LOGO_URL(model);
-        
+
+        if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
+            log.warn("action - CSRFtoken verification failed. Redirecting to login.");
+            model.addAttribute(ConstantValue.PASSWORD_CHANGE_ERROR, "Could not change password - CSRFtoken missing or incorrect");
+            SessionDao.instance.addModel_CSRFtoken(model);
+            SessionDao.instance.addModel_LoginTypes(model);
+            CookieManager.clearUserTokenCookies(request, response);
+            return "login";
+
+        }
+
+
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
         String newpassword = request.getParameter("newpassword");
 //        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
         WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
         log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
 
-        ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
+        ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
         model.addAttribute("username", passwordChangeToken.getUser());
-        if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            String error = response.getEntity(String.class);
+        if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+            String error = uasResponse.getEntity(String.class);
             log.error(error);
-            if (response.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
+            if (uasResponse.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
                 model.addAttribute("error", "The password you entered was found to be too weak, please try another password.");
             } else {
                 model.addAttribute("error", error + "\nusername:" + passwordChangeToken.getUser());
@@ -106,7 +121,6 @@ public class PasswordChangeController {
         String redirectURI = "/sso/welcome";
         model.addAttribute(ConstantValue.REDIRECT, redirectURI);
         log.info("login - Redirecting to {}", redirectURI);
-        //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         SessionDao.instance.addModel_CSRFtoken(model);
         return "action";
     }
