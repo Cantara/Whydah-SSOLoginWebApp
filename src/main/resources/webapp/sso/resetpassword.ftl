@@ -19,6 +19,7 @@
                 <form method="post" class="new_user_session">
                     <p>You will receive an email containing instructions how to set a new password.</p>
                     <h4><label for="username">Username</label></h4>
+                    <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                     <input id="username" name="username" size="30" type="text" placeholder="Username"/>
                     <input class="button button-login" name="commit" type="submit" value="Request new password"/>
                 </form>
