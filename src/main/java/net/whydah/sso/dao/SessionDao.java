@@ -276,9 +276,11 @@ public enum SessionDao {
 	
 	//////END HANDLE PARAMTERS FROM THE REQUEST
 
+
+    ///  Block side-channel attacks
     public void setCSP(HttpServletResponse response) {
-        response.addHeader("Content-Security-Policy", "frame-ancestors 'none");
-        // response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self'; report-uri REDACTED");
+        response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
+        response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self'; report-uri REDACTED");
     }
 
 
