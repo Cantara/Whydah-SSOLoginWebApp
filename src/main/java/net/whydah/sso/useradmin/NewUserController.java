@@ -51,6 +51,8 @@ public class NewUserController {
         //model.addAttribute("logoURL", LOGOURL);
         //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         SessionDao.instance.addModel_CSRFtoken(model);
+        SessionDao.instance.setCSP(response);
+
         SessionDao.instance.addModel_LOGO_URL(model);
         String username = request.getParameter("username");
         String email = request.getParameter("useremail");
@@ -117,7 +119,9 @@ public class NewUserController {
         //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         SessionDao.instance.addModel_LOGO_URL(model);
         SessionDao.instance.addModel_CSRFtoken(model);
-        
+        SessionDao.instance.setCSP(response);
+
+
         //String fbId = "";
         //String username = "user";
         UserCredential userCredential = new UserCredential() {

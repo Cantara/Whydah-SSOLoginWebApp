@@ -40,8 +40,9 @@ public class SSOLoginController {
 		SessionDao.instance.updateApplinks();
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
-		SessionDao.instance.addModel_MYURI(model);
-		SessionDao.instance.addModel_WHYDAH_VERSION(model);
+        SessionDao.instance.setCSP(response);
+        SessionDao.instance.addModel_MYURI(model);
+        SessionDao.instance.addModel_WHYDAH_VERSION(model);
         model.addAttribute(ConstantValue.SESSIONCHECK, sessionCheckOnly);
         model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
         
@@ -114,9 +115,11 @@ public class SSOLoginController {
 		SessionDao.instance.addModel_WHYDAH_VERSION(model);
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
-		
-		if(userTokenXml==null){
-			return "login";
+        SessionDao.instance.setCSP(response);
+
+
+        if (userTokenXml == null) {
+            return "login";
 		} else {
 
 			boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
@@ -144,8 +147,10 @@ public class SSOLoginController {
 		SessionDao.instance.addModel_WHYDAH_VERSION(model);
 		SessionDao.instance.addModel_IAM_MODE(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
-		model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
-		SessionDao.instance.addModel_LoginTypes(model);
+        SessionDao.instance.setCSP(response);
+
+        model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+        SessionDao.instance.addModel_LoginTypes(model);
         //if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
 		if(!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
             log.warn("action - CSRFtoken verification failed. Redirecting to login.");

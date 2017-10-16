@@ -41,11 +41,12 @@ public class PasswordChangeController {
     }
 
     @RequestMapping("/resetpassword")
-    public String resetpassword(HttpServletRequest request, Model model) {
+    public String resetpassword(HttpServletRequest request, HttpServletResponse response, Model model) {
         log.trace("resetpassword was called");
         SessionDao.instance.addModel_LOGO_URL(model);
         SessionDao.instance.addModel_MYURI(model);
         SessionDao.instance.addModel_CSRFtoken(model);
+        SessionDao.instance.setCSP(response);
 
 
         String username = sanitizeUsername(request.getParameter("username"));
@@ -54,9 +55,9 @@ public class PasswordChangeController {
         }
 
         WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()+"/auth/password/reset/username/" + username);
-        ClientResponse response = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
-        if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            String error = response.getEntity(String.class);
+        ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
+        if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+            String error = uasResponse.getEntity(String.class);
             log.error(error);
             model.addAttribute("error", error+"\nusername:"+username);
             return "resetpassword";
@@ -65,7 +66,7 @@ public class PasswordChangeController {
     }
 
     @RequestMapping("/changepassword/*")
-    public String changePasswordFromLink(HttpServletRequest request, Model model) {
+    public String changePasswordFromLink(HttpServletRequest request, HttpServletResponse response, Model model) {
         log.warn("changePasswordFromLink was called");
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
       //model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
@@ -73,6 +74,8 @@ public class PasswordChangeController {
         //model.addAttribute(ConstantValue.MYURI, properties.getProperty("myuri"));
         SessionDao.instance.addModel_MYURI(model);
         SessionDao.instance.addModel_CSRFtoken(model);
+        SessionDao.instance.setCSP(response);
+
 
         model.addAttribute("username", passwordChangeToken.getUser());
         model.addAttribute("token", passwordChangeToken.getToken());
@@ -92,6 +95,8 @@ public class PasswordChangeController {
             log.warn("action - CSRFtoken verification failed. Redirecting to login.");
             model.addAttribute(ConstantValue.PASSWORD_CHANGE_ERROR, "Could not change password - CSRFtoken missing or incorrect");
             SessionDao.instance.addModel_CSRFtoken(model);
+            SessionDao.instance.setCSP(response);
+
             SessionDao.instance.addModel_LoginTypes(model);
             CookieManager.clearUserTokenCookies(request, response);
             return "login";
