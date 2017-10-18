@@ -284,6 +284,8 @@ public enum SessionDao {
         response.addHeader("X-Content-Type-Options", "nosniff");
         response.addHeader("X-Permitted-Cross-Domain-Policies", "master-only");
         response.addHeader("X-XSS-Protection", "1; mode=block");
+        response.addHeader("X-Frame-Options", "deny");
+
     }
 
 
