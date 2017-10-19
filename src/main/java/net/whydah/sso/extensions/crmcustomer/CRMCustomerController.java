@@ -1,13 +1,6 @@
 package net.whydah.sso.extensions.crmcustomer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
@@ -18,7 +11,7 @@ import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
 import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.util.SSLTool;
-
+import net.whydah.sso.utils.EscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -26,7 +19,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
 
 @Controller
 public class CRMCustomerController {
@@ -84,7 +82,7 @@ public class CRMCustomerController {
         String uid = UserTokenXpathHelper.getUserID(userTokenXml);
 
         //String crmCustomerJson = new CommandGetCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, UserTokenXpathHelper.getPersonref(userTokenXml)).execute();
-        String crmCustomerJson = SessionDao.instance.getCRMHelper().getCrmdata(userTokenXml);
+        String crmCustomerJson = EscapeUtils.escapeHtml(SessionDao.instance.getCRMHelper().getCrmdata(userTokenXml));
         Customer existingCustomer = null;
         if (crmCustomerJson != null) {
             existingCustomer = CustomerMapper.fromJson(crmCustomerJson);
@@ -180,7 +178,7 @@ public class CRMCustomerController {
 //        String location = new CommandUpdateCRMCustomer(crmServiceUri, tokenServiceClient.getMyAppTokenID(), userTokenId, personRef, completeCustomerJson).execute();
 
         Customer customer = createCustomerFromRequest(request);
-        String completeCustomerJson = CustomerMapper.toJson(customer);
+        String completeCustomerJson = EscapeUtils.escapeHtml(CustomerMapper.toJson(customer));
         //TODO:HUYDO: check this line on 24 May 2016 
         SessionDao.instance.getCRMHelper().updateCrmData(userTokenXml, completeCustomerJson);
         
@@ -251,11 +249,12 @@ public class CRMCustomerController {
         ObjectMapper mapper = new ObjectMapper();
         Customer customer = mapper.readValue(request.getReader(), Customer.class);
 
-        String customerJson = CustomerMapper.toJson(customer);
+        String customerJson = EscapeUtils.escapeHtml(CustomerMapper.toJson(customer));
 
         String location = SessionDao.instance.getCRMHelper().updateCrmData(userTokenXml, customerJson);
 
-        model.addAttribute(ConstantValue.JSON_DATA, customerJson);
+
+        model.addAttribute(ConstantValue.JSON_DATA, EscapeUtils.escapeHtml(customerJson));
 
         return "json";
     }
@@ -268,9 +267,9 @@ public class CRMCustomerController {
         String userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
         String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
 
-        String crmCustomerJson = SessionDao.instance.getCRMHelper().getCrmdata(userTokenXml); 
-        
-        model.addAttribute(ConstantValue.JSON_DATA, ""+crmCustomerJson);
+        String crmCustomerJson = SessionDao.instance.getCRMHelper().getCrmdata(userTokenXml);
+
+        model.addAttribute(ConstantValue.JSON_DATA, "" + EscapeUtils.escapeHtml(crmCustomerJson));
 
         return "json";
     }
