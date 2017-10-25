@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Properties;
 
 @Controller
@@ -28,6 +29,7 @@ public class HealthResource {
     protected static Properties properties;
 
     private static String applicationInstanceName;
+    public static boolean ok = false;
 
 
 
@@ -60,7 +62,7 @@ public class HealthResource {
             if (serviceClient.getWAS()==null){
                 return Response.ok("Initializing").build();
             }
-            boolean ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
+            ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
             if (ok && serviceClient.getWAS().checkActiveSession()) {
                 log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
@@ -80,12 +82,14 @@ public class HealthResource {
 
     public String getHealthTextJson() {
         return "{\n" +
-                "  \"Status\": \"OK\",\n" +
+                "  \"Status\": \"" + ok + "\",\n" +
                 "  \"Version\": \"" + getVersion() + "\",\n" +
                 "  \"DEFCON\": \"" + serviceClient.getWAS().getDefcon() + "\",\n" +
                 "  \"hasApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().getActiveApplicationTokenId() != null) + "\",\n" +
                 "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
                 "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().hasApplicationMetaData()) + "\",\n" +
+                "  \"now\": \"" + Instant.now() + "\",\n" +
+                "  \"running since\": \"" + WhydahUtil.getRunningSince() + "\"\n\n" +
                 "  \"" + ConstantValue.SECURITYTOKENSERVICEHEALTH + "\": \"" + properties.getProperty("securitytokenservice") + "health" + "\" ,\n" +
                 "  \"" + ConstantValue.USERADMINSERVICEHEALTH + "\": \"" + properties.getProperty("useradminservice") + "health" + "\" ,\n" +
                 "  \"" + ConstantValue.STATISTICSSERVICEHEALTH + "\": \"" + properties.getProperty("reportservice") + "health" + "\" ,\n" +
