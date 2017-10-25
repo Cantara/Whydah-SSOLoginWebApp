@@ -54,12 +54,12 @@ public class PasswordChangeController {
             return "resetpassword";
         }
 
-        WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()+"/auth/password/reset/username/" + username);
+        WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + username);
         ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
         if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
             String error = uasResponse.getEntity(String.class);
             log.error(error);
-            model.addAttribute("error", error+"\nusername:"+username);
+            model.addAttribute("error", error + "\nusername:" + username);
             return "resetpassword";
         }
         return "resetpassworddone";
@@ -69,7 +69,7 @@ public class PasswordChangeController {
     public String changePasswordFromLink(HttpServletRequest request, HttpServletResponse response, Model model) {
         log.warn("changePasswordFromLink was called");
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
-      //model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
+        //model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
         SessionDao.instance.addModel_LOGO_URL(model);
         //model.addAttribute(ConstantValue.MYURI, properties.getProperty("myuri"));
         SessionDao.instance.addModel_MYURI(model);
@@ -145,8 +145,12 @@ public class PasswordChangeController {
                 .replaceAll("(?i)%2fscript%3e", "")   // case 1
                 .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
                 .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
-                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
+                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "")     // case 3
+                .replaceAll("alert", "")    // alerts
+                .replaceAll("prompt", "")    // prompt
+                .replaceAll("confirm", "");  // confirms
     }
+
 
     public static String sanitizeUsername(String string) {
         if (string == null || string.length() < 3) {
@@ -158,7 +162,11 @@ public class PasswordChangeController {
                 .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
                 .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
                 .replaceAll("(?i)<.*?script:.*?>.*?</.*?>", "") // case 2
-                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
+                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "")     // case 3
+                .replaceAll("alert", "")    // alerts
+                .replaceAll("prompt", "")    // prompt
+                .replaceAll("confirm", "");  // confirms
     }
 
 }
+

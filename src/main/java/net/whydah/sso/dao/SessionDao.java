@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.text.Normalizer;
 import java.util.*;
 
 public enum SessionDao {
@@ -49,8 +50,9 @@ public enum SessionDao {
 	public String MY_APP_URI;
 	public String LOGOUT_ACTION_URI;
 	public String LOGIN_URI;
-	
-	CRMHelper crmHelper;
+    private boolean matchRedirectURLtoModel = false;
+
+    CRMHelper crmHelper;
 	ReportServiceHelper reportServiceHelper;
 
 
@@ -82,8 +84,9 @@ public enum SessionDao {
 			this.adminUserCredential = new UserCredential(properties.getProperty("uasuser"), properties.getProperty("uaspw"));
 			crmHelper = new CRMHelper(serviceClient, crmServiceUri, properties.getProperty("email.verification.link"));
 			reportServiceHelper = new ReportServiceHelper(serviceClient, reportservice);
-			
-		} catch (IOException e) {
+
+            this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
+        } catch (IOException e) {
 			e.printStackTrace();
 		}
 
@@ -195,8 +198,8 @@ public enum SessionDao {
 		return true;
 	}
 
-	public String getFromRequest_RedirectURI(HttpServletRequest request) {
-		String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
+    public String getFromRequest_RedirectURI_Old(HttpServletRequest request) {
+        String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
 		if (redirectURI == null || redirectURI.length() < 1) {
 			log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
 			return DEFAULT_REDIRECT;
@@ -209,6 +212,51 @@ public enum SessionDao {
 			return DEFAULT_REDIRECT;
 		}
 	}
+
+    public String getFromRequest_RedirectURI(HttpServletRequest request) {
+        String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
+        String hashContent = request.getParameter("hashContent");
+        if (hashContent == null) {
+            hashContent = "";
+        } else {
+            int origSize = hashContent.length();
+            String withoutAccent = Normalizer.normalize(hashContent, Normalizer.Form.NFD);
+            hashContent = withoutAccent.replaceAll("[^a-zA-Z0-9 ]", "");            //hashContent = sanitize(escapeHtml(hashContent.replace("alert", "").replace("confirm", "")));
+            // If there are issues in the hashContent we return default
+            if (origSize != hashContent.length()) {
+                return DEFAULT_REDIRECT;
+
+            }
+        }
+        if (redirectURI == null || redirectURI.length() < 1) {
+            log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
+            return DEFAULT_REDIRECT;
+        }
+        try {
+            redirectURI = validateRedirectURIAgainstApplicationModel(request, redirectURI).replace("alert", "");
+            URI redirect = new URI(redirectURI + hashContent);
+            return redirect.toString();
+        } catch (Exception e) {
+            return DEFAULT_REDIRECT;
+        }
+    }
+
+    /**
+     * @param request
+     * @param redirectURI
+     * @return
+     */
+    private String validateRedirectURIAgainstApplicationModel(HttpServletRequest request, String redirectURI) {
+        if (!matchRedirectURLtoModel) {
+            return redirectURI;
+        }
+        String validBaseline = ApplicationMapper.toShortListJson(getServiceClient().getWAS().getApplicationList());
+        if (validBaseline.contains(request.getParameter(ConstantValue.REDIRECT_URI))) {
+            return redirectURI;
+        } else {
+            return DEFAULT_REDIRECT;
+        }
+    }
 
 	public String getFromRequest_CellPhone(HttpServletRequest request) {
 		String cellPhone = request.getParameter(ConstantValue.CELL_PHONE);
