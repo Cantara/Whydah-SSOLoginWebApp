@@ -27,11 +27,15 @@ public class HealthResource {
     private static final Logger log = LoggerFactory.getLogger(HealthResource.class);
     protected static Properties properties;
 
+    private static String applicationInstanceName;
+
+
 
     public HealthResource()  {
         try {
             properties = AppConfig.readProperties();
             this.serviceClient = new WhydahServiceClient();
+            this.applicationInstanceName = properties.getProperty("applicationname");
 
         } catch (Exception e){
             log.warn("Unable to create WhydahServiceClient in constructor",e);
@@ -97,12 +101,12 @@ public class HealthResource {
         if (mavenVersionResource != null) {
             try {
                 mavenProperties.load(mavenVersionResource.openStream());
-                return mavenProperties.getProperty("version", "missing version info in " + resourcePath);
+                return mavenProperties.getProperty("version", "missing version info in " + resourcePath) + " [" + applicationInstanceName + " - " + WhydahUtil.getMyIPAddresssesString() + "]";
             } catch (IOException e) {
                 log.warn("Problem reading version resource from classpath: ", e);
             }
         }
-        return "(DEV VERSION)";
+        return "(DEV VERSION)" + " [" + applicationInstanceName + " - " + WhydahUtil.getMyIPAddresssesString() + "]";
     }
 }
 
