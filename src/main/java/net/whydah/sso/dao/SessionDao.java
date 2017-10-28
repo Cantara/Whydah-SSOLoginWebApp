@@ -430,7 +430,7 @@ public enum SessionDao {
 		String userTokenXml = serviceClient.getUserTokenByUserTokenID(userTokenId);
 		String userid = UserTokenXpathHelper.getUserID(userTokenXml);
 		UserToken adminUser = getUserAdminToken();
-		String userRolesJson = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenXml(), adminUser.getTokenid(), userid).execute();
+		String userRolesJson = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenXml(), adminUser.getUserTokenId(), userid).execute();
 		log.debug("Roles returned:" + userRolesJson);
 		return userRolesJson;
 	}
