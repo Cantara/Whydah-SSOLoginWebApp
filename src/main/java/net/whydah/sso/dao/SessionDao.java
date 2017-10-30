@@ -13,6 +13,7 @@ import net.whydah.sso.commands.adminapi.user.role.CommandGetUserRoles;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.LoginTypes;
+import net.whydah.sso.ddd.sso.RedirectURI;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.helpers.UserXpathHelper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
@@ -225,15 +226,18 @@ public enum SessionDao {
             // If there are issues in the hashContent we return default
             if (origSize != hashContent.length()) {
                 return DEFAULT_REDIRECT;
-
             }
         }
-        if (redirectURI == null || redirectURI.length() < 1) {
+        if (!(new RedirectURI(redirectURI).isValid())) {
             log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
             return DEFAULT_REDIRECT;
         }
         try {
-            redirectURI = validateRedirectURIAgainstApplicationModel(request, redirectURI).replace("alert", "");
+            if (matchRedirectURLtoModel) {
+                redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList()).getRedirectURI();
+            } else {
+                redirectURI = new RedirectURI(redirectURI).getRedirectURI();
+            }
             URI redirect = new URI(redirectURI + hashContent);
             return redirect.toString();
         } catch (Exception e) {
@@ -241,22 +245,6 @@ public enum SessionDao {
         }
     }
 
-    /**
-     * @param request
-     * @param redirectURI
-     * @return
-     */
-    private String validateRedirectURIAgainstApplicationModel(HttpServletRequest request, String redirectURI) {
-        if (!matchRedirectURLtoModel) {
-            return redirectURI;
-        }
-        String validBaseline = ApplicationMapper.toShortListJson(getServiceClient().getWAS().getApplicationList());
-        if (validBaseline.contains(request.getParameter(ConstantValue.REDIRECT_URI))) {
-            return redirectURI;
-        } else {
-            return DEFAULT_REDIRECT;
-        }
-    }
 
 	public String getFromRequest_CellPhone(HttpServletRequest request) {
 		String cellPhone = request.getParameter(ConstantValue.CELL_PHONE);

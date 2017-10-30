@@ -1,21 +1,20 @@
 package net.whydah.sso.authentication.whydah;
 
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-
+import net.whydah.sso.user.types.UserTokenID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Properties;
 
 @Controller
 public class SSOLogoutController {
@@ -47,7 +46,7 @@ public class SSOLogoutController {
     public String logout(HttpServletRequest request, HttpServletResponse response, Model model) {
         //model.addAttribute("logoURL", getLogoUrl());
     	SessionDao.instance.addModel_LOGO_URL(model);
-        String redirectUriFromClient = getRedirectUri(request);
+        String redirectUriFromClient = SessionDao.instance.getFromRequest_RedirectURI(request);
         //model.addAttribute(SessionHelper.REDIRECT_URI, redirectUri);
         String userTokenId = CookieManager.getUserTokenId(request);
         log.trace("logout was called. userTokenId={}, redirectUriFromClient={}", userTokenId, redirectUriFromClient);
@@ -79,10 +78,10 @@ public class SSOLogoutController {
     @RequestMapping("/logoutaction")
     public String logoutAction(HttpServletRequest request, HttpServletResponse response, Model model) {
         String userTokenId = CookieManager.getUserTokenId(request);
-        String redirectUri = getRedirectUri(request);
+        String redirectUri = SessionDao.instance.getFromRequest_RedirectURI(request);
         log.trace("logoutaction was called. userTokenId={}, redirectUri={}", userTokenId, redirectUri);
 
-        if (userTokenId != null && userTokenId.length() > 1) {
+        if (new UserTokenID(userTokenId).isValid()) {
             SessionDao.instance.getServiceClient().releaseUserToken(userTokenId);
         } else {
             log.warn("logoutAction - tokenServiceClient.releaseUserToken was not called because no userTokenId was found in request or cookie.");
@@ -109,13 +108,5 @@ public class SSOLogoutController {
         return LOGOURL;
     }
 
-    private String getRedirectUri(HttpServletRequest request) {
-        String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
-        if (redirectURI == null || redirectURI.length() <= 3) {
-            log.trace("getRedirectURI - No redirectURI found, setting to {}", "login");
-            redirectURI = "login";
-        }
-        return redirectURI;
-    }
 
 }
