@@ -13,7 +13,7 @@ import net.whydah.sso.commands.adminapi.user.role.CommandGetUserRoles;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.LoginTypes;
-import net.whydah.sso.ddd.sso.RedirectURI;
+import net.whydah.sso.ddd.model.RedirectURI;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.helpers.UserXpathHelper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
@@ -228,16 +228,16 @@ public enum SessionDao {
                 return DEFAULT_REDIRECT;
             }
         }
-        if (!(new RedirectURI(redirectURI).isValid())) {
-            log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
+		if (!(RedirectURI.isValid(redirectURI))) {
+			log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
             return DEFAULT_REDIRECT;
         }
         try {
             if (matchRedirectURLtoModel) {
-                redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList()).getRedirectURI();
-            } else {
-                redirectURI = new RedirectURI(redirectURI).getRedirectURI();
-            }
+				redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList(), null).getInput();
+			} else {
+				redirectURI = new RedirectURI(redirectURI, null, null).getInput();
+			}
             URI redirect = new URI(redirectURI + hashContent);
             return redirect.toString();
         } catch (Exception e) {

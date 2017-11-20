@@ -4,7 +4,7 @@ import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.user.types.UserTokenID;
+import net.whydah.sso.ddd.model.UserTokenId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -81,7 +81,7 @@ public class SSOLogoutController {
         String redirectUri = SessionDao.instance.getFromRequest_RedirectURI(request);
         log.trace("logoutaction was called. userTokenId={}, redirectUri={}", userTokenId, redirectUri);
 
-        if (new UserTokenID(userTokenId).isValid()) {
+        if (UserTokenId.isValid(userTokenId)) {
             SessionDao.instance.getServiceClient().releaseUserToken(userTokenId);
         } else {
             log.warn("logoutAction - tokenServiceClient.releaseUserToken was not called because no userTokenId was found in request or cookie.");

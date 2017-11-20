@@ -6,8 +6,8 @@ import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.UserTokenId;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.user.types.UserTokenID;
 import net.whydah.sso.utils.SignupHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,19 +52,19 @@ public class SSOLoginController {
         String userTokenIdFromCookie = CookieManager.getUserTokenIdFromCookie(request);
         log.trace("login: redirectURI={}, SessionCheck={}, userTokenIdFromCookie={}", redirectURI, sessionCheckOnly, userTokenIdFromCookie);
 
-        UserTokenID whydahUserTokenId = UserTokenID.invalidTokenID();
+        UserTokenId whydahUserTokenId = null;
         if ("logout".equalsIgnoreCase(userTokenIdFromCookie)) {
             log.info("userTokenId={} from cookie. TODO: should probably clear the logout cookie here?", userTokenIdFromCookie);
             CookieManager.clearUserTokenCookies(request, response);
             //usertokenId = WhydahUserTokenId.invalidTokenId();
         } else if (userTokenIdFromCookie != null && SessionDao.instance.getServiceClient().verifyUserTokenId(userTokenIdFromCookie)) {
             log.trace("userTokenId={} from cookie verified OK.", userTokenIdFromCookie);
-            whydahUserTokenId = UserTokenID.fromUserTokenID(userTokenIdFromCookie);
+            whydahUserTokenId = new UserTokenId(userTokenIdFromCookie);
         } else {
             CookieManager.clearUserTokenCookies(request, response);
         }
 
-        if (whydahUserTokenId.isValid()) {
+        if (whydahUserTokenId != null) {
             log.trace("login - whydahUserTokenId={} is valid", whydahUserTokenId);
 
             if (ConstantValue.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)) {
