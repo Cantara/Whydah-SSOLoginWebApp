@@ -4,7 +4,7 @@ import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.ddd.model.UserTokenId;
+import net.whydah.sso.ddd.model.user.UserTokenId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;

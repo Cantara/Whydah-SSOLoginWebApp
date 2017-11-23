@@ -13,7 +13,7 @@ import net.whydah.sso.commands.adminapi.user.role.CommandGetUserRoles;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.LoginTypes;
-import net.whydah.sso.ddd.model.RedirectURI;
+import net.whydah.sso.ddd.model.application.RedirectURI;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.helpers.UserXpathHelper;
 import net.whydah.sso.user.mappers.UserTokenMapper;

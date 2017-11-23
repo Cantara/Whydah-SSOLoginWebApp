@@ -6,7 +6,7 @@ import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.ddd.model.UserTokenId;
+import net.whydah.sso.ddd.model.user.UserTokenId;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.utils.SignupHelper;
 import org.slf4j.Logger;
