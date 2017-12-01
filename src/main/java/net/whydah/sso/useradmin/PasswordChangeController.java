@@ -51,9 +51,11 @@ public class PasswordChangeController {
 
 
         if (!UserName.isValid(request.getParameter("username"))) {
+            model.addAttribute("error", "\nIllegal username");
             return "resetpassword";
         }
         if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
+            model.addAttribute("error", "\nIllegal CSRFToken");
             return "resetpassword";
         }
         String username = new UserName(request.getParameter("username")).getInput();
