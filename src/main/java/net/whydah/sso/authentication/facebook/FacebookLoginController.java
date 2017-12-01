@@ -1,29 +1,28 @@
 package net.whydah.sso.authentication.facebook;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.restfb.types.User;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.application.RedirectURI;
+import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.restfb.types.User;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 
 /**
  * @author <a href="mailto:erik.drolshammer@altran.com">Erik Drolshammer</a>
@@ -49,29 +48,30 @@ public class FacebookLoginController {
 
     @RequestMapping("/fblogin")
     public String facebookLogin(HttpServletRequest request, Model model) throws MalformedURLException {
+        SessionDao.instance.addModel_CSRFtoken(model);
+        model.addAttribute(ConstantValue.LOGO_URL, LOGOURL);
         if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.FACEBOOKLOGIN_ENABLED)) {
             return "login";
         }
-        String clientRedirectURI = sanitize(request.getParameter("redirectURI"));
-        String facebookLoginUrl = FacebookHelper.getFacebookLoginUrl(clientRedirectURI, fbauthURI);
-        model.addAttribute(ConstantValue.LOGO_URL, LOGOURL);
+        RedirectURI clientRedirectURI = new RedirectURI(request.getParameter("redirectURI"));
+        String facebookLoginUrl = FacebookHelper.getFacebookLoginUrl(clientRedirectURI.getInput(), fbauthURI);
         model.addAttribute("redirect", facebookLoginUrl);
-        //model.addAttribute(ConstantValue.CSRFtoken, SessionHelper.getCSRFtoken());
-        SessionDao.instance.addModel_CSRFtoken(model);
         log.info("Redirecting to {}", facebookLoginUrl);
         return "action";
     }
 
     @RequestMapping("/fbauth")
     public String facebookAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
-    	 if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.FACEBOOKLOGIN_ENABLED)) {
+        SessionDao.instance.addModel_CSRFtoken(model);
+        SessionDao.instance.addModel_LOGO_URL(model);
+        SessionDao.instance.addModel_LoginTypes(model);
+        if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.FACEBOOKLOGIN_ENABLED)) {
              return "login";
          }
         String code = request.getParameter("code");
         log.trace("fbauth got code: {}",code);
         log.trace("fbauth - got state: {}",request.getParameter("state"));
         //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-        SessionDao.instance.addModel_CSRFtoken(model);
         Map.Entry<String, User> pair = FacebookHelper.loginAndCreateFacebookUser(code, fbauthURI);
         if (pair == null) {
             log.error("Could not fetch facebok user.");
@@ -82,17 +82,13 @@ public class FacebookLoginController {
         }
         String fbAccessToken = pair.getKey();
         User fbUser = pair.getValue();
-        //model.addAttribute(SessionHelper.LOGO_URL, LOGOURL);
-        SessionDao.instance.addModel_LOGO_URL(model);
-        //ModelHelper.setEnabledLoginTypes(model);
-        SessionDao.instance.addModel_LoginTypes(model);
 
         String userticket = UUID.randomUUID().toString();
         UserCredential userCredential;
         try {
             String username = fbUser.getUsername();
             // Since Facebook sometimes returns username=null, we fallback on using facebook user email as username
-            if (username==null || username.length()<6){
+            if (!UserName.isValid(username)) {
                 if (fbUser.getEmail()==null || fbUser.getEmail().length()<6){
                     username=fbUser.getId();
                     log.trace("facebook returned username, email=null, using facebook id as username instead");
@@ -107,9 +103,8 @@ public class FacebookLoginController {
             userCredential = new FacebookUserCredential(fbUser.getId(), username);
         } catch(IllegalArgumentException iae) {
             log.error("fbauth - unable to build usercredential for facebook token.",iae.getLocalizedMessage());
-            //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-            SessionDao.instance.addModel_CSRFtoken(model);
-            //TODO Do we need to add client redirect URI here?
+            String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
+            model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
             return "login";
         }
 
@@ -126,7 +121,7 @@ public class FacebookLoginController {
             userTokenXml = tokenServiceClient.createAndLogonUser(fbUser, fbAccessToken, userCredential, userticket);
             if (userTokenXml == null) {
                 log.error("createAndLogonUser failed. Did not get a valid UserToken. Redirecting to login page.");
-                String redirectURI = getRedirectURI(request);
+                String redirectURI = getfbauthRedirectURI(request);
                 model.addAttribute("redirectURI", redirectURI);
                 model.addAttribute("loginError", "Login error: Could not create or authenticate user.");
                 //ModelHelper.setEnabledLoginTypes(model);
@@ -151,7 +146,7 @@ public class FacebookLoginController {
         return "action";
     }
 
-    private String getRedirectURI(HttpServletRequest request) {
+    private String getfbauthRedirectURI(HttpServletRequest request) {
         String redirectURI = request.getParameter("fbauthURI");
         log.debug("fbauthURI from request: {}", redirectURI);
         if (redirectURI == null || redirectURI.length() < 4) {
@@ -161,14 +156,5 @@ public class FacebookLoginController {
         return redirectURI;
     }
 
-    public static String sanitize(String string) {
-        return string
-                .replaceAll("&", "")   // case 1
-                .replaceAll("(?i)%3c%2fnoscript%3e", "")   // case 1
-                .replaceAll("(?i)%2fscript%3e", "")   // case 1
-                .replaceAll("(?i)<script.*?>.*?</script.*?>", "")   // case 1
-                .replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "") // case 2
-                .replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");     // case 3
-    }
 
 }
