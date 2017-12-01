@@ -53,6 +53,9 @@ public class PasswordChangeController {
         if (!UserName.isValid(request.getParameter("username"))) {
             return "resetpassword";
         }
+        if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
+            return "resetpassword";
+        }
         String username = new UserName(request.getParameter("username")).getInput();
 
         WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + username);
