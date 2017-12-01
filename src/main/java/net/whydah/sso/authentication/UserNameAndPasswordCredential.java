@@ -1,31 +1,32 @@
 package net.whydah.sso.authentication;
 
-import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.ddd.model.user.Password;
+import net.whydah.sso.ddd.model.user.UserName;
 
 @Deprecated //  Use UserCredential in Typelib
 public class UserNameAndPasswordCredential implements UserCredential {
-    private String userName;
-    private String password;
+    private UserName userName;
+    private Password password;
 
     public UserNameAndPasswordCredential(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
+        this.userName = new UserName(userName);
+        this.password = new Password(password);
     }
 
     public String getUserName() {
-        return userName;
+        return userName.getInput();
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName = new UserName(userName);
     }
 
     public String getPassword() {
-        return password;
+        return password.getInput();
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = new Password(password);
     }
 
     @Override
@@ -53,6 +54,6 @@ public class UserNameAndPasswordCredential implements UserCredential {
 
     @Override
     public String toString() {
-        return "UserNameAndPasswordCredential{" + "userName='" + userName + '}';
+        return "UserNameAndPasswordCredential{" + "userName='" + getUserName() + '}';
     }
 }

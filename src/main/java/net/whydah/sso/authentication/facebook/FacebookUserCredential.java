@@ -1,6 +1,7 @@
 package net.whydah.sso.authentication.facebook;
 
 import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.ddd.model.user.UserName;
 
 /**
  * @author <a href="mailto:erik.drolshammer@altran.com">Erik Drolshammer</a>
@@ -9,7 +10,7 @@ import net.whydah.sso.authentication.UserCredential;
 @Deprecated //  Use UserCredential in Typelib
 public class FacebookUserCredential implements UserCredential {
     private final String fbId;
-    private final String username;
+    private final UserName username;
 
     public FacebookUserCredential(String facebookUserId, String username) {
         if (facebookUserId == null) {
@@ -20,7 +21,7 @@ public class FacebookUserCredential implements UserCredential {
         }
 
         this.fbId = facebookUserId;
-        this.username = username;
+        this.username = new UserName(username);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class FacebookUserCredential implements UserCredential {
                 "<usercredential>\n" +
                 "    <params>\n" +
                 "        <fbId>" + fbId + "</fbId>\n" +
-                "        <username>" + username + "</username>\n" +
+                "        <username>" + username.getInput() + "</username>\n" +
                 "    </params> \n" +
                 "</usercredential>\n";
     }
@@ -38,7 +39,7 @@ public class FacebookUserCredential implements UserCredential {
     public String toString() {
         return "FacebookUserCredential{" +
                 "fbId='" + fbId + '\'' +
-                ", username='" + username + '\'' +
+                ", username='" + username.getInput() + '\'' +
                 '}';
     }
 }
