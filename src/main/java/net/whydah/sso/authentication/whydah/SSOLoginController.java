@@ -6,6 +6,8 @@ import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.Password;
+import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.ddd.model.user.UserTokenId;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.utils.SignupHelper;
@@ -148,8 +150,10 @@ public class SSOLoginController {
 		SessionDao.instance.addModel_IAM_MODE(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
         SessionDao.instance.setCSP(response);
+        SessionDao.instance.addModel_LoginTypes(model);
 
         model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+
         SessionDao.instance.addModel_LoginTypes(model);
         //if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
 		if(!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
@@ -164,6 +168,14 @@ public class SSOLoginController {
             return "login";
 
         }
+
+        if (!UserName.isValid(SessionDao.instance.getFromRequest_User(request)) || !Password.isValid(SessionDao.instance.getFromRequest_Password(request))) {
+            log.warn("action - illegal username or password. Redirecting to login.");
+            model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in.");
+            CookieManager.clearUserTokenCookies(request, response);
+            return "login";
+        }
+
         UserCredential user = new UserNameAndPasswordCredential(SessionDao.instance.getFromRequest_User(request), SessionDao.instance.getFromRequest_Password(request));
         String userTicket = UUID.randomUUID().toString();
         String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
@@ -171,13 +183,10 @@ public class SSOLoginController {
         if (userTokenXml == null) {
             log.warn("action - getUserToken failed. Redirecting to login.");
             model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in.");
-            //ModelHelper.setEnabledLoginTypes(model);
-            SessionDao.instance.addModel_LoginTypes(model);
             CookieManager.clearUserTokenCookies(request, response);
-            //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-            SessionDao.instance.addModel_CSRFtoken(model);
             return "login";
         }
+
         SessionDao.instance.getServiceClient().getWAS().updateDefcon(userTokenXml);
         if (redirectURI.contains(ConstantValue.USERTICKET) && !redirectURI.toLowerCase().contains("http")) {
             log.warn("action - redirectURI contain ticket and no URL. Redirecting to welcome.");
