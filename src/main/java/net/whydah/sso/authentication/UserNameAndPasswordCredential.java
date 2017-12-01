@@ -13,6 +13,11 @@ public class UserNameAndPasswordCredential implements UserCredential {
         this.password = new Password(password);
     }
 
+    public UserNameAndPasswordCredential(UserName userName, Password password) {
+        this.userName = userName;
+        this.password = password;
+    }
+
     public String getUserName() {
         return userName.getInput();
     }
@@ -32,7 +37,13 @@ public class UserNameAndPasswordCredential implements UserCredential {
     @Override
     public String toXML(){
         if (userName== null){
-            return templateToken;   //TODO Er ikke disse to helt identiske?
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
+                    "    <usercredential>\n" +
+                    "        <params>\n" +
+                    "            <username>" + "" + "</username>\n" +
+                    "            <password>" + "" + "</password>\n" +
+                    "        </params> \n" +
+                    "    </usercredential>\n";
         } else {
             return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
             "<usercredential>\n" +
@@ -44,13 +55,6 @@ public class UserNameAndPasswordCredential implements UserCredential {
         }
     }
 
-    String templateToken = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
-            "    <usercredential>\n" +
-            "        <params>\n" +
-            "            <username>" + getUserName() + "</username>\n" +
-            "            <password>" + getPassword() + "</password>\n" +
-            "        </params> \n" +
-            "    </usercredential>\n";
 
     @Override
     public String toString() {
