@@ -7,6 +7,7 @@ import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.UserName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -49,10 +50,10 @@ public class PasswordChangeController {
         SessionDao.instance.setCSP(response);
 
 
-        String username = sanitizeUsername(request.getParameter("username"));
-        if (username == null) {
+        if (!UserName.isValid(request.getParameter("username"))) {
             return "resetpassword";
         }
+        String username = new UserName(request.getParameter("username")).getInput();
 
         WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + username);
         ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
