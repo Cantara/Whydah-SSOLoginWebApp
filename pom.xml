@@ -27,7 +27,7 @@
         <spring.version>4.3.10.RELEASE</spring.version>
         <jackson-version>2.9.2</jackson-version>
         <org.springframework.security-version>4.2.3.RELEASE</org.springframework.security-version>
-        <jetty.version>7.3.0.v20110203</jetty.version>
+        <jetty.version>7.3.1.v20110307</jetty.version>
         <metrics.version>4.0.0-alpha2</metrics.version>
     </properties>
 
