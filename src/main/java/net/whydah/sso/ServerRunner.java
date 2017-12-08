@@ -5,6 +5,7 @@ import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.util.SSLTool;
+import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -39,7 +40,9 @@ public class ServerRunner {
 
         printConfiguration(AppConfig.readProperties());
 
-        int port = serverRunner.server.getConnectors()[0].getLocalPort();
+        NetworkConnector networkConnector = (NetworkConnector) serverRunner.server.getConnectors()[0];
+        int port = networkConnector.getLocalPort();
+//        int port = serverRunner.server.getConnectors()[0].getLocalPort();
         serverRunner.join();
         SSLTool.disableCertificateValidation();
         WhydahServiceClient tc = new WhydahServiceClient();
