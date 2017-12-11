@@ -22,7 +22,7 @@
 
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah.admin.sdk.version>2.4.24</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.4.29</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.3.10.RELEASE</spring.version>
         <jackson-version>2.9.2</jackson-version>
