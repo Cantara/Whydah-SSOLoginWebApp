@@ -145,6 +145,21 @@ public class CookieManager {
             response.setHeader("SET-COOKIE", sb.toString());
 
         } else {
+            StringBuilder sb = new StringBuilder(USER_TOKEN_REFERENCE_NAME);
+//            sb.append("=");
+            sb.append(userTokenId);
+            sb.append(";expires=");
+//            sb.append("0");
+            sb.append(";path=");
+            sb.append("/");
+            sb.append(";HttpOnly");
+            if (IS_MY_URI_SECURED) {
+                sb.append(";secure");
+            }
+            log.trace("Cleared cookie " + sb);
+            response.setHeader("SET-COOKIE", sb.toString());
+
+/*
             Cookie cookie = getUserTokenCookie(request);
             if (cookie == null) {
                 cookie = new Cookie(USER_TOKEN_REFERENCE_NAME, userTokenId);
@@ -154,11 +169,12 @@ public class CookieManager {
             if (cookiedomain != null && !cookiedomain.isEmpty()) {
                 cookie.setDomain(cookiedomain);
             }
-            cookie.setPath("; HttpOnly;");
+            cookie.setPath(";HttpOnly");
             cookie.setSecure(IS_MY_URI_SECURED);
             response.addCookie(cookie);
             log.trace("Cleared cookie with name={}, value/userTokenId={}, domain={}, path={}, maxAge={}, secure={}",
                     cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge(), cookie.getSecure());
+*/
         }
     }
 }
