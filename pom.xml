@@ -25,7 +25,6 @@
         <whydah.admin.sdk.version>2.4.44</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.3.10.RELEASE</spring.version>
-        <jackson-version>2.9.2</jackson-version>
         <org.springframework.security-version>4.2.3.RELEASE</org.springframework.security-version>
         <jetty.version>9.4.8.v20171121</jetty.version>
         <metrics.version>4.0.0-alpha2</metrics.version>
@@ -87,22 +86,6 @@
             <version>2.22.2</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson-version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
