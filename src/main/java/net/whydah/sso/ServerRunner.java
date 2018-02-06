@@ -57,6 +57,9 @@ public class ServerRunner {
     public ServerRunner(int portNo) throws IOException {
         this.PORT_NO=portNo;
         server=new Server(PORT_NO);
+        ROOT_URL = "http://localhost:" + PORT_NO + CONTEXT;
+        TESTURL = ROOT_URL + "/action";
+
         context = new ServletContextHandler(server, CONTEXT);
         version = this.getClass().getPackage().getImplementationVersion();
 
