@@ -25,7 +25,7 @@
         <whydah.admin.sdk.version>2.4.51</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>4.3.10.RELEASE</spring.version>
-        <org.springframework.security-version>4.2.3.RELEASE</org.springframework.security-version>
+        <org.springframework.security-version>4.2.4.RELEASE</org.springframework.security-version>
         <jetty.version>9.4.8.v20171121</jetty.version>
         <metrics.version>4.0.0-alpha2</metrics.version>
     </properties>
