@@ -133,7 +133,7 @@ public class SSOLoginController {
 			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
 			model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
 			model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
-			SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
+			//SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
 			return ConstantValue.DEFAULT_REDIRECT;
 		}
     }
@@ -201,7 +201,7 @@ public class SSOLoginController {
             model.addAttribute(ConstantValue.DEFCON, SessionDao.instance.getServiceClient().getWAS().getDefcon());
             model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
             SessionDao.instance.getCRMHelper().getCrmdata_AddToModel(model, userTokenXml);
-            SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
+            //SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
             return "welcome";
         }
 
