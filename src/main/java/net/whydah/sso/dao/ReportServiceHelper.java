@@ -1,14 +1,15 @@
 package net.whydah.sso.dao;
 
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
-import net.whydah.sso.commands.extensions.statistics.CommandGetUserActivityStats;
-import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import java.net.URI;
+import java.time.Instant;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
 
-import java.net.URI;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.commands.extensions.statistics.CommandGetUserSessionStats;
+import net.whydah.sso.extensions.useractivity.helpers.UserActivityHelper;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 
 public class ReportServiceHelper {
 
@@ -23,12 +24,14 @@ public class ReportServiceHelper {
 		this.reportservice = reportservice;
 	}
 
-	public String getUserAccessLog(String userTokenId){
+	public String getUserAccessLog(String userTokenId, Instant from, Instant to){
 		String userTokenXml = serviceClient.getUserTokenByUserTokenID(userTokenId);
 		String userid = UserTokenXpathHelper.getUserID(userTokenXml);
-		String userActivitiesJson = new CommandGetUserActivityStats(reportservice,"whydah", "usersession", userid, null, null).execute();
-        return UserActivityHelper.getTimedUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid);
-    }
+		String userActivitiesJson = new CommandGetUserSessionStats(reportservice, userid, from, to).execute();
+		return UserActivityHelper.getTimedUserSessionsJsonFromUserActivityJson(userActivitiesJson, userid);
+	}
+
+	
 
 //	 public void addUserActivities(Model model, String userTokenXml) {
 //	        model.addAttribute(ConstantValue.USERACTIVITIES_SIMPLIFIED, "{}");
