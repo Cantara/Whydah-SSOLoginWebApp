@@ -2,6 +2,7 @@ package net.whydah.sso.extensions.crmcustomer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.extensions.crmcustomer.mappers.CustomerMapper;
@@ -10,6 +11,7 @@ import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
 import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
 import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.user.mappers.UserTokenMapper;
 import net.whydah.sso.util.SSLTool;
 import net.whydah.sso.utils.EscapeUtils;
 import org.slf4j.Logger;
@@ -25,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.UUID;
 
 @Controller
 public class CRMCustomerController {
@@ -312,12 +315,12 @@ public class CRMCustomerController {
     }
 
 
-    @RequestMapping(value = "/verify/email_send_token", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/verify/email_send_token", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
     public String sendEmailVerificationToken(HttpServletRequest request, Model model) {
 
     	String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
         String userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
-        String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
+        //String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
 
         String email = SessionDao.instance.getFromRequest_Email(request);
 
@@ -331,22 +334,52 @@ public class CRMCustomerController {
     }
 
 
-    @RequestMapping(value = "/verify/email_by_token", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/verify/email_by_token", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
     public String verifyEmailByToken(HttpServletRequest request, Model model) {
-
-        String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
-        String userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
-        String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
-
+//
+//        String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
+//        String userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
+//        String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
+//
+//        String email = SessionDao.instance.getFromRequest_Email(request);
+//        String token = SessionDao.instance.getFromRequest_Token(request);
+//
+//        //Boolean tokenVerified = new CommandVerifyEmailByToken(crmServiceUri, serviceClient.getMyAppTokenXml(), userTokenId, personRef, email, token).execute();
+//        //use this instead
+//        boolean tokenVerified = SessionDao.instance.getCRMHelper().verifyEmailByToken(userTokenXml, email, token);
+//        model.addAttribute(ConstantValue.JSON_DATA, ""+tokenVerified);
+//
+//        return "json";
+    	
+    	String userticket = SessionDao.instance.getFromRequest_UserTicket(request);
         String email = SessionDao.instance.getFromRequest_Email(request);
-        String token = SessionDao.instance.getFromRequest_Token(request);
+        String emailtoken = SessionDao.instance.getFromRequest_Token(request);
+        String userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTicket(userticket);
 
         //Boolean tokenVerified = new CommandVerifyEmailByToken(crmServiceUri, serviceClient.getMyAppTokenXml(), userTokenId, personRef, email, token).execute();
         //use this instead
-        boolean tokenVerified = SessionDao.instance.getCRMHelper().verifyEmailByToken(userTokenXml, email, token);
-        model.addAttribute(ConstantValue.JSON_DATA, ""+tokenVerified);
+        boolean tokenVerified = SessionDao.instance.getCRMHelper().verifyEmailByToken(userTokenXml, email, emailtoken);
+        /*if (tokenVerified) {
+            String crmCustomerJson = SessionDao.instance.getCRMHelper().getCrmdata(userTokenXml);
+            if (crmCustomerJson != null) {
 
-        return "json";
+                crmCustomerJson = SessionDao.instance.getCRMHelper().updateEmailVerificationStatus(crmCustomerJson, new String[]{email});
+                //Update to CRM
+                SessionDao.instance.getCRMHelper().updateCrmData(userTokenXml, crmCustomerJson);
+            }
+        }*/
+        model.addAttribute(ConstantValue.JSON_DATA, "" + tokenVerified);
+        String redirectURI = "login";
+        try {
+            redirectURI = AppConfig.readProperties().getProperty("email.verification.redirect.link");
+            redirectURI = redirectURI + (redirectURI.contains("&")?"&" :"?") + "userticket=" + SessionDao.instance.getServiceClient().createTicketForUserTokenID(UUID.randomUUID().toString(), UserTokenMapper.fromUserTokenXml(userTokenXml).getUserTokenId());
+        } catch (IOException ioe) {
+            log.warn("Error when reading 'email.verification.redirect.link' from config parameters", ioe);
+        }
+        model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+        model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+        log.info("login - Redirecting to {}", redirectURI);
+        return "action";
     }
 
 

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 
 import java.net.URI;
+import java.util.UUID;
 
 
 public class CRMHelper {
@@ -160,19 +161,42 @@ public class CRMHelper {
 
 	public boolean sendEmailVerificiationToken(String userTokenXml, String email) {
 		
-		UserToken userToken = UserTokenMapper.fromUserTokenXml(userTokenXml);
+//		UserToken userToken = UserTokenMapper.fromUserTokenXml(userTokenXml);
+//		
+//		if (userToken.getPersonRef().length() > 2) {
+//			try {
+//				SSLTool.disableCertificateValidation();
+//                Boolean tokenSent = new CommandSendEmailVerificationToken(crmServiceUri, serviceClient.getMyAppTokenXml(), userToken.getUserTokenId(), userToken.getPersonRef(), email, emailVerificationLink).execute();
+//                log.info("sendEmailVerificiationToken - used personRef={}, appTokenID:{}, userTokenXml:{},email:{}", userToken.getPersonRef(), serviceClient.getMyAppTokenID(), userTokenXml, email);
+//				return tokenSent;		
+//			} catch (Exception e) {
+//				log.warn("sendEmailVerificiationToken failed - used personRef={}, appTokenID:{}, userTokenXml:{},pin:{},phone:{}", userToken.getPersonRef(), serviceClient.getMyAppTokenID(), userTokenXml, email);
+//			}
+//		}
+//		return false;
 		
+		if (email == null || email.length() < 5) {
+			return false;
+		}
+		UserToken userToken = UserTokenMapper.fromUserTokenXml(userTokenXml);
+
 		if (userToken.getPersonRef().length() > 2) {
 			try {
 				SSLTool.disableCertificateValidation();
-                Boolean tokenSent = new CommandSendEmailVerificationToken(crmServiceUri, serviceClient.getMyAppTokenXml(), userToken.getUserTokenId(), userToken.getPersonRef(), email, emailVerificationLink).execute();
-                log.info("sendEmailVerificiationToken - used personRef={}, appTokenID:{}, userTokenXml:{},email:{}", userToken.getPersonRef(), serviceClient.getMyAppTokenID(), userTokenXml, email);
-				return tokenSent;		
+
+				String ticket = UUID.randomUUID().toString();
+
+				if(SessionDao.instance.getServiceClient().createTicketForUserTokenID(ticket, userToken.getUserTokenId())) {
+					CommandSendEmailVerificationToken cmd = new CommandSendEmailVerificationToken(crmServiceUri, serviceClient.getMyAppTokenXml(), userToken.getUserTokenId(), userToken.getPersonRef(), email, emailVerificationLink, ticket, 30000);
+					log.info("sendEmailVerificiationToken - used personRef={}, appTokenID:{}, email:{}, userTokenXml:{}", userToken.getPersonRef(), serviceClient.getMyAppTokenID(), email, userTokenXml);
+					return cmd.execute();
+				}
 			} catch (Exception e) {
-				log.warn("sendEmailVerificiationToken failed - used personRef={}, appTokenID:{}, userTokenXml:{},pin:{},phone:{}", userToken.getPersonRef(), serviceClient.getMyAppTokenID(), userTokenXml, email);
+				log.warn("sendEmailVerificiationToken failed - used personRef={}, appTokenID:{}, email:{}, userTokenXml:{}", userToken.getPersonRef(), serviceClient.getMyAppTokenID(), email, userTokenXml);
 			}
 		}
 		return false;
+
 	}
 
 	public boolean verifyEmailByToken(String userTokenXml, String email, String token) {
