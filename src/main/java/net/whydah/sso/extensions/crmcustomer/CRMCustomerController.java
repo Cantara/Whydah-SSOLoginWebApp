@@ -372,7 +372,11 @@ public class CRMCustomerController {
         String redirectURI = "login";
         try {
             redirectURI = AppConfig.readProperties().getProperty("email.verification.redirect.link");
-            redirectURI = redirectURI + (redirectURI.contains("&")?"&" :"?") + "userticket=" + SessionDao.instance.getServiceClient().createTicketForUserTokenID(UUID.randomUUID().toString(), UserTokenMapper.fromUserTokenXml(userTokenXml).getUserTokenId());
+            String newTicket = UUID.randomUUID().toString();
+            boolean result = SessionDao.instance.getServiceClient().createTicketForUserTokenID(newTicket, UserTokenMapper.fromUserTokenXml(userTokenXml).getUserTokenId());
+            if(result) {
+            	redirectURI = redirectURI + (redirectURI.contains("&")?"&" :"?") + "userticket=" + newTicket;
+            }
         } catch (IOException ioe) {
             log.warn("Error when reading 'email.verification.redirect.link' from config parameters", ioe);
         }
