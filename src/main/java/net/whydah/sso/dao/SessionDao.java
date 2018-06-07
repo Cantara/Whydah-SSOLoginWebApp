@@ -5,6 +5,8 @@ import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.application.types.Application;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.basehelpers.JsonPathHelper;
+import net.whydah.sso.commands.adminapi.user.CommandUpdateUser;
 import net.whydah.sso.commands.adminapi.user.CommandUserExists;
 import net.whydah.sso.commands.adminapi.user.CommandUserPasswordLoginEnabled;
 import net.whydah.sso.commands.adminapi.user.role.CommandAddUserRole;
@@ -16,8 +18,10 @@ import net.whydah.sso.config.LoginTypes;
 import net.whydah.sso.ddd.model.application.RedirectURI;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.helpers.UserXpathHelper;
+import net.whydah.sso.user.mappers.UserIdentityMapper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
 import net.whydah.sso.user.types.UserCredential;
+import net.whydah.sso.user.types.UserIdentity;
 import net.whydah.sso.user.types.UserToken;
 import net.whydah.sso.utils.ServerUtil;
 import net.whydah.sso.utils.SignupHelper;
@@ -28,6 +32,8 @@ import org.springframework.ui.Model;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.UriBuilder;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
 import java.text.Normalizer;
@@ -309,6 +315,19 @@ public enum SessionDao {
 		return request.getParameter(ConstantValue.TOKEN);
 	}
 
+	public String getFromJsonRequest_Email(HttpServletRequest request) {
+		StringBuffer postedJsonString = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				postedJsonString.append(line);
+		} catch (Exception e) { /*report an error*/ }
+
+		log.trace("getFromJsonRequest_Email - postedJsonString: {}", postedJsonString);
+		String email = JsonPathHelper.findJsonPathValue(postedJsonString.toString(), "$.email");
+		return email;
+	}
 	
 	//////END HANDLE PARAMTERS FROM THE REQUEST
 
@@ -508,7 +527,11 @@ public enum SessionDao {
 		return null;
 	}
 	
-
+	public String updateUserToken(UserToken ut) {
+		UserIdentity u = new UserIdentity(ut.getUid(), ut.getUserName(), ut.getFirstName(), ut.getLastName(), ut.getPersonRef(), ut.getEmail(), ut.getCellPhone());
+		String userjson = UserIdentityMapper.toJson(u);
+		return new CommandUpdateUser(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), u.getUid(), userjson).execute();
+	}
 
 
 }

@@ -9,6 +9,7 @@ import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.user.Password;
 import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.ddd.model.user.UserTokenId;
+import net.whydah.sso.errorhandling.AppException;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.utils.SignupHelper;
 import org.slf4j.Logger;
@@ -139,7 +140,7 @@ public class SSOLoginController {
     }
 
     @RequestMapping("/action")
-    public String action(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String action(HttpServletRequest request, HttpServletResponse response, Model model) throws AppException {
     	
     	String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
 		log.trace("action: redirectURI: {}", redirectURI);
