@@ -8,6 +8,8 @@ import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.user.mappers.UserIdentityMapper;
+import net.whydah.sso.user.types.UserIdentity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -67,6 +69,7 @@ public class NewUserController {
                     "\", \"lastName\":\"" + lastName +
                     "\", \"personRef\":\"\", \"email\":\"" + email +
                     "\", \"cellPhone\":\"" + cellPhone + "\"}";
+            UserIdentity signupUser = UserIdentityMapper.fromUserIdentityWithNoIdentityJson(userJson);
             if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
                 log.warn("action - CSRFtoken verification failed. Redirecting to login.");
                 //ModelHelper.setEnabledLoginTypes(model);
@@ -74,15 +77,15 @@ public class NewUserController {
                 SessionDao.instance.addModel_CSRFtoken(model);
                 return "login";
             }
-            ;
+
             try {
                 WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()).path("signup");//.path("signup");
-                log.trace("signup was called. Calling UAS with url " + uasWR.getURI());
+                log.debug("signup was called. Calling UAS with url " + uasWR.getURI());
 
                 ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
                 if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
                     String error = uasResponse.getEntity(String.class);
-                    log.error(error);
+                    log.error("error:{} \n URL: {} \n user:{}", error, uasWR.getURI().toString(), signupUser);
                     model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
                 } else {
                    // ModelHelper.setEnabledLoginTypes(model);
@@ -94,7 +97,7 @@ public class NewUserController {
                 }
 
             } catch (IllegalStateException ise) {
-                log.info(ise.getMessage());
+                log.info("IllegalStateException {}", ise);
             } catch (RuntimeException e) {
                 log.error("Unkonwn error.", e);
             }
