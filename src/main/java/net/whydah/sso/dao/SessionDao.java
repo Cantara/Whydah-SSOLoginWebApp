@@ -32,7 +32,6 @@ import org.springframework.ui.Model;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.UriBuilder;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
@@ -414,16 +413,7 @@ public enum SessionDao {
 		return exists;
 	}
 
-	public UserToken getUserAdminToken(){
-		UserToken adminUser = UserTokenMapper.fromUserTokenXml(getUserAdminTokenXml());
-		return adminUser;
-	}
 
-	public String getUserAdminTokenXml(){
-
-		return getUserAdminTokenXml( UUID.randomUUID().toString());
-		
-	}
 	
 	public String getUserAdminTokenXml(String userTicket){
 
@@ -526,6 +516,43 @@ public enum SessionDao {
 		}
 		return null;
 	}
+
+    public UserToken getUserAdminToken() {
+        UserToken adminUser = UserTokenMapper.fromUserTokenXml(getUserAdminTokenXml());
+        return adminUser;
+    }
+
+    private String adminUserTicket = null;
+    private String adminUserTokenXML = null;
+
+    public String getUserAdminTokenXml() {
+        try {
+            adminUserTicket = UUID.randomUUID().toString();
+            adminUserTokenXML = serviceClient.getUserToken(adminUserCredential, adminUserTicket);
+            return adminUserTokenXML;
+        } catch (Exception e) {
+            log.error("Problems getting userAdminTokenId", uasServiceUri);
+            throw e;
+        }
+        //
+        //        if (adminUserTokenXML != null) {
+        //            return adminUserTokenXML;
+        //        } else {
+        //        	if(adminUserTicket==null){
+        //        		adminUserTicket = UUID.randomUUID().toString();
+        //        	}
+        //            log.trace("getUserAdminTokenId called - Calling UserAdminService at " + uasServiceUri + " userCredentialXml:" + adminUserCredential);
+        //            try {
+        //                adminUserTokenXML = serviceClient.getUserToken(adminUserCredential, adminUserTicket);
+        //                return adminUserTokenXML;
+        //            } catch (Exception e) {
+        //                log.error("Problems getting userAdminTokenId", uasServiceUri);
+        //                throw e;
+        //            }
+        //        }
+
+
+    }
 	
 	public String updateUserToken(UserToken ut) {
 		UserIdentity u = new UserIdentity(ut.getUid(), ut.getUserName(), ut.getFirstName(), ut.getLastName(), ut.getPersonRef(), ut.getEmail(), ut.getCellPhone());

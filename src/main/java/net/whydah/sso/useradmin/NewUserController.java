@@ -5,6 +5,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.commands.adminapi.user.CommandAddUser;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
@@ -81,6 +82,16 @@ public class NewUserController {
             try {
                 WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()).path("signup");//.path("signup");
                 log.debug("signup was called. Calling UAS with url " + uasWR.getURI());
+
+                // Move to new hystrix userAdd command
+                String userAddRoleResult = new CommandAddUser(uasServiceUri, SessionDao.instance.getServiceClient().getMyAppTokenID(), SessionDao.instance.getUserAdminToken().getUserTokenId(), userJson).execute();
+                if (userAddRoleResult != null && userAddRoleResult.length() > 4) {
+                    model.addAttribute("username", username);
+                    SessionDao.instance.addModel_LoginTypes(model);
+                    SessionDao.instance.addModel_CSRFtoken(model);
+                    return "signup_result";
+
+                }
 
                 ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
                 if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
