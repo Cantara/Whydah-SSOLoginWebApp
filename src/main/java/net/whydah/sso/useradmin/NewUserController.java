@@ -6,6 +6,7 @@ import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.commands.adminapi.user.CommandAddUser;
+import net.whydah.sso.commands.adminapi.user.CommandResetUserPassword;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
@@ -85,7 +86,9 @@ public class NewUserController {
 
                 // Move to new hystrix userAdd command
                 String userAddRoleResult = new CommandAddUser(uasServiceUri, SessionDao.instance.getServiceClient().getMyAppTokenID(), SessionDao.instance.getUserAdminToken().getUserTokenId(), userJson).execute();
+
                 if (userAddRoleResult != null && userAddRoleResult.length() > 4) {
+                    new CommandResetUserPassword(uasServiceUri, SessionDao.instance.getServiceClient().getMyAppTokenID(), username).execute();
                     model.addAttribute("username", username);
                     SessionDao.instance.addModel_LoginTypes(model);
                     SessionDao.instance.addModel_CSRFtoken(model);
