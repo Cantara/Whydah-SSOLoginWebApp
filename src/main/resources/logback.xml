@@ -1,36 +1,53 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<configuration>
+<configuration scan="true" scanPeriod="60 seconds">
+    <property name="LOG_DIR" value="logs/"/>
+    <property name="env" value="devtest"/>
+    <property name="appName" value="SSOLWA"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </layout>
     </appender>
 
-    <!--Daily rolling file appender -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>logs/SSOLoginWebApp.log</File>
+        <File>${LOG_DIR}${appName}.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>logs/SSOLoginWebApp-%d{yyyy-MM-dd}.log</FileNamePattern>
+            <fileNamePattern>${LOG_DIR}${appName}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>5</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <maxFileSize>5MB</maxFileSize>
-        </triggeringPolicy>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
     </appender>
 
 
+    <!--    <logger name="net.whydah.sso.usertoken.UserTokenXpathHelper" level="INFO"/>
+        <logger name="net.whydah.sso.user.helpers.UserTokenXpathHelper" level="INFO"/>
+        <logger name="net.whydah.sso.commands.userauth.CommandGetUsertokenByUsertokenId" level="INFO"/>
+        <logger name="net.whydah.sso.application.helpers" level="INFO"/>
+        <logger name="net.whydah.sso.authentication.whydah.HealthController" level="INFO"/>
+        <logger name="net.whydah.sso" level="DEBUG"/> -->
+    <logger name="ch.qos.logback" level="WARN"/>
     <logger name="org.eclipse.jetty" level="WARN" />
+    <logger name="org.apache.mina.filter.codec" level="WARN"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="hsqldb.db" level="WARN"/>
+    <logger name="org.apache.directory" level="WARN"/>
+    <logger name="org.apache.mina" level="WARN"/>
+    <logger name="net.whydah.identity.user.resource.FreemarkerViewProcessor" level="INFO"/>
+    <logger name="net.whydah.identity.util.FileUtils" level="WARN"/>
+    <logger name="com.jayway.jsonpath.internal.PathCompiler" level="WARN"/>
+    <logger name="com.jayway.jsonpath" level="INFO"/>
+    <logger name="org.springframework.web.servlet" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
 
 
-    <logger name="net.whydah.sso.authentication.whydah.clients.UserTokenXpathHelper" level="INFO"/>
-    <logger name="net.whydah.sso.application.helpers" level="INFO"/>
-    <logger name="net.whydah.sso" level="TRACE" />
-
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
+    <root level="DEBUG">
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>
+
+
