@@ -14,8 +14,8 @@
     	  <!--Each file should be at most 50MB, keep 5 days worth of history, but at most 3GB -->
     	  <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 		        <fileNamePattern>${LOG_DIR}${appName}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-		        <maxHistory>5</maxHistory> 
-		        <totalSizeCap>3GB</totalSizeCap>
+		        <maxHistory>5</maxHistory>
+              <totalSizeCap>1GB</totalSizeCap>
 		        <maxFileSize>50MB</maxFileSize>          
 		   </rollingPolicy>	   
 	        <encoder>
