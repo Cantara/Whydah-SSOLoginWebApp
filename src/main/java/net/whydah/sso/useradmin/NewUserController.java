@@ -62,21 +62,26 @@ public class NewUserController {
         String username = request.getParameter("username");
         username = username.trim();
         String email = request.getParameter("useremail").trim();
-        email = email.trim();
         String firstName = request.getParameter("firstname").trim();
-        firstName = firstName.trim();
         String lastName = request.getParameter("lastname").trim();
-        lastName = lastName.trim();
         String cellPhone = request.getParameter("cellphone").trim();
-        cellPhone = cellPhone.trim();
         log.trace("signup requested user - email: {} and username: {}", email, username);
         if (email != null && username != null) {
             UserIdentity signupUser = new UserIdentity(UUID.randomUUID().toString());
-            signupUser.setUsername(username);
-            signupUser.setFirstName(firstName);
+            signupUser.setUsername(username.trim());
+            if (firstName != null) {
+                firstName = firstName.trim();
+            }
+            signupUser.setFirstName(lastName);
+            if (lastName != null) {
+                lastName = lastName.trim();
+            }
             signupUser.setLastName(lastName);
+            if (cellPhone != null) {
+                cellPhone = cellPhone.trim();
+            }
             signupUser.setCellPhone(cellPhone);
-            signupUser.setEmail(email);
+            signupUser.setEmail(email.trim());
 
             String userJson = UserIdentityMapper.toJsonWithoutUID(signupUser);
 
