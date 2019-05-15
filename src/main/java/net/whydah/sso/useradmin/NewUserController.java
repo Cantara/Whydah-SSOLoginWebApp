@@ -71,7 +71,7 @@ public class NewUserController {
             if (firstName != null) {
                 firstName = firstName.trim();
             }
-            signupUser.setFirstName(lastName);
+            signupUser.setFirstName(firstName);
             if (lastName != null) {
                 lastName = lastName.trim();
             }
