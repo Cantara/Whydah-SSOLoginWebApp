@@ -60,7 +60,7 @@ public class NewUserController {
 
         SessionDao.instance.addModel_LOGO_URL(model);
         String username = request.getParameter("username");
-        String email = request.getParameter("email");
+        String email = request.getParameter("useremail");
         String firstName = request.getParameter("firstname");
         String lastName = request.getParameter("lastname");
         String cellPhone = request.getParameter("cellphone");
