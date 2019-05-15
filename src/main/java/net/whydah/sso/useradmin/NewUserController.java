@@ -60,8 +60,7 @@ public class NewUserController {
 
         SessionDao.instance.addModel_LOGO_URL(model);
         String username = request.getParameter("username");
-        username = username.trim();
-        String email = request.getParameter("useremail").trim();
+        String email = request.getParameter("email").trim();
         String firstName = request.getParameter("firstname").trim();
         String lastName = request.getParameter("lastname").trim();
         String cellPhone = request.getParameter("cellphone").trim();
@@ -81,7 +80,10 @@ public class NewUserController {
                 cellPhone = cellPhone.trim();
             }
             signupUser.setCellPhone(cellPhone);
-            signupUser.setEmail(email.trim());
+            if (email != null) {
+                email = email.trim();
+            }
+            signupUser.setEmail(email);
 
             String userJson = UserIdentityMapper.toJsonWithoutUID(signupUser);
 
