@@ -27,6 +27,7 @@ public class LoginTypes {
         signupEnabled = TRUE.equalsIgnoreCase(properties.getProperty("signupEnabled"));
 
         log.debug(String.format("Signup is %6s, Facebook Sign on is %1s, OpenId Sign on is %2s, Omni Sign on is %3s, netIQ Sign on is %4s, User/Password Sign on is %5s."
+                , properties.getProperty("signupEnabled")
                 , properties.getProperty("logintype.facebook")
 									, properties.getProperty("logintype.openid")
 									, properties.getProperty("logintype.omni")

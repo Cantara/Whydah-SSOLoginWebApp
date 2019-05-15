@@ -58,11 +58,16 @@ public class NewUserController {
         SessionDao.instance.setCSP(response);
 
         SessionDao.instance.addModel_LOGO_URL(model);
-        String username = request.getParameter("username").trim();
+        String username = request.getParameter("username");
+        username = username.trim();
         String email = request.getParameter("useremail").trim();
+        email = email.trim();
         String firstName = request.getParameter("firstname").trim();
+        firstName = firstName.trim();
         String lastName = request.getParameter("lastname").trim();
+        lastName = lastName.trim();
         String cellPhone = request.getParameter("cellphone").trim();
+        cellPhone = cellPhone.trim();
         log.trace("signup requested user - email: {} and username: {}", email, username);
         if (email != null && username != null) {
             UserIdentity signupUser = new UserIdentity();
