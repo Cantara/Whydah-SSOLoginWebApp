@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Enumeration;
+import java.util.UUID;
 
 @Controller
 public class NewUserController {
@@ -70,7 +71,7 @@ public class NewUserController {
         cellPhone = cellPhone.trim();
         log.trace("signup requested user - email: {} and username: {}", email, username);
         if (email != null && username != null) {
-            UserIdentity signupUser = new UserIdentity();
+            UserIdentity signupUser = new UserIdentity(UUID.randomUUID().toString());
             signupUser.setUsername(username);
             signupUser.setFirstName(firstName);
             signupUser.setLastName(lastName);
