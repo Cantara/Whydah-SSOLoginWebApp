@@ -65,13 +65,15 @@ public class NewUserController {
         String cellPhone = request.getParameter("cellphone");
         log.trace("signup requested user - email: {} and username: {}", email, username);
         if (email != null && username != null) {
-            log.info("Requested signup - email: " + email + "  username: " + username + "  firstname: " + firstName + "  lastname: " + lastName + "  cellphone: " + cellPhone + " ");
-            String userJson = "{\"username\":\"" + username +
-                    "\", \"firstName\":\"" + firstName +
-                    "\", \"lastName\":\"" + lastName +
-                    "\", \"personRef\":\"\", \"email\":\"" + email +
-                    "\", \"cellPhone\":\"" + cellPhone + "\"}";
-            UserIdentity signupUser = UserIdentityMapper.fromUserIdentityWithNoIdentityJson(userJson);
+            UserIdentity signupUser = new UserIdentity();
+            signupUser.setUsername(username);
+            signupUser.setFirstName(firstName);
+            signupUser.setLastName(lastName);
+            signupUser.setCellPhone(cellPhone);
+            signupUser.setEmail(email);
+
+            String userJson = UserIdentityMapper.toJsonWithoutUID(signupUser);
+
             if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
                 log.warn("action - CSRFtoken verification failed. Redirecting to login.");
                 //ModelHelper.setEnabledLoginTypes(model);
