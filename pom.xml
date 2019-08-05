@@ -35,10 +35,10 @@
 
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah.admin.sdk.version>2.5.9</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.5.18</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
-        <spring.version>5.1.5.RELEASE</spring.version>
-        <org.springframework.security-version>5.0.12.RELEASE</org.springframework.security-version>
+        <spring.version>5.1.9.RELEASE</spring.version>
+        <org.springframework.security-version>5.1.5.RELEASE</org.springframework.security-version>
         <jetty.version>9.4.17.v20190418</jetty.version>
         <metrics.version>4.0.0-alpha2</metrics.version>
     </properties>
