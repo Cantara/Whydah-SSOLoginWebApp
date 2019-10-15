@@ -233,7 +233,7 @@ public enum SessionDao {
                 return DEFAULT_REDIRECT;
             }
         }
-		if (!(RedirectURI.isValid(redirectURI))) {
+        if (!(RedirectURI.isValid(redirectURI)) || redirectURI.equalsIgnoreCase("null") || redirectURI.equalsIgnoreCase("")) {
 			log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
             return DEFAULT_REDIRECT;
         }
