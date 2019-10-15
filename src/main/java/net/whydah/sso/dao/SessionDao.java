@@ -220,33 +220,38 @@ public enum SessionDao {
 	}
 
     public String getFromRequest_RedirectURI(HttpServletRequest request) {
-        String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
-        String hashContent = request.getParameter("hashContent");
-        if (hashContent == null) {
-            hashContent = "";
-        } else {
-            int origSize = hashContent.length();
-            String withoutAccent = Normalizer.normalize(hashContent, Normalizer.Form.NFD);
-            hashContent = withoutAccent.replaceAll("[^a-zA-Z0-9 ]", "");            //hashContent = sanitize(escapeHtml(hashContent.replace("alert", "").replace("confirm", "")));
-            // If there are issues in the hashContent we return default
-            if (origSize != hashContent.length()) {
+        try {
+            String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
+            String hashContent = request.getParameter("hashContent");
+            if (hashContent == null) {
+                hashContent = "";
+            } else {
+                int origSize = hashContent.length();
+                String withoutAccent = Normalizer.normalize(hashContent, Normalizer.Form.NFD);
+                hashContent = withoutAccent.replaceAll("[^a-zA-Z0-9 ]", "");            //hashContent = sanitize(escapeHtml(hashContent.replace("alert", "").replace("confirm", "")));
+                // If there are issues in the hashContent we return default
+                if (origSize != hashContent.length()) {
+                    return DEFAULT_REDIRECT;
+                }
+            }
+            if (redirectURI == null || !(RedirectURI.isValid(redirectURI)) || redirectURI.equalsIgnoreCase("null") || redirectURI.equalsIgnoreCase("")) {
+                log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
                 return DEFAULT_REDIRECT;
             }
-        }
-        if (!(RedirectURI.isValid(redirectURI)) || redirectURI.equalsIgnoreCase("null") || redirectURI.equalsIgnoreCase("")) {
-			log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
-            return DEFAULT_REDIRECT;
-        }
-        try {
-            if (matchRedirectURLtoModel) {
-				redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList(), null).getInput();
-			} else {
-				redirectURI = new RedirectURI(redirectURI, null, null).getInput();
-			}
-            URI redirect = new URI(redirectURI + hashContent);
-            return redirect.toString();
+            try {
+                if (matchRedirectURLtoModel) {
+                    redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList(), null).getInput();
+                } else {
+                    redirectURI = new RedirectURI(redirectURI, null, null).getInput();
+                }
+                URI redirect = new URI(redirectURI + hashContent);
+                return redirect.toString();
+            } catch (Exception e) {
+                return DEFAULT_REDIRECT;
+            }
         } catch (Exception e) {
             return DEFAULT_REDIRECT;
+
         }
     }
 
