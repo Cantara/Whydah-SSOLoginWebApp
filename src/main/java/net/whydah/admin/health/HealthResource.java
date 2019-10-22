@@ -7,6 +7,8 @@ import net.whydah.sso.util.WhydahUtil;
 import net.whydah.sso.whydah.DEFCON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
@@ -45,9 +46,9 @@ public class HealthResource {
 
     }
 
-    @RequestMapping("/health")
+    @RequestMapping(value = "/health", produces = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response isHealthy(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public ResponseEntity isHealthy(HttpServletRequest request, HttpServletResponse response, Model model) {
         if (serviceClient==null){
             try {
                 properties = AppConfig.readProperties();
@@ -60,22 +61,23 @@ public class HealthResource {
         }
         try {
             if (serviceClient.getWAS()==null){
-                return Response.ok("Initializing").build();
+                return ResponseEntity.ok("Initializing");
             }
             ok = serviceClient.getWAS().getDefcon().equals(DEFCON.DEFCON5);
 
             if (ok && serviceClient.getWAS().checkActiveSession()) {
                 log.trace("isHealthy={}, status: {}", ok, WhydahUtil.getPrintableStatus(serviceClient.getWAS()));
                 model.addAttribute(ConstantValue.HEALTH, getHealthTextJson());
-                return Response.ok(getHealthTextJson(), MediaType.APPLICATION_JSON).build();
+                return ResponseEntity.ok(getHealthTextJson());
             } else {
-                model.addAttribute(ConstantValue.HEALTH, "isHealthy={false}");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                model.addAttribute(ConstantValue.HEALTH, "{\n  \"isHealthy\": \"false\"\n}");
+                return ResponseEntity.ok("{\"isHealthy\": \"false\"}");
+//                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         } catch (Exception e){
             log.warn("Initializing WhydahServiceClient",e);
             model.addAttribute(ConstantValue.HEALTH, "Initializing WhydahServiceClient");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
         }
     }
