@@ -91,7 +91,7 @@ public class HealthResource {
                 "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
                 "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().hasApplicationMetaData()) + "\",\n" +
                 "  \"now\": \"" + Instant.now() + "\",\n" +
-                "  \"running since\": \"" + WhydahUtil.getRunningSince() + "\"\n\n" +
+                "  \"running since\": \"" + WhydahUtil.getRunningSince() + "\",\n\n" +
                 "  \"" + ConstantValue.SECURITYTOKENSERVICEHEALTH + "\": \"" + properties.getProperty("securitytokenservice") + "health" + "\" ,\n" +
                 "  \"" + ConstantValue.USERADMINSERVICEHEALTH + "\": \"" + properties.getProperty("useradminservice") + "health" + "\" ,\n" +
                 "  \"" + ConstantValue.STATISTICSSERVICEHEALTH + "\": \"" + properties.getProperty("reportservice") + "health" + "\" ,\n" +
