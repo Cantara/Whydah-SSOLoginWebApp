@@ -214,7 +214,6 @@
                 <version>2.5.3</version>
                 <configuration>
                     <tagNameFormat>v@{project.version}+r${maven.build.timestamp}</tagNameFormat>
-                    <releaseVersion>v@{project.version}+r${maven.build.timestamp}</releaseVersion>
                 </configuration>
             </plugin>
             <plugin>
