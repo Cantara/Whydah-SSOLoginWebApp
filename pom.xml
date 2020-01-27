@@ -39,7 +39,7 @@
         <whydah.admin.sdk.version>2.5.34</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.2.3.RELEASE</spring.version>
-        <org.springframework.security-version>5.2.3.RELEASE</org.springframework.security-version>
+        <spring.security-version>5.2.1.RELEASE</spring.security-version>
         <jetty.version>9.4.26.v20200117</jetty.version>
         <metrics.version>4.1.2</metrics.version>
     </properties>
@@ -116,7 +116,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${org.springframework.security-version}</version>
+            <version>${spring.security-version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
