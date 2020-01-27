@@ -36,11 +36,11 @@
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
-        <whydah.admin.sdk.version>2.5.31</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.5.34</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.2.3.RELEASE</spring.version>
-        <org.springframework.security-version>5.2.0.RELEASE</org.springframework.security-version>
-        <jetty.version>9.4.25.v20191220</jetty.version>
+        <org.springframework.security-version>5.2.3.RELEASE</org.springframework.security-version>
+        <jetty.version>9.4.26.v20200117</jetty.version>
         <metrics.version>4.1.2</metrics.version>
     </properties>
 
@@ -54,7 +54,7 @@
                 <role>Developer</role>
             </roles>
             <organization>Cantara</organization>
-            <organizationUrl>http://wiki.cantara.no/</organizationUrl>
+            <organizationUrl>https://wiki.cantara.no/</organizationUrl>
         </developer>
         <developer>
             <id>kimcs</id>
