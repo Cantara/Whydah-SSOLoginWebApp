@@ -60,8 +60,9 @@ public enum SessionDao {
 
     CRMHelper crmHelper;
 	ReportServiceHelper reportServiceHelper;
-
-
+	LoginTypes enabledLoginTypes;
+	PersonaServiceHelper personaService;
+	
 	public CRMHelper getCRMHelper(){
 		return crmHelper;
 	}
@@ -81,16 +82,17 @@ public enum SessionDao {
 			MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
             LOGOUT_ACTION_URI = MY_APP_URI + "logoutaction";
             LOGIN_URI = MY_APP_URI + "login";
-			
+            enabledLoginTypes = new LoginTypes(properties);
+            
 			this.serviceClient = new WhydahServiceClient(properties);
 			this.tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
 			this.uasServiceUri = UriBuilder.fromUri(properties.getProperty("useradminservice")).build();
 			this.crmServiceUri = UriBuilder.fromUri(properties.getProperty("crmservice")).build();
 			this.reportservice = UriBuilder.fromUri(properties.getProperty("reportservice")).build();
 			this.adminUserCredential = new UserCredential(properties.getProperty("uasuser"), properties.getProperty("uaspw"));
-			crmHelper = new CRMHelper(serviceClient, crmServiceUri, properties.getProperty("email.verification.link"));
-			reportServiceHelper = new ReportServiceHelper(serviceClient, reportservice);
-
+			this.crmHelper = new CRMHelper(serviceClient, crmServiceUri, properties.getProperty("email.verification.link"));
+			this.reportServiceHelper = new ReportServiceHelper(serviceClient, reportservice);
+			this.personaService = new PersonaServiceHelper(properties);
             this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
         } catch (IOException e) {
 			e.printStackTrace();
@@ -103,17 +105,24 @@ public enum SessionDao {
 	//////ADD BASIC VALUE TO THE MODEL
 
 	public Model addModel_LoginTypes(Model model){
-		LoginTypes enabledLoginTypes = new LoginTypes(properties);
+		
 		model.addAttribute(ConstantValue.SIGNUPENABLED, enabledLoginTypes.isSignupEnabled());
 		model.addAttribute(ConstantValue.USERPASSWORDLOGINENABLED, enabledLoginTypes.isUserpasswordLoginEnabled());
         model.addAttribute(ConstantValue.FACEBOOKLOGIN_ENABLED, enabledLoginTypes.isFacebookLoginEnabled());
         model.addAttribute(ConstantValue.OPENIDLOGIN_ENABLED, enabledLoginTypes.isOpenIdLoginEnabled());
         model.addAttribute(ConstantValue.OMNILOGIN_ENABLED, enabledLoginTypes.isOmniLoginEnabled());
         model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
-
+        model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
+        
         if (enabledLoginTypes.isNetIQLoginEnabled()) {
             setNetIQOverrides(model);
         }
+        
+        if(enabledLoginTypes.isPersonasShortcutEnabled()) {
+        	model.addAttribute("personas", personaService.getPersonasCredentials());
+        }
+        
+        
 		return model;
 	}
 	

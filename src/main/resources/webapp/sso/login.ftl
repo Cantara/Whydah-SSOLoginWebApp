@@ -105,6 +105,40 @@
                 </form>
             </div> 
         </#if>
+        
+        <#if personasshortcutEnabled == true>
+        	
+            <div class="login-box">
+             		<h4>Log in with Personas</h4>
+                
+                	<#list personas>
+					    <#items as persona>
+					        <form action="action" class="new_user_session personaform" name="getusertoken" method="post">
+		                        <input id="user_session_login" name="user" type="hidden" value="${persona.userName}" >
+		                        <input id="user_session_password" name="password" type="hidden" value="${persona.password}">
+		                        <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
+		                        <input type="hidden" name="redirectURI" value="${redirectURI!"welcome"}">
+		                        <input id="user_session_remember_me" name="user_session[remember_me]" type="hidden" value="1"/>
+		                        <input class="button button-login" name="commit" type="submit" value="${persona.displayText}"/>
+		                        <!--
+		                        <#if persona.description != ''>
+ 									 <span class="personatooltip"><b>${persona.displayText}</b> <br/> ${persona.description}</span>         
+ 								</#if>	
+ 								!-->	
+ 								<span class="personatooltip"><b>${persona.displayText}</b> <br/> ${persona.description}</span>         
+		                                     
+		                     </form>
+		                    
+					       
+					    </#items>
+					  
+					    <#else>
+					    	<p>No personas</p>
+					</#list>
+
+
+            </div> 
+        </#if>
 
         <#if signupEnabled == true>
              <p id="signup">Not registered? <a href="signup">Register here!</a></p>

@@ -56,6 +56,7 @@ public class ConstantValue {
     public static final String OPENIDLOGIN_ENABLED = "openidLoginEnabled";
     public static final String OMNILOGIN_ENABLED = "omniLoginEnabled";
     public static final String NETIQLOGIN_ENABLED = "netIQLoginEnabled";
+    public static final String PERSONASSHOTCUT_ENABLED = "personasshortcutEnabled";
 
 
 }
