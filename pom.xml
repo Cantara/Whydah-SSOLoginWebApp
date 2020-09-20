@@ -36,7 +36,7 @@
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
-        <whydah.admin.sdk.version>2.5.70</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.5.71</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.2.8.RELEASE</spring.version>
         <spring.security-version>5.3.4.RELEASE</spring.security-version>
