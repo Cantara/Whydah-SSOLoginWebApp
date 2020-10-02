@@ -39,7 +39,7 @@
         <whydah.admin.sdk.version>2.5.71</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.2.9.RELEASE</spring.version>
-        <spring.security-version>5.3.4.RELEASE</spring.security-version>
+        <spring.security-version>5.4.0</spring.security-version>
         <jetty.version>9.4.31.v20200723</jetty.version>
         <metrics.version>4.1.12.1</metrics.version>
     </properties>
