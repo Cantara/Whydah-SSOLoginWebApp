@@ -6,20 +6,6 @@
     <name>SSOLoginWebApp</name>
     <url>https://wiki.cantara.no/display/iam/SSOLoginWebApp</url>
 
-    <repositories>
-        <!-- Needed for parent  -->
-        <repository>
-            <id>cantara-releases</id>
-            <name>Cantara Release Repository</name>
-            <url>https://mvnrepo.cantara.no/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>cantara-snapshots</id>
-            <name>Cantara Snapshot Repository</name>
-            <url>https://mvnrepo.cantara.no/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
-
     <parent>
         <groupId>no.cantara.emi</groupId>
         <artifactId>parent</artifactId>
@@ -36,7 +22,7 @@
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
-        <whydah.admin.sdk.version>2.6.0</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.6.2</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.2.9.RELEASE</spring.version>
         <spring.security-version>5.4.0</spring.security-version>
@@ -398,4 +384,20 @@
             </plugin>
         </plugins>
     </build>
+    
+    
+    <repositories>
+        <!-- Needed for parent  -->
+        <repository>
+            <id>cantara-releases</id>
+            <name>Cantara Release Repository</name>
+            <url>https://mvnrepo.cantara.no/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>cantara-snapshots</id>
+            <name>Cantara Snapshot Repository</name>
+            <url>https://mvnrepo.cantara.no/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
 </project>
