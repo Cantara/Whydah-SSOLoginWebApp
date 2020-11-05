@@ -27,7 +27,7 @@
         <spring.version>5.2.9.RELEASE</spring.version>
         <spring.security-version>5.4.0</spring.security-version>
         <jetty.version>9.4.32.v20200930</jetty.version>
-        <metrics.version>4.1.12.1</metrics.version>
+        <metrics.version>4.1.13</metrics.version>
     </properties>
 
 
