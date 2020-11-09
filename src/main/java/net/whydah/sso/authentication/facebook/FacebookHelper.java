@@ -2,6 +2,7 @@ package net.whydah.sso.authentication.facebook;
 
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
+import com.restfb.Version;
 import com.restfb.types.User;
 import net.whydah.sso.config.AppConfig;
 import org.slf4j.Logger;
@@ -71,7 +72,8 @@ public class FacebookHelper {
     public static Map.Entry<String, User> loginAndCreateFacebookUser(String code, String fbauthURI) {
         String fbAccessToken = getAccessToken(code, fbauthURI);
         //FacebookUser fbUser = createUserFromFacebookAttributes(faceBookAccessToken);
-        FacebookClient facebookClient = new DefaultFacebookClient(fbAccessToken);
+        FacebookClient facebookClient = new DefaultFacebookClient(Version.LATEST);
+        facebookClient.createClientWithAccessToken(fbAccessToken);
         User fbUser = facebookClient.fetchObject("me", User.class);
         log.trace("fbUser {}",fbUser);
         Map.Entry<String, User> pair = new AbstractMap.SimpleImmutableEntry<>(fbAccessToken, fbUser);
