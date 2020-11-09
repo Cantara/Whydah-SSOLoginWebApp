@@ -1,11 +1,8 @@
 package net.whydah.sso.authentication.facebook;
 
+import com.restfb.*;
 import net.whydah.sso.config.ApplicationMode;
 
-import com.restfb.Connection;
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Parameter;
 import com.restfb.types.User;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -42,7 +39,8 @@ public class FacebookHelperTest {
     @Test
     public void testCreateUserFromFacebookAttributes() {
         String faceBookAccessToken = "fbAccessTokenHere";
-        FacebookClient facebookClient = new DefaultFacebookClient(faceBookAccessToken);
+        FacebookClient facebookClient = new DefaultFacebookClient(Version.LATEST);
+        facebookClient.createClientWithAccessToken(faceBookAccessToken);
         User fbUser = facebookClient.fetchObject("me", User.class);
 
         assertEquals("745925301", fbUser.getId());
@@ -65,7 +63,8 @@ public class FacebookHelperTest {
     @Test
     public void testGetFacebookFriends() {
         String faceBookAccessToken = "fbAccessTokenHere";
-        FacebookClient facebookClient = new DefaultFacebookClient(faceBookAccessToken);
+        FacebookClient facebookClient = new DefaultFacebookClient(Version.LATEST);
+        facebookClient.createClientWithAccessToken(faceBookAccessToken);
 
         Connection<User> friendsConnection = facebookClient.fetchConnection("me/friends", User.class, Parameter.with("fields", "id, name, birthday"));
         @SuppressWarnings("unused")
