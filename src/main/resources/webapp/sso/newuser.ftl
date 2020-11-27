@@ -18,7 +18,7 @@
 
             <#if error??><p class="error">${error!}</p></#if>
 
-            <form method="POST" class="new_user_session">
+            <form method="POST" class="new_user_session" accept-charset="utf-8">
                 <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
 
                 <h4><label for="username">Username:</label></h4>
