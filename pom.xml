@@ -5,32 +5,27 @@
     <version>2.6.5-SNAPSHOT</version>
     <name>SSOLoginWebApp</name>
     <url>https://wiki.cantara.no/display/iam/SSOLoginWebApp</url>
-
     <parent>
         <groupId>no.cantara.emi</groupId>
         <artifactId>parent</artifactId>
         <version>8</version>
     </parent>
-
-    <scm>
-        <developerConnection>scm:git:ssh://git@github.com/cantara/Whydah-SSOLoginWebApp.git</developerConnection>
-        <connection>scm:git:https://github.com/cantara/Whydah-SSOLoginWebApp.git</connection>
-        <url>https://github.com/cantara/Whydah-SSOLoginWebApp</url>
-      <tag>HEAD</tag>
-  </scm>
-
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
-        <whydah.admin.sdk.version>2.6.3</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.6.10</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.3.0</spring.version>
         <spring.security-version>5.4.0</spring.security-version>
         <jetty.version>9.4.34.v20201102</jetty.version>
         <metrics.version>4.1.14</metrics.version>
+        <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
     </properties>
-
-
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com/cantara/Whydah-SSOLoginWebApp.git</developerConnection>
+        <connection>scm:git:https://github.com/cantara/Whydah-SSOLoginWebApp.git</connection>
+        <url>https://github.com/cantara/Whydah-SSOLoginWebApp</url>
+        <tag>HEAD</tag>
+     </scm>
     <developers>
         <developer>
             <id>totto</id>
