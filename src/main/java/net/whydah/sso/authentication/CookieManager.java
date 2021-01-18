@@ -92,11 +92,10 @@ public class CookieManager {
     }
     
     public static void clearUserTokenCookies(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = getUserTokenCookie(request);
-        if (cookie != null) {
-
-            addCookie("", 0, request, response);
-        }
+    	Cookie cookie = new Cookie(USER_TOKEN_REFERENCE_NAME, "");
+    	cookie.setMaxAge(0);
+    	cookie.setPath("/");
+        response.addCookie(cookie);
     }
 
     public static String getUserTokenId(HttpServletRequest request) {
@@ -146,10 +145,10 @@ public class CookieManager {
 
         } else {
             StringBuilder sb = new StringBuilder(USER_TOKEN_REFERENCE_NAME);
-//            sb.append("=");
+            sb.append("=");
             sb.append(userTokenId);
             sb.append(";expires=");
-//            sb.append("0");
+            sb.append("0");
             sb.append(";path=");
             sb.append("/");
             sb.append(";HttpOnly");
