@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.whydah.sso</groupId>
     <artifactId>SSOLoginWebApp</artifactId>
-    <version>2.6.17-SNAPSHOT</version>
+    <version>2.6.40-SNAPSHOT</version>
     <name>SSOLoginWebApp</name>
     <url>https://wiki.cantara.no/display/iam/SSOLoginWebApp</url>
     <parent>
@@ -12,7 +12,7 @@
     </parent>
     <properties>
         <service.name>Whydah-SSOLoginWebApp</service.name>
-        <whydah.admin.sdk.version>2.6.20</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.6.40</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
         <spring.version>5.3.3</spring.version>
         <spring.security-version>5.4.4</spring.security-version>
@@ -66,8 +66,6 @@
             <artifactId>jersey-client</artifactId>
             <version>2.33</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -127,7 +125,6 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
@@ -153,19 +150,16 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
         </dependency>
-
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20201115</version>
         </dependency>
-
         <dependency>
             <groupId>com.restfb</groupId>
             <artifactId>restfb</artifactId>
             <version>3.14.0</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
