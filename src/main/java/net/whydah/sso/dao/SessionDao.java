@@ -347,19 +347,19 @@ public enum SessionDao {
 
     ///  Block side-channel attacks - looks correct bud does not clear the detectify "alert"
     public void setCSP(HttpServletResponse response) {
-        response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
-		response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.quadim.no https://*.cantara.no  'unsafe-inline' 'unsafe-eval'; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self'; report-uri REDACTED");
+		response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
+		response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.quadim.ai https://*.cantara.no  'unsafe-inline' 'unsafe-eval'; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self'; report-uri REDACTED");
 		response.addHeader("X-Content-Type-Options", "nosniff");
-        response.addHeader("X-Permitted-Cross-Domain-Policies", "master-only");
-        response.addHeader("X-XSS-Protection", "1; mode=block");
-        response.addHeader("X-Frame-Options", "deny");
+		response.addHeader("X-Permitted-Cross-Domain-Policies", "master-only");
+		response.addHeader("X-XSS-Protection", "1; mode=block");
+		response.addHeader("X-Frame-Options", "deny");
 
-    }
+	}
 
     public void setCSP2(HttpServletResponse response) {
 		response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
-		response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.quadim.no https://*.cantara.no  'unsafe-inline' 'unsafe-eval'; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self'; report-uri REDACTED");
-    }
+		response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.quadim.ai https://*.cantara.no  'unsafe-inline' 'unsafe-eval'; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self'; report-uri REDACTED");
+	}
 
 
     //HANDLE LOGIC FROM CONTROLLERS
