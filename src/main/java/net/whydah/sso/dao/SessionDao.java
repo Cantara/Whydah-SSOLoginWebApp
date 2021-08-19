@@ -23,11 +23,14 @@ import net.whydah.sso.user.mappers.UserTokenMapper;
 import net.whydah.sso.user.types.UserCredential;
 import net.whydah.sso.user.types.UserIdentity;
 import net.whydah.sso.user.types.UserToken;
+import net.whydah.sso.utils.HazelcastMapHelper;
 import net.whydah.sso.utils.ServerUtil;
 import net.whydah.sso.utils.SignupHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
+
+import com.hazelcast.map.IMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -71,7 +74,7 @@ public enum SessionDao {
 		return reportServiceHelper;
 	}
 	
-	private Map<String, String> csrftokens = new HashMap<>();
+	private IMap<String, String> csrftokens = HazelcastMapHelper.register("csrftokens_map");
 
 	private SessionDao() {
 
