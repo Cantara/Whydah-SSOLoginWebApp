@@ -1,7 +1,6 @@
 package net.whydah.sso.authentication.whydah;
 
 import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.dao.ConstantValue;
@@ -11,6 +10,7 @@ import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.ddd.model.user.UserTokenId;
 import net.whydah.sso.errorhandling.AppException;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.user.types.UserCredential;
 import net.whydah.sso.utils.SignupHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,6 +177,7 @@ public class SSOLoginController {
             return "login";
         }
 
+        
         UserCredential user = new UserNameAndPasswordCredential(SessionDao.instance.getFromRequest_User(request), SessionDao.instance.getFromRequest_Password(request));
         String userTicket = UUID.randomUUID().toString();
         String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);

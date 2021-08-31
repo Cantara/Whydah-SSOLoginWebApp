@@ -2,9 +2,10 @@ package net.whydah.sso.authentication;
 
 import net.whydah.sso.ddd.model.user.Password;
 import net.whydah.sso.ddd.model.user.UserName;
+import net.whydah.sso.user.types.UserCredential;
 
-@Deprecated //  Use UserCredential in Typelib
-public class UserNameAndPasswordCredential implements UserCredential {
+// @Deprecated //  Use UserCredential in Typelib
+public class UserNameAndPasswordCredential extends UserCredential {
     private UserName userName;
     private Password password;
 

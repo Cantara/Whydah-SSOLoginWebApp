@@ -44,7 +44,12 @@
                         <label for="user_session_remember_me">Remember me</label>
                     </p>
                     <p style="float:right">
-                        <a href="resetpassword" class="new_password">Forgot password</a>
+                    	<#if redirectURI??>
+                    		<a href="resetpassword?redirectURI=${redirectURI}" class="new_password">Forgot password</a>		        	         
+			            <#else>
+			            	<a href="resetpassword" class="new_password">Forgot password</a>
+			            </#if>
+                        
                     </p>
                 </form> 
             </div>
@@ -141,7 +146,11 @@
         </#if>
 
         <#if signupEnabled == true>
-             <p id="signup">Not registered? <a href="signup">Register here!</a></p>
+        	<#if redirectURI??>
+        	   <p id="signup">Not registered? <a href="signup?redirectURI=${redirectURI}">Register here!</a></p>             
+            <#else>
+            	<p id="signup">Not registered? <a href="signup">Register here!</a></p>
+            </#if>             
         </#if>
 
     </div>

@@ -4,10 +4,13 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.user.UserName;
+import net.whydah.sso.user.types.UserCredential;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.util.UUID;
 
 /**
  * Password management self service.
@@ -49,6 +53,8 @@ public class PasswordChangeController {
         SessionDao.instance.addModel_CSRFtoken(model);
         SessionDao.instance.setCSP(response);
 
+        String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
+        model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
 
         if (!UserName.isValid(request.getParameter("username"))) {
             model.addAttribute("error", "\nIllegal username");
@@ -82,6 +88,10 @@ public class PasswordChangeController {
         SessionDao.instance.addModel_CSRFtoken(model);
         SessionDao.instance.setCSP(response);
 
+        String redirectURI = SessionDao.instance.getRedirectURIForNewUser(passwordChangeToken.getUser());
+        if(redirectURI!=null) {
+        	model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+        }
 
         model.addAttribute("username", passwordChangeToken.getUser());
         model.addAttribute("token", passwordChangeToken.getToken());
@@ -97,6 +107,11 @@ public class PasswordChangeController {
         log.trace("doChangePasswordFromLink was called");
         SessionDao.instance.addModel_LOGO_URL(model);
 
+        String redirectURI =  SessionDao.instance.getFromRequest_RedirectURI(request);
+        if(redirectURI!=null) {
+        	model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+        }
+        
         if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
             log.warn("action - CSRFtoken verification failed. Redirecting to login.");
             model.addAttribute(ConstantValue.PASSWORD_CHANGE_ERROR, "Could not change password - CSRFtoken missing or incorrect");
@@ -108,7 +123,7 @@ public class PasswordChangeController {
             return "login";
 
         }
-
+        SessionDao.instance.addModel_CSRFtoken(model);
 
         PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
         String newpassword = request.getParameter("newpassword");
@@ -129,7 +144,19 @@ public class PasswordChangeController {
             model.addAttribute("token", passwordChangeToken.getToken());
             return "changepassword";
         }
-        String redirectURI = "/sso/welcome";
+        
+        if(redirectURI!=null && !redirectURI.equals("welcome")) {
+        	UserCredential user = new UserNameAndPasswordCredential(passwordChangeToken.getUser(), newpassword);
+        	String userTicket = UUID.randomUUID().toString();
+        	String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
+        	if (userTokenXml != null) {
+        		 redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);    		
+        	}    	
+        } else {
+        	redirectURI = "/sso/welcome";
+        }
+        
+        
         model.addAttribute(ConstantValue.REDIRECT, redirectURI);
         log.info("login - Redirecting to {}", redirectURI);
         SessionDao.instance.addModel_CSRFtoken(model);

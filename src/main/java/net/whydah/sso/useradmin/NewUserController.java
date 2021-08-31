@@ -59,6 +59,10 @@ public class NewUserController {
         SessionDao.instance.setCSP(response);
 
         SessionDao.instance.addModel_LOGO_URL(model);
+        
+        String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
+        model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+        
         String username = request.getParameter("username");
         String email = request.getParameter("useremail");
         String firstName = request.getParameter("firstname");
@@ -104,6 +108,15 @@ public class NewUserController {
 
                 if (userAddRoleResult != null && userAddRoleResult.length() > 4) {
                     new CommandResetUserPassword(uasServiceUri, SessionDao.instance.getServiceClient().getMyAppTokenID(), username).execute();
+                    
+                    
+                    if (redirectURI != null && redirectURI.length() > 10) {
+                        
+                    
+                    	SessionDao.instance.addRedirectURIForNewUser(username, redirectURI);
+                    	
+                    }
+                    
                     model.addAttribute("username", username);
                     SessionDao.instance.addModel_LoginTypes(model);
                     SessionDao.instance.addModel_CSRFtoken(model);
@@ -111,19 +124,19 @@ public class NewUserController {
 
                 }
 
-                ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
-                if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-                    String error = uasResponse.getEntity(String.class);
-                    log.error("error:{} \n URL: {} \n user:{}", error, uasWR.getURI().toString(), signupUser);
-                    model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
-                } else {
-                   // ModelHelper.setEnabledLoginTypes(model);
-                    //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-                    model.addAttribute("username", username);
-                    SessionDao.instance.addModel_LoginTypes(model);
-                    SessionDao.instance.addModel_CSRFtoken(model);
-                    return "signup_result";
-                }
+//                ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
+//                if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+//                    String error = uasResponse.getEntity(String.class);
+//                    log.error("error:{} \n URL: {} \n user:{}", error, uasWR.getURI().toString(), signupUser);
+//                    model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
+//                } else {
+//                   // ModelHelper.setEnabledLoginTypes(model);
+//                    //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+//                    model.addAttribute("username", username);
+//                    SessionDao.instance.addModel_LoginTypes(model);
+//                    SessionDao.instance.addModel_CSRFtoken(model);
+//                    return "signup_result";
+//                }
 
             } catch (IllegalStateException ise) {
                 log.info("IllegalStateException {}", ise);

@@ -19,11 +19,14 @@
             </#if>
 
             <form action="../dochangepassword/${token}" method="post" class="new_user_session" name="changePasswordForm">
+            	<#if redirectURI??>
+               		<input type="hidden" name="redirectURI" value="${redirectURI}"/>
+             	</#if>
                 <h4><label for="user_session_password">New password for <em>${username}</em></label></h4>
                 <input id="user_session_password" name="newpassword" size="30" type="password" onkeyup="hideErrors();"/>
                 <h4><label for="user_session_password_2">Repeat password</label></h4>
                 <input id="user_session_password_2" name="newpassword" size="30" type="password" onkeyup="hideErrors();checkPwMatch();"/>
-        <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
+        		<input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                 <p class="error" id="pwMatchError" style="display:none">Passwords do not match.</p>
                 <p class="error" id="pwEmptyError" style="display:none">Please enter a password.</p>
                 <button class="button" type="button" value="Change password" onClick="changePassword();">Change password</button>

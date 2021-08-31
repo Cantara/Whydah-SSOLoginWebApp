@@ -74,7 +74,8 @@ public enum SessionDao {
 		return reportServiceHelper;
 	}
 	
-	private IMap<String, String> csrftokens = HazelcastMapHelper.register("csrftokens_map");
+	private static IMap<String, String> csrftokens = HazelcastMapHelper.registerMap("csrftokens_map");
+	private static IMap<String, String> username_redirectURI = HazelcastMapHelper.registerMap("username_redirectURI");
 
 	private SessionDao() {
 
@@ -577,5 +578,15 @@ public enum SessionDao {
 		return new CommandUpdateUser(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), u.getUid(), userjson).execute();
 	}
 
+	public void addRedirectURIForNewUser(String username, String redirectURI) {
+		if(redirectURI!=null && !redirectURI.equals(DEFAULT_REDIRECT)) {
+			SessionDao.username_redirectURI.put(username, redirectURI);
+		}
+	}
+	
+	public String getRedirectURIForNewUser(String username) {
+		return SessionDao.username_redirectURI.remove(username);
+	}
+	
 
 }
