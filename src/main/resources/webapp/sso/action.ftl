@@ -5,9 +5,9 @@
     <meta http-equiv="refresh" content="0;url=${redirect!"/sso/welcome"}">
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <link rel="stylesheet" href="css/whydah.css" type="text/css"/>
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
-    <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/sso/css/whydah.css" type="text/css"/>
+    <link rel="shortcut icon" href="/sso/images/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="/sso/images/favicon.ico" type="image/x-icon"/>
 </head>
 <body>
     <div id="page-content">
