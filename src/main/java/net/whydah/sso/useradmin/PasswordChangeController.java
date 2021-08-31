@@ -153,13 +153,15 @@ public class PasswordChangeController {
 			return "changepassword";
 		}
 
-		if(redirectURI!=null && !redirectURI.equals("welcome")) {
-			UserCredential user = new UserNameAndPasswordCredential(passwordChangeToken.getUser(), newpassword);
-			String userTicket = UUID.randomUUID().toString();
-			String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
+		//try to log the user on
+		UserCredential user = new UserNameAndPasswordCredential(passwordChangeToken.getUser(), newpassword);
+		String userTicket = UUID.randomUUID().toString();
+		String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
+        
+		if(redirectURI!=null && !redirectURI.equals("welcome")) {			
 			if (userTokenXml != null) {
 				redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);    		
-			}    	
+			}
 		} else {
 			redirectURI = "/sso/welcome";
 		}
