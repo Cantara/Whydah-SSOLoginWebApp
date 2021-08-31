@@ -14,7 +14,11 @@
         </div>
         <div class="login-box">
             URL for password reset is no longer valid.<br/><br/>
-            Please <a href="../resetpassword">reset password</a> and try again.
+            <#if redirectURI??>
+              Please <a href="../resetpassword?redirectURI=${redirectURI}">reset password</a> and try again.            
+            <#else>
+            	Please <a href="../resetpassword">reset password</a> and try again.
+            </#if> 
         </div>
     </div>
 </div>

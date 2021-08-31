@@ -580,12 +580,15 @@ public enum SessionDao {
 
 	public void addRedirectURIForNewUser(String username, String redirectURI) {
 		if(redirectURI!=null && !redirectURI.equals(DEFAULT_REDIRECT)) {
+			log.debug("add redirectURI= {} for username {}", redirectURI, username);
 			SessionDao.username_redirectURI.put(username, redirectURI);
 		}
 	}
 	
-	public String getRedirectURIForNewUser(String username) {
-		return SessionDao.username_redirectURI.remove(username);
+	public String getRedirectURIForNewUser(String username) {	
+		String redirectURI = SessionDao.username_redirectURI.remove(username);
+		log.debug("get redirectURI= {} for username {}", redirectURI, username);
+		return redirectURI;
 	}
 	
 

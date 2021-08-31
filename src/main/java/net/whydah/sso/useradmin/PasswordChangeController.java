@@ -119,16 +119,20 @@ public class PasswordChangeController {
 		if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
 			log.warn("action - CSRFtoken verification failed. Redirecting to login.");
 			model.addAttribute(ConstantValue.PASSWORD_CHANGE_ERROR, "Could not change password - CSRFtoken missing or incorrect");
+	
+			SessionDao.instance.addModel_LOGO_URL(model);
 			SessionDao.instance.addModel_CSRFtoken(model);
-			SessionDao.instance.setCSP(response);
-
+	        SessionDao.instance.setCSP(response);
+	        SessionDao.instance.addModel_MYURI(model);
+	        SessionDao.instance.addModel_WHYDAH_VERSION(model);        
 			SessionDao.instance.addModel_LoginTypes(model);
 			CookieManager.clearUserTokenCookies(request, response);
-			return "login";
+			return "/sso/login";
 
 		}
+		
 		SessionDao.instance.addModel_CSRFtoken(model);
-
+		
 		PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
 		String newpassword = request.getParameter("newpassword");
 		//        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
