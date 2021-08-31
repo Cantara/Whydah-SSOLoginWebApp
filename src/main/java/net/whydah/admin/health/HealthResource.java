@@ -88,7 +88,7 @@ public class HealthResource {
                 "  \"Version\": \"" + getVersion() + "\",\n" +
                 "  \"DEFCON\": \"" + serviceClient.getWAS().getDefcon() + "\",\n" +
                 "  \"hasApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().getActiveApplicationTokenId() != null) + "\",\n" +
-                "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
+               // "  \"hasValidApplicationToken\": \"" + Boolean.toString(serviceClient.getWAS().checkActiveSession()) + "\",\n" +
                 "  \"hasApplicationsMetadata\": \"" + Boolean.toString(serviceClient.getWAS().hasApplicationMetaData()) + "\",\n" +
                 "  \"now\": \"" + Instant.now() + "\",\n" +
                 "  \"running since\": \"" + WhydahUtil.getRunningSince() + "\",\n\n" +
