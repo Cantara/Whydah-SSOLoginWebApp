@@ -5,10 +5,12 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.user.UserName;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserCredential;
 
 import org.slf4j.Logger;
@@ -157,7 +159,11 @@ public class PasswordChangeController {
 		UserCredential user = new UserNameAndPasswordCredential(passwordChangeToken.getUser(), newpassword);
 		String userTicket = UUID.randomUUID().toString();
 		String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
-        
+        //attach to browser's cookie
+		String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
+        Integer tokenRemainingLifetimeSeconds = WhydahServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+        CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
+		
 		if(redirectURI!=null && !redirectURI.equals("welcome")) {			
 			if (userTokenXml != null) {
 				redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);    		
