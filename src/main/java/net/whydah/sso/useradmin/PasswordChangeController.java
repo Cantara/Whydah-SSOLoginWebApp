@@ -56,6 +56,9 @@ public class PasswordChangeController {
         String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
         model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
 
+        if (request.getParameter("username") == null || request.getParameter("username").length() < 3) {
+            return "resetpassword";
+        }
         if (!UserName.isValid(request.getParameter("username"))) {
             model.addAttribute("error", "\nIllegal username");
             return "resetpassword";
