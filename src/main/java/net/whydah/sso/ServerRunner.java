@@ -45,7 +45,7 @@ public class ServerRunner {
 //        int port = serverRunner.server.getConnectors()[0].getLocalPort();
         serverRunner.join();
         SSLTool.disableCertificateValidation();
-        WhydahServiceClient tc = new WhydahServiceClient();
+        //WhydahServiceClient tc = new WhydahServiceClient();
         log.info("SSOLoginWebApp started OK. Version = {},IAM_MODE = {}, url: http://localhost:{}{}/login",
                 version, ApplicationMode.getApplicationMode(), String.valueOf(port), CONTEXT);
 

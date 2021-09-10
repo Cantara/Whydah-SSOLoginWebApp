@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class NetIQLoginController {
         private static final Logger log = LoggerFactory.getLogger(NetIQLoginController.class);
-    private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
+    private final WhydahServiceClient tokenServiceClient = SessionDao.instance.getServiceClient();
 
         // set this to your servlet URL for the authentication servlet/filter
         private final String hetIQauthURI;

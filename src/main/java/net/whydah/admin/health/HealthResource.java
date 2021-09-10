@@ -3,6 +3,7 @@ package net.whydah.admin.health;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.util.WhydahUtil;
 import net.whydah.sso.whydah.DEFCON;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import java.util.Properties;
 
 @Controller
 public class HealthResource {
-    private static WhydahServiceClient serviceClient;
+    private static WhydahServiceClient serviceClient = SessionDao.instance.getServiceClient();
 
     private static final Logger log = LoggerFactory.getLogger(HealthResource.class);
     protected static Properties properties;
@@ -37,8 +38,7 @@ public class HealthResource {
     public HealthResource()  {
         try {
             properties = AppConfig.readProperties();
-            this.serviceClient = new WhydahServiceClient();
-            this.applicationInstanceName = properties.getProperty("applicationname");
+            applicationInstanceName = properties.getProperty("applicationname");
 
         } catch (Exception e){
             log.warn("Unable to create WhydahServiceClient in constructor",e);
