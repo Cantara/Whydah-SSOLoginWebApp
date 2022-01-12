@@ -13,6 +13,8 @@ import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.session.baseclasses.BaseDevelopmentWhydahServiceClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
@@ -24,6 +26,7 @@ import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
 public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
+    private final static Logger log = LoggerFactory.getLogger(WhydahServiceClient.class);
 
     //TODO: HUYDO will check, move all general functions to base
 	
