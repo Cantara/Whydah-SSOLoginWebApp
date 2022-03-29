@@ -14,7 +14,7 @@
         <service.name>Whydah-SSOLoginWebApp</service.name>
         <whydah.admin.sdk.version>2.10.6</whydah.admin.sdk.version>
         <jersey.version>1.6</jersey.version>
-        <spring.version>5.3.16</spring.version>
+        <spring.version>5.3.17</spring.version>
         <spring.security-version>5.6.2</spring.security-version>
         <jetty.version>9.4.45.v20220203</jetty.version>
         <metrics.version>4.2.8</metrics.version>
