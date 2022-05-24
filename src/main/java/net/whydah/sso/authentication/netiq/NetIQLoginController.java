@@ -1,15 +1,5 @@
 package net.whydah.sso.authentication.netiq;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
@@ -18,27 +8,39 @@ import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
 @Controller
 public class NetIQLoginController {
-        private static final Logger log = LoggerFactory.getLogger(NetIQLoginController.class);
-    private final WhydahServiceClient tokenServiceClient = SessionDao.instance.getServiceClient();
+    private static final Logger log = LoggerFactory.getLogger(NetIQLoginController.class);
+    private WhydahServiceClient tokenServiceClient;
 
-        // set this to your servlet URL for the authentication servlet/filter
-        private final String hetIQauthURI;
-        String LOGOURL="/sso/images/site-logo.png";
+    // set this to your servlet URL for the authentication servlet/filter
+    private String hetIQauthURI;
+    String LOGOURL = "/sso/images/site-logo.png";
 
         public NetIQLoginController() throws IOException {
+            if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.NETIQLOGIN_ENABLED)) {
+                return;
+            }
+            tokenServiceClient = SessionDao.instance.getServiceClient();
             Properties properties = AppConfig.readProperties();
             String MY_APP_URI = properties.getProperty("myuri");
-            hetIQauthURI =  properties.getProperty("netIQauthURL");
-            LOGOURL=properties.getProperty("logourl");
+            hetIQauthURI = properties.getProperty("netIQauthURL");
+            LOGOURL = properties.getProperty("logourl");
         }
 
 
