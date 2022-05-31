@@ -57,10 +57,11 @@ public class GoogleAuthHelper {
 	
 	String MY_APP_URI;
 	String SSO_CALL_BACK;
+	Properties properties;
 
 	@PostConstruct
 	public void init() throws IOException {
-		Properties properties = AppConfig.readProperties();
+		properties = AppConfig.readProperties();
 		MY_APP_URI = properties.getProperty("myuri");
 		SSO_CALL_BACK = MY_APP_URI.replaceFirst("/$", "") + "/googleauth";
 	}
@@ -89,7 +90,7 @@ public class GoogleAuthHelper {
 
 	public String getAuthorizationCodeUrl(String domain, String userhint, String callbackUrl, String state, String nonce) {
 		
-		GoogleConnectionProperties ggDomainProperties = new GoogleConnectionProperties(MY_APP_URI, ExternalIAMSSOSuppliers.configurationForDomain(domain));
+		GoogleConnectionProperties ggDomainProperties = new GoogleConnectionProperties(MY_APP_URI, properties);
 		return
 				 new GoogleAuthorizationCodeRequestUrl(ggDomainProperties.getClientId(),
 						 ggDomainProperties.getSSOCallback(), Arrays.asList(
@@ -277,7 +278,7 @@ public class GoogleAuthHelper {
 
 	private GoogleConnectionProperties getDomainAppConfig() throws MalformedURLException {
 		//String domain = GoogleSessionManagementHelper.getSessionSelectedDomain(httpRequest);
-		return new GoogleConnectionProperties(MY_APP_URI, null);
+		return new GoogleConnectionProperties(MY_APP_URI, properties);
 	}
 
 	private void validateAuthRespMatchesAuthCodeFlow(AuthenticationSuccessResponse oidcResponse) throws Exception {
