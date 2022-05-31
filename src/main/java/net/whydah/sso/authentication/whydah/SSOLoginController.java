@@ -12,6 +12,8 @@ import net.whydah.sso.errorhandling.AppException;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserCredential;
 import net.whydah.sso.utils.SignupHelper;
+import net.whydah.sso.utils.FreeMarkerHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.util.UUID;
 
@@ -33,7 +37,7 @@ public class SSOLoginController {
     }
 
     @RequestMapping("/login")
-    public String login(HttpServletRequest request, HttpServletResponse response,Model model) {
+    public Response login(HttpServletRequest request, HttpServletResponse response,Model model) {
     	
     	
     	String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
@@ -76,8 +80,8 @@ public class SSOLoginController {
                 //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
                 SessionDao.instance.addModel_CSRFtoken(model);
                 log.info("login - Redirecting to {}", redirectURI);
-                return "action";
-
+                //return "action";
+                return Response.ok(FreeMarkerHelper.createBody("/action.ftl", model.asMap())).build();
             }
             String userTicket = UUID.randomUUID().toString();
             if (SessionDao.instance.getServiceClient().createTicketForUserTokenID(userTicket, whydahUserTokenId.toString())){
@@ -89,7 +93,8 @@ public class SSOLoginController {
                 log.info("login - Redirecting to {}", redirectURI);
                 //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
                 SessionDao.instance.addModel_CSRFtoken(model);
-                return "action";
+                //return "action";
+                return Response.ok(FreeMarkerHelper.createBody("/action.ftl", model.asMap())).build();
             }
         }
 
@@ -98,7 +103,8 @@ public class SSOLoginController {
             // Action use redirect - not redirectURI
             model.addAttribute(ConstantValue.REDIRECT, redirectURI);
             log.info("login - isSessionCheckOnly - Redirecting to {}", redirectURI);
-            return "action";
+            return Response.ok(FreeMarkerHelper.createBody("/action.ftl", model.asMap())).build();
+            //return "action";
 
         } 
 
@@ -106,7 +112,9 @@ public class SSOLoginController {
         SessionDao.instance.addModel_LoginTypes(model);
         //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
         SessionDao.instance.addModel_CSRFtoken(model);
-        return "login";
+        
+        return Response.ok(FreeMarkerHelper.createBody("/login.ftl", model.asMap())).build();
+        //return "login";
     }
 
     @RequestMapping("/welcome")

@@ -72,7 +72,36 @@ a:hover {
     color: #4b4b4b;
 }
 
+
 .button {
+    font-family: inherit;
+    font-size: 1.1em;
+    margin: .5em 0;
+    color: #fff;
+    /*background: #2D7BB2;*/
+    background: #2db2a7;
+    padding: .5em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
+}
+
+
+.button-google {
+    font-family: inherit;
+    font-size: 1.1em;
+    margin: .5em 0;
+    color: #fff;
+    background: #ba1717;
+    padding: .5em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
+}
+
+.button-facebook {
     font-family: inherit;
     font-size: 1.1em;
     margin: .5em 0;
@@ -85,10 +114,59 @@ a:hover {
     box-sizing: border-box;
 }
 
-.button:hover {
-    background: #1f547a;
+.button-rebel {
+    font-family: inherit;
+    font-size: 1.1em;
+    margin: .5em 0;
     color: #fff;
+    background-color: #ff3381;
+    padding: .5em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
 }
+
+.button-netiq {
+    font-family: inherit;
+    font-size: 1.1em;
+    margin: .5em 0;
+    color: #fff;
+    background-color: #3369ff;
+    padding: .5em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
+}
+
+.button:hover {
+  color: #3c3c3c;
+  background-color: #fff;
+  border: 1px solid  #2db2a7;
+}
+.button-google:hover {
+  color: #3c3c3c;
+  background-color: #fff;
+  border: 1px solid#ba1717;
+}
+.button-facebook:hover {
+  color: #3c3c3c;
+  background-color: #fff;
+  border: 1px solid #2D7BB2;
+}
+.button-rebel:hover {
+  color: #3c3c3c;
+  background-color: #fff;
+  border: 1px solid #ff3381;
+}
+.button-netiq:hover {
+  color: #3c3c3c;
+  background-color: #fff;
+  border: 1px solid #3369ff;
+}
+
+
 
 .button-login {
     width: 100%;

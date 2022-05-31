@@ -4,10 +4,15 @@ import net.whydah.sso.ServerRunner;
 import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.application.types.Application;
 import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthHelper;
+import net.whydah.sso.authentication.iamproviders.whydah.WhydahOauthIntegrationConfig;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.basehelpers.JsonPathHelper;
+import net.whydah.sso.commands.adminapi.user.CommandGetUserAggregate;
 import net.whydah.sso.commands.adminapi.user.CommandUpdateUser;
+import net.whydah.sso.commands.adminapi.user.CommandUpdateUserAggregate;
 import net.whydah.sso.commands.adminapi.user.CommandUserExists;
+import net.whydah.sso.commands.adminapi.user.CommandUserNameExists;
 import net.whydah.sso.commands.adminapi.user.CommandUserPasswordLoginEnabled;
 import net.whydah.sso.commands.adminapi.user.role.CommandAddUserRole;
 import net.whydah.sso.commands.adminapi.user.role.CommandDeleteUserRole;
@@ -18,8 +23,11 @@ import net.whydah.sso.config.LoginTypes;
 import net.whydah.sso.ddd.model.application.RedirectURI;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.helpers.UserXpathHelper;
+import net.whydah.sso.user.mappers.UserAggregateMapper;
 import net.whydah.sso.user.mappers.UserIdentityMapper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
+import net.whydah.sso.user.types.UserAggregate;
+import net.whydah.sso.user.types.UserApplicationRoleEntry;
 import net.whydah.sso.user.types.UserCredential;
 import net.whydah.sso.user.types.UserIdentity;
 import net.whydah.sso.user.types.UserToken;
@@ -28,6 +36,7 @@ import net.whydah.sso.utils.ServerUtil;
 import net.whydah.sso.utils.SignupHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
 import com.hazelcast.map.IMap;
@@ -66,6 +75,8 @@ public enum SessionDao {
 	LoginTypes enabledLoginTypes;
 	PersonaServiceHelper personaService;
 	
+	WhydahOauthIntegrationConfig whydahOauthConfig;
+	
 	public CRMHelper getCRMHelper(){
 		return crmHelper;
 	}
@@ -98,6 +109,7 @@ public enum SessionDao {
 			this.reportServiceHelper = new ReportServiceHelper(serviceClient, reportservice);
 			this.personaService = new PersonaServiceHelper(properties);
             this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
+            whydahOauthConfig = new WhydahOauthIntegrationConfig(properties);
         } catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +129,9 @@ public enum SessionDao {
         model.addAttribute(ConstantValue.OMNILOGIN_ENABLED, enabledLoginTypes.isOmniLoginEnabled());
         model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
         model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
-        
+        model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
+       
+        model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
         if (enabledLoginTypes.isNetIQLoginEnabled()) {
             setNetIQOverrides(model);
         }
@@ -157,6 +171,10 @@ public enum SessionDao {
         if (loginType.equalsIgnoreCase(ConstantValue.SIGNUPENABLED)) {
             return enabledLoginTypes.isSignupEnabled();
         }
+        if (loginType.equalsIgnoreCase(ConstantValue.GOOGLELOGIN_ENABLED)) {
+            return enabledLoginTypes.isGoogleLoginEnabled();
+        }
+        
         return false;
     }
 
@@ -431,7 +449,10 @@ public enum SessionDao {
 		return exists;
 	}
 
-
+//	public boolean checkIfUserNameExists(String username) {
+//		Boolean exists = new CommandUserNameExists(uasServiceUri, serviceClient.getMyAppTokenID(), UserTokenXpathHelper.getUserTokenId(getUserAdminTokenXml()), username).execute();
+//		return exists;
+//	}
 	
 	public String getUserAdminTokenXml(String userTicket){
 
@@ -591,5 +612,146 @@ public enum SessionDao {
 		return redirectURI;
 	}
 	
+	public void syncWhydahUserInfoWithThirdPartyUserInfo(String whydahuid, String provider, String accessToken, String appRoles, String thirdpartyUserId, String username, String firstName, String lastName, String email, String cellPhone, String personRef) {
+		try {
+			String json = new CommandGetUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), whydahuid).execute();
+			log.warn("syncWhydahUserInfoWithThirdPartyUserInfo CommandGetUserAggregate -  json {}", json);
+			if (json != null) {
+				UserAggregate u = UserAggregateMapper.fromJson(json);
+				log.warn("syncWhydahUserInfoWithThirdPartyUserInfo UserAggregate - {}", u);
+				if (u != null) {
+					u.setCellPhone(cellPhone);
+					u.setEmail(email);
+					u.setFirstName(firstName);
+					u.setLastName(lastName);
+					u.setPersonRef(personRef);
+					boolean aad_data_found = false;
+					boolean google_data_found = false;
+					boolean rebel_data_found = false;
+					for (UserApplicationRoleEntry entry : u.getRoleList()) {
 
+						if (provider.equalsIgnoreCase("aad")) {
+							if (entry.getOrgName().equalsIgnoreCase("AzureAD") && entry.getRoleName().equalsIgnoreCase("data")) {
+								aad_data_found = true;
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("aad", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								entry.setRoleValue(value);
+							}
+						}
+						if (provider.equalsIgnoreCase("google")) {
+							if (entry.getOrgName().equalsIgnoreCase("Google") && entry.getRoleName().equalsIgnoreCase("data")) {
+								google_data_found = true;
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("google", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								entry.setRoleValue(value);
+							}
+						}
+						if (provider.equalsIgnoreCase("rebel")) {
+							if (entry.getOrgName().equalsIgnoreCase("Rebel") && entry.getRoleName().equalsIgnoreCase("data")) {
+								rebel_data_found = true;
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("rebel", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								entry.setRoleValue(value);
+							}
+						}
+						//do for facebook
+						//do for netiq
+						//do for others
+
+					}
+					if (!aad_data_found && provider.equalsIgnoreCase("aad")) {
+						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
+						role.setUserId(whydahuid);
+						role.setApplicationId("2215");
+						role.setApplicationName("Whydah");
+						role.setOrgName("AzureAD");
+						role.setRoleName("data");
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("aad", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						role.setRoleValue(value);
+						if (u.getRoleList() == null) {
+							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
+						}
+						u.getRoleList().add(role);
+
+					}
+
+					if (!google_data_found && provider.equalsIgnoreCase("google")) {
+						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
+						role.setUserId(whydahuid);
+						role.setApplicationId("2215");
+						role.setApplicationName("Whydah");
+						role.setOrgName("Google");
+						role.setRoleName("data");
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("google", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						role.setRoleValue(value);
+						if (u.getRoleList() == null) {
+							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
+						}
+						u.getRoleList().add(role);
+
+					}
+					
+					if (!rebel_data_found && provider.equalsIgnoreCase("rebel")) {
+						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
+						role.setUserId(whydahuid);
+						role.setApplicationId("2215");
+						role.setApplicationName("Whydah");
+						role.setOrgName("Rebel");
+						role.setRoleName("data");
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("rebel", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						role.setRoleValue(value);
+						if (u.getRoleList() == null) {
+							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
+						}
+						u.getRoleList().add(role);
+
+					}
+
+					new CommandUpdateUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), UserAggregateMapper.toJson(u)).execute();
+				}
+			}
+			log.warn("syncWhydahUserInfoWithThirdPartyUserInfo UserAggregate -  returned null");
+		} catch (Exception e) {
+			log.error("Unable to sync state with whydah", e);
+		}
+
+
+	}
+
+	public void saveRoleDatatoWhydah(String whydahuid, String appId, String appName, String orgName, String roleName, String roleValue) {
+		log.info("saveRoleDatatoWhydah start ");
+		try {
+			String json = new CommandGetUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), whydahuid).execute();
+			log.info("saveRoleDatatoWhydah - returned json {}", json);
+			if (json != null) {
+				UserAggregate u = UserAggregateMapper.fromJson(json);
+				log.info("saveRoleDatatoWhydah - returned UserAggregate {}", u);
+				boolean role_found = false;
+				for (UserApplicationRoleEntry entry : u.getRoleList()) {
+					if (entry.getRoleName().equalsIgnoreCase(roleName)) {
+						log.info("saveRoleDatatoWhydah - role_found {}", role_found);
+						role_found = true;
+						entry.setRoleValue(roleValue);
+					}
+				}
+				if (!role_found) {
+					log.info("saveRoleDatatoWhydah - create role ");
+					UserApplicationRoleEntry role = new UserApplicationRoleEntry();
+					role.setUserId(whydahuid);
+					role.setApplicationId(appId);
+					role.setApplicationName(appName);
+					role.setOrgName(orgName);
+					role.setRoleName(roleName);
+					role.setRoleValue(roleValue);
+					if (u.getRoleList() == null) {
+						u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
+					}
+					u.getRoleList().add(role);
+				}
+				new CommandUpdateUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), UserAggregateMapper.toJson(u)).execute();
+				log.info("saveRoleDatatoWhydah end ");
+			}
+			log.info("saveRoleDatatoWhydah - returned json null");
+		} catch (Exception e) {
+			log.error("Unable to update Whydah", e);
+		}
+
+	}
 }

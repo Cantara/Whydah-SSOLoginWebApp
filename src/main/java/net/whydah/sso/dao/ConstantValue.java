@@ -52,11 +52,14 @@ public class ConstantValue {
     public static final String CRMSERVICEHEALTH = "crmservice_health";
     public static final String STATISTICSSERVICEHEALTH = "statisticsservice_health";
 
+    public static final String LOGIN_HINT = "loginusername";
     public static final String FACEBOOKLOGIN_ENABLED = "facebookLoginEnabled";
     public static final String OPENIDLOGIN_ENABLED = "openidLoginEnabled";
     public static final String OMNILOGIN_ENABLED = "omniLoginEnabled";
     public static final String NETIQLOGIN_ENABLED = "netIQLoginEnabled";
     public static final String PERSONASSHOTCUT_ENABLED = "personasshortcutEnabled";
+    public static final String GOOGLELOGIN_ENABLED = "googleLoginEnabled";
+	public static final String WHYDAH_LOGININTEGRATION_PROVIDERS = "whydahLoginIntegrationProviders";
 
 
 }

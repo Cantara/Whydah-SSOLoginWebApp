@@ -32,7 +32,8 @@ public class LoginTypes {
     private boolean newIQLoginEnabled;
     private boolean signupEnabled;
     private boolean enablePersonasShortcut=false;
-
+    private boolean googleLoginEnabled;
+    private boolean rebelLoginEnabled;
 
     public LoginTypes(Properties properties) {
     	
@@ -43,7 +44,8 @@ public class LoginTypes {
         newIQLoginEnabled =  ENABLED.equalsIgnoreCase(properties.getProperty("logintype.netiq"));
 		userpasswordLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.userpassword"));
         signupEnabled = TRUE.equalsIgnoreCase(properties.getProperty("signupEnabled"));
-
+        googleLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.google"));
+        rebelLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.rebel"));
 
         log.debug(String.format("Signup is %6s, Facebook Sign on is %1s, OpenId Sign on is %2s, Omni Sign on is %3s, netIQ Sign on is %4s, User/Password Sign on is %5s."
                 , properties.getProperty("signupEnabled")
@@ -81,6 +83,14 @@ public class LoginTypes {
 	
 	public boolean isPersonasShortcutEnabled() {
 		return enablePersonasShortcut;
+	}
+	
+	public boolean isGoogleLoginEnabled() {
+		return googleLoginEnabled;
+	}
+	
+	public boolean isRebelLoginEnabled() {
+		return rebelLoginEnabled;
 	}
 	
 	
