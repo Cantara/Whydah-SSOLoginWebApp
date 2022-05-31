@@ -86,7 +86,7 @@ public class FacebookLoginController {
         String userticket = UUID.randomUUID().toString();
         UserCredential userCredential;
         try {
-            String username = fbUser.getUsername();
+            String username = fbUser.getId();
             // Since Facebook sometimes returns username=null, we fallback on using facebook user email as username
             if (!UserName.isValid(username)) {
                 if (fbUser.getEmail()==null || fbUser.getEmail().length()<6){

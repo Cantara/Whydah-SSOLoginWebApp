@@ -97,14 +97,14 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         formData.add("usercredential", userCredential.toXML());
         String facebookUserAsXml = FacebookHelper.getFacebookUserAsXml(fbUser, fbAccessToken);
         formData.add("fbuser", facebookUserAsXml);
-        log.trace("createAndLogonUser with fbuser XML: " + facebookUserAsXml+"\nformData:\n"+formData);
-        log.info("createAndLogonUser username=" + fbUser.getUsername());
+        log.trace("createAndLogonUser with fbuser XML: " + facebookUserAsXml + "\nformData:\n" + formData);
+        log.info("createAndLogonUser id=" + fbUser.getId());
         ClientResponse response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
 
         //No need to retry if we know it is forbidden.
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
             //throw new IllegalArgumentException("createAndLogonUser failed. username=" + fbUser.getUsername() + ", id=" + fbUser.getId());
-            log.warn("createAndLogonUser failed. username=" + fbUser.getUsername() + ", id=" + fbUser.getId());
+            log.warn("createAndLogonUser failed. id=" + fbUser.getId() + ", id=" + fbUser.getId());
             return null;
         }
         if (response.getStatus() == OK.getStatusCode()) {

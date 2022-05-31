@@ -92,28 +92,28 @@ public class FacebookHelper {
         strb.append("<user>\n");
         strb.append("    <params>\n");
 
-        strb.append("        <fbAccessToken>").append(fbAccessToken).append( "</fbAccessToken>\n");
+        strb.append("        <fbAccessToken>").append(fbAccessToken).append("</fbAccessToken>\n");
 
-        strb.append("        <userId>").append(fbUser.getId()).append( "</userId>\n");
+        strb.append("        <userId>").append(fbUser.getId()).append("</userId>\n");
         String firstName = fbUser.getFirstName();
         if (fbUser.getMiddleName() != null) {
             firstName += " ";
             firstName += fbUser.getMiddleName();
         }
-        strb.append("        <firstName>").append(firstName).append( "</firstName>\n");
-        strb.append("        <lastName>").append(fbUser.getLastName()).append( "</lastName>\n");
-        if (fbUser.getUsername()!=null && fbUser.getUsername().length()>2){
-            strb.append("        <username>").append(fbUser.getUsername()).append( "</username>\n");
-        } else if (fbUser.getEmail()!=null && fbUser.getEmail().length()>2) {
+        strb.append("        <firstName>").append(firstName).append("</firstName>\n");
+        strb.append("        <lastName>").append(fbUser.getLastName()).append("</lastName>\n");
+        if (fbUser.getId() != null && fbUser.getId().length() > 2) {
+            strb.append("        <username>").append(fbUser.getId()).append("</username>\n");
+        } else if (fbUser.getEmail() != null && fbUser.getEmail().length() > 2) {
             log.warn("Facebook returned username = null, using email as username ");
-            strb.append("        <username>").append(fbUser.getEmail()).append( "</username>\n");
-        } else if (fbUser.getId()!=null && fbUser.getId().length()>2) {
+            strb.append("        <username>").append(fbUser.getEmail()).append("</username>\n");
+        } else if (fbUser.getId() != null && fbUser.getId().length() > 2) {
             log.warn("Facebook returned username and email = null, using id as username ");
-            strb.append("        <username>").append(fbUser.getId()).append( "</username>\n");
+            strb.append("        <username>").append(fbUser.getId()).append("</username>\n");
         }
-        strb.append("        <gender>").append(fbUser.getGender()).append( "</gender>\n");
-        if (fbUser.getEmail()!=null && fbUser.getEmail().length()>2) {
-            strb.append("        <email>").append(fbUser.getEmail()).append( "</email>\n");
+        strb.append("        <gender>").append(fbUser.getGender()).append("</gender>\n");
+        if (fbUser.getEmail() != null && fbUser.getEmail().length() > 2) {
+            strb.append("        <email>").append(fbUser.getEmail()).append("</email>\n");
         } else {
             log.warn("Facebook returned email = null, using dummy@email.com as email ");
             strb.append("        <email>").append(FACEBOOK_FALLBACKEMAIL).append( "</email>\n");
