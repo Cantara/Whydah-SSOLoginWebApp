@@ -13,10 +13,10 @@ public class GoogleConnectionProperties {
     	
         redirectUriSignIn = ssoURL + "googleauth"; 
         
-        if(properties!=null) {
-        	clientId = properties.getProperty("google.clientid");
-        	clientSecret = properties.getProperty("google.secretkey");
-        }
+       
+        clientId = properties.getProperty("google.clientid");
+    	clientSecret = properties.getProperty("google.secretkey");
+    	
         //assign for testing
         if(clientId == null || clientSecret == null) {
         	clientId = "87067140729-3v9p8b3l9hkk8juhm1d2gn366ehls2uv.apps.googleusercontent.com";
