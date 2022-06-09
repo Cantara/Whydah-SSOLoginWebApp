@@ -9,7 +9,7 @@
 <div id="page-content">
     <div id="logo">
         <img src="${logoURL}" alt="Whydah Signup Page"/>
-        <h2>Whydah Signup</h2>
+        <!--<h2>Whydah Signup</h2> -->
     </div>
 
     <div class="login-box">
@@ -20,6 +20,8 @@
         <p>Signup - You will soon receive an email containing a link you can follow to complete the signup process..</p>
         <h4>Username:  ${username!} </h4>
     </form>
+     <br/>
+     <a href="/sso/login">Go to Login page</a>
 </div>
 </div>
 </body>
