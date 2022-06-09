@@ -15,11 +15,12 @@
             </div>
 
         <div class="login-box">
-
+			<a href="${redirectURI}"><img src="/sso/images/history-back.svg" alt="back" /></a>
             <#if error??><p class="error">${error!}</p></#if>
 
             <form method="POST" class="new_user_session" accept-charset="utf-8">
                 <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
+                <input type="hidden" name="redirectURI" value="${redirectURI}"/>
 
                 <h4><label for="username">Username:</label></h4>
                 <input id="username" name="username" size="30" type="text" placeholder="Username"/>

@@ -21,7 +21,9 @@
         <h4>Username:  ${username!} </h4>
     </form>
      <br/>
-     <a href="/sso/login">Go to Login page</a>
+     
+     <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+     <a href="${redirectURI}"><img src="/sso/images/history-back.svg" alt="back" /></a>
 </div>
 </div>
 </body>
