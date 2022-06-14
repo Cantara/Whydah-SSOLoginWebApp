@@ -22,22 +22,22 @@
                 <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
 
-                <h4><label for="username">Username:</label></h4>
-                <input id="username" name="username" size="30" type="text" placeholder="Username"/>
+                <h4><label for="username">Username (*):</label></h4>
+                <input id="username" name="username" size="30" type="text" placeholder="Username" required minlength="3"/>
 
-                <h4><label for="firstname">First Name:</label></h4>
-                <input id="firstname" name="firstname" size="30" type="text" placeholder="Firstname"/>
+                <h4><label for="firstname">First Name (*):</label></h4>
+                <input id="firstname" name="firstname" size="30" type="text" placeholder="Firstname" required/>
 
-                <h4><label for="lastname">Last Name:</label></h4>
-                <input id="lastname" name="lastname" size="30" type="text" placeholder="Lastname"/>
+                <h4><label for="lastname">Last Name (*):</label></h4>
+                <input id="lastname" name="lastname" size="30" type="text" placeholder="Lastname" required/>
 
-                <h4><label for="user">Email:</label></h4>
-                <input id="useremail" name="useremail" size="30" type="text" placeholder="Email"/>
+                <h4><label for="user">Email (*):</label></h4>
+                <input id="useremail" name="useremail" size="30" type="email" placeholder="Email" required/>
 
-                <h4><label for="cellphone">Cell phone:</label></h4>
+                <h4><label for="cellphone">Cell phone: (optional)</label></h4>
                 <input id="cellphone" name="cellphone" size="30" type="text" placeholder="Cellphone"/>
-
-                <p>You will receive an email with instructions of how to set your password.</p>
+				<!--
+                <p>You will receive an email with instructions of how to set your password.</p> !-->
 
                 <input class="button button-login" name="commit" type="submit" value="Register"/>
 

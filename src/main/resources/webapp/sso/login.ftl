@@ -23,13 +23,13 @@
             
         
             <div class="login-box">
-            
+            <#if redirectURI??>
             	<#if "${redirectURI}"?contains("oauth2/user?oauth_session=")>
             	   <a href="${redirectURI}&cancelled=true"><img src="/sso/images/history-back.svg" alt="back" /></a>
             	<#else>
             	    <a href="${redirectURI!"welcome"}"><img src="/sso/images/history-back.svg" alt="back" /></a>
             	</#if>
-            	
+            </#if>	
             	
                 <#if userpasswordLoginEnabled == true>
                 <form action="action" class="new_user_session" name="getusertoken" method="post">

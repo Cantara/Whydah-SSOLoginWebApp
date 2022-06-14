@@ -71,7 +71,7 @@ public class NewUserController {
 		String lastName = request.getParameter("lastname");
 		String cellPhone = request.getParameter("cellphone");
 		log.trace("signup requested user - email: {} and username: {}", email, username);
-		if (email != null && username != null) {
+		if (email != null && username != null && firstName !=null && lastName !=null) {
 			UserIdentity signupUser = new UserIdentity(UUID.randomUUID().toString());
 			signupUser.setUsername(username.trim());
 			if (firstName != null) {
@@ -112,7 +112,12 @@ public class NewUserController {
 					@Override
 					protected void onFailed(String responseBody, int statusCode) {
 						AppException error = AppException.getAppException(responseBody); 
-						model.addAttribute("error", error.getMessage() );
+						if(error.getMessage().equalsIgnoreCase("ConflictException")) {
+							model.addAttribute("error", "Username is already taken. Try another name" );
+						} else {
+							model.addAttribute("error", error.getMessage());
+						}
+						
 					}
 				};
 				String userAddRoleResult = userAddRoleResultCmd.execute();
@@ -135,19 +140,7 @@ public class NewUserController {
 
 				}
 
-				//                ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userJson);
-				//                if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-				//                    String error = uasResponse.getEntity(String.class);
-				//                    log.error("error:{} \n URL: {} \n user:{}", error, uasWR.getURI().toString(), signupUser);
-				//                    model.addAttribute("error", "We were unable to create the requested user at this time. Try different data or try again later.");
-				//                } else {
-				//                   // ModelHelper.setEnabledLoginTypes(model);
-				//                    //model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-				//                    model.addAttribute("username", username);
-				//                    SessionDao.instance.addModel_LoginTypes(model);
-				//                    SessionDao.instance.addModel_CSRFtoken(model);
-				//                    return "signup_result";
-				//                }
+			
 
 			} catch (Exception e) {
 				log.error("Unkonwn error.", e);
@@ -155,6 +148,11 @@ public class NewUserController {
 
 			}
 
+		} else if(email == null && username == null && firstName ==null && lastName ==null) {
+			//nothing to do. First time loading
+		} else {
+			
+			model.addAttribute("error", "Missing fields (*) required!" );
 		}
 
 		//ModelHelper.setEnabledLoginTypes(model);

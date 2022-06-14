@@ -67,6 +67,11 @@ public class PasswordChangeController {
 		}
 		
 		String username = new UserName(request.getParameter("username")).getInput();
+		
+		if(!SessionDao.instance.checkIfUserExists(username)) {
+			model.addAttribute("error",  "\nusername: " + username + " not found");
+			return "resetpassword";
+		}
 
 		WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + username);
 		ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);

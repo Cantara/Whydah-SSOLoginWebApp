@@ -25,16 +25,28 @@ body {
     color: #4b4b4b;
     background: #eef;
     margin-bottom: 20px;
+    
+    -ms-overflow-style: none;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+html {
+  scrollbar-width: none;
 }
 
 h2 { font-weight: normal; }
 h4 { margin-top: 1em; }
 
 #page-content {
-    margin: 30px auto;
+    margin: 10px auto;
     padding: 1em;
     max-width: 800px;
-	text-align: center;
+    text-align: center;
+    
+    scrollbar-width: none;
+    
+   
 }
 
 /* LOGIN */
@@ -61,6 +73,7 @@ h4 { margin-top: 1em; }
 
 #logo img {
     max-width: 100%;
+    max-height: 110px;
 }
 
 a {
@@ -184,7 +197,7 @@ p {
     border-radius: 5px;
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=password], input[type=email] {
     font-family: inherit;
     font-size: 1.1em;
     width: 100%;
