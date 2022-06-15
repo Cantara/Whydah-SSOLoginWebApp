@@ -16,6 +16,7 @@ public class WhydahProvider {
 	private boolean enabled;
 	private String oauthClientId;
 	private String oauthUrl;
+	private String logo;
 	
 
 	@Override

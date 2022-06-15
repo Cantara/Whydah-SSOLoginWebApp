@@ -3,7 +3,10 @@
 <head>
     <title>SSO Login</title>
     <meta charset="utf-8"/>
+    
+    
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="css/whydah.css" type="text/css"/>
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
     <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
@@ -65,13 +68,19 @@
                 </form> 
                 </#if>
                 <br/><hr/>
+                
                 <#if googleLoginEnabled == true>
                 <form action="googlelogin" class="new_user_session" name="googlelogin" method="post">
                     <#if redirectURI??>
                       <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                     </#if>
                     <input type="hidden" name="loginusername" value="" id="v2_gg_loginusername" />
-                    <input name="commit" type="submit" value="Sign in with Google" class="button button-login button-google"/>
+                    <button class="customBtn" type="submit">
+				      <span class="icon" style="background: url('/sso/images/g-normal.png') transparent 5px 50% no-repeat;"></span>
+				      <span class="buttonText">Sign in with Google</span>
+				    </button>
+				    
+                    
                  </form>
                  </#if>
                  
@@ -80,7 +89,11 @@
                             <#if redirectURI??>
                                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                             </#if>
-                            <input name="commit" type="submit" value="Sign in with Facebook" class="button button-login button-facebook"/>
+                         <button class="customBtn" type="submit">				     
+					       <span class="buttonText">Sign in with Facebook</span>
+					    </button>
+				    
+                         <!--<input name="commit" type="submit" value="Facebook" class="button button-login button-facebook"/> -->
                         </form>
                 </#if>
                 <#if netIQLoginEnabled == true>
@@ -89,7 +102,11 @@
                             <#if redirectURI??>
                                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                             </#if>
-                            <input name="commit" type="submit" value="Sign in with NetIQ" class="button button-login button-netiq"/>
+                             <button class="customBtn" type="submit">				     
+					       		<span class="buttonText">Sign in with NetIQ</span>
+					    	 </button>
+					    	 <!--
+                            <input name="commit" type="submit" value="NetIQ" class="button button-login button-netiq"/> -->
                         </form>
                     </div>
                 </#if>
@@ -103,7 +120,19 @@
 		                          <input type="hidden" name="redirectURI" value="${redirectURI}"/>
 		                        </#if>
 		                        <input type="hidden" name="loginusername" value="" id="v2_rebel_loginusername" />
-		                        <input name="commit" type="submit" value="Sign in with ${provider.displayText}" class="button button-login button-${provider.provider}"/>
+		                        <button class="customBtn" type="submit">
+		                            <#if provider.logo??>
+						            	<#if "${provider.logo}"?starts_with("data:image") || "${provider.logo}"?starts_with("http")>
+						            	   <span class="icon" style="background: url('${provider.logo}') transparent 5px 50% no-repeat;"></span>					            	  
+						            	<#else>
+						            	   <span class="icon" style="background: url('/sso/images/${provider.logo}') transparent 5px 50% no-repeat;"></span>
+						            	</#if>
+						            </#if>	
+		                        	
+				      				<span class="buttonText">Sign in with ${provider.displayText}</span>
+		                        </button>
+		                        <!--
+		                        <input name="commit" type="submit" value="${provider.displayText}" class="button button-login button-${provider.provider}"/> -->
 	                    	</form>  
 	                      </#if>
 					    </#items>
