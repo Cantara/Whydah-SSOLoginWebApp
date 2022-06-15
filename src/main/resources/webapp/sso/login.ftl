@@ -66,7 +66,7 @@
                 </#if>
                 <br/><hr/>
                 <#if googleLoginEnabled == true || netIQLoginEnabled == true || rebelLoginEnabled == true || facebookLoginEnabled == true>
-                <h4>OR Login with</h4>
+                <h4>Signup/Login with</h4>
                 </#if>
                 <#if googleLoginEnabled == true>
                 <form action="googlelogin" class="new_user_session" name="googlelogin" method="post">

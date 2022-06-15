@@ -106,7 +106,7 @@ a:hover {
     font-size: 1.1em;
     margin: .5em 0;
     color: #fff;
-    background: #ba1717;
+    background: #4285F4;
     padding: .5em;
     cursor: pointer;
     border-radius: 5px;
@@ -131,6 +131,8 @@ a:hover {
     font-family: inherit;
     font-size: 1.1em;
     margin: .5em 0;
+    color: #fff;
+    background: #ba1717;
     color: #fff;
     background-color: #ff3381;
     padding: .5em;
