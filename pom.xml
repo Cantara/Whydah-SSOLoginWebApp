@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.whydah.sso</groupId>
     <artifactId>SSOLoginWebApp</artifactId>
-    <version>2.12.6-SNAPSHOT</version>
+    <version>2.12.6</version>
     <name>SSOLoginWebApp</name>
     <url>https://wiki.cantara.no/display/iam/SSOLoginWebApp</url>
     <parent>
@@ -24,7 +24,7 @@
         <developerConnection>scm:git:ssh://git@github.com/cantara/Whydah-SSOLoginWebApp.git</developerConnection>
         <connection>scm:git:https://github.com/cantara/Whydah-SSOLoginWebApp.git</connection>
         <url>https://github.com/cantara/Whydah-SSOLoginWebApp</url>
-        <tag>HEAD</tag>
+        <tag>v2.12.6</tag>
      </scm>
     <developers>
         <developer>
