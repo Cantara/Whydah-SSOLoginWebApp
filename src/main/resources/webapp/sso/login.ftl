@@ -65,16 +65,13 @@
                 </form> 
                 </#if>
                 <br/><hr/>
-                <#if googleLoginEnabled == true || netIQLoginEnabled == true || rebelLoginEnabled == true || facebookLoginEnabled == true>
-                <h4>Signup/Login with</h4>
-                </#if>
                 <#if googleLoginEnabled == true>
                 <form action="googlelogin" class="new_user_session" name="googlelogin" method="post">
                     <#if redirectURI??>
                       <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                     </#if>
                     <input type="hidden" name="loginusername" value="" id="v2_gg_loginusername" />
-                    <input name="commit" type="submit" value="Google" class="button button-login button-google"/>
+                    <input name="commit" type="submit" value="Sign in with Google" class="button button-login button-google"/>
                  </form>
                  </#if>
                  
@@ -83,7 +80,7 @@
                             <#if redirectURI??>
                                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                             </#if>
-                            <input name="commit" type="submit" value="Facebook" class="button button-login button-facebook"/>
+                            <input name="commit" type="submit" value="Sign in with Facebook" class="button button-login button-facebook"/>
                         </form>
                 </#if>
                 <#if netIQLoginEnabled == true>
@@ -92,7 +89,7 @@
                             <#if redirectURI??>
                                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                             </#if>
-                            <input name="commit" type="submit" value="NetIQ" class="button button-login button-netiq"/>
+                            <input name="commit" type="submit" value="Sign in with NetIQ" class="button button-login button-netiq"/>
                         </form>
                     </div>
                 </#if>
@@ -106,7 +103,7 @@
 		                          <input type="hidden" name="redirectURI" value="${redirectURI}"/>
 		                        </#if>
 		                        <input type="hidden" name="loginusername" value="" id="v2_rebel_loginusername" />
-		                        <input name="commit" type="submit" value="${provider.displayText}" class="button button-login button-${provider.provider}"/>
+		                        <input name="commit" type="submit" value="Sign in with ${provider.displayText}" class="button button-login button-${provider.provider}"/>
 	                    	</form>  
 	                      </#if>
 					    </#items>
