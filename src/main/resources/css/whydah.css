@@ -49,6 +49,8 @@ h4 { margin-top: 1em; }
    
 }
 
+
+
 /* LOGIN */
 .wide-box, .login-box {
     margin: .5em auto;
@@ -69,6 +71,19 @@ h4 { margin-top: 1em; }
 .wide-box {
     width: 100%;
     text-align: left;
+}
+
+@media only screen and (max-width: 768px) {
+  .wide-box, .login-box {
+    
+    box-sizing: content-box;
+   
+  }
+
+.login-box {
+    width: 60%;
+}
+
 }
 
 #logo img {
