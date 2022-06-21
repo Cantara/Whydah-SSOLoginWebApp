@@ -131,6 +131,8 @@ public enum SessionDao {
         model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
         model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
         
+        model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
+        
         //sign up
         model.addAttribute(ConstantValue.SIGNUP_GOOGLE_ON, enabledLoginTypes.isSignuppageGoogleOn());
         model.addAttribute(ConstantValue.SIGNUP_FACEBOOK_ON, enabledLoginTypes.isSignuppageFacebookOn());
@@ -138,7 +140,7 @@ public enum SessionDao {
         model.addAttribute(ConstantValue.SIGNUP_WHYDAH_INTEGRATION_PROVIDERS_ON, enabledLoginTypes.isSignuppageWhydahIntegrationproviderOn());
         
        
-        model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
+       
         if (enabledLoginTypes.isNetIQLoginEnabled()) {
             setNetIQOverrides(model);
         }

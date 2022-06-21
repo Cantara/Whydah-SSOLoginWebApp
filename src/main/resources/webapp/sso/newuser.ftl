@@ -87,7 +87,7 @@
                     </div>
                 </#if>
                 
-               <#if netIQLoginEnabled == true && signuppageWhydahIntegrationProviderOn == true>
+               <#if signuppageWhydahIntegrationProviderOn == true>
                 <#list whydahLoginIntegrationProviders>
 					    <#items as provider>
 					      <#if provider.enabled == true>
