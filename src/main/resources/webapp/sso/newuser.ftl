@@ -42,6 +42,81 @@
                 <input class="button button-login" name="commit" type="submit" value="Register"/>
 
             </form>
+            
+            <br/><hr/>
+                
+                <#if googleLoginEnabled == true && signupageGoogleOn == true>
+                <form action="googlelogin" class="new_user_session" name="googlelogin" method="post">
+                    <#if redirectURI??>
+                      <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+                    </#if>
+                    <input type="hidden" name="loginusername" value="" />
+                    <button class="customBtn" type="submit">
+				      <span class="icon" style="background: url('/sso/images/g-normal.png') transparent 5px 50% no-repeat;"></span>
+				      <span class="buttonText">Sign up with Google</span>
+				    </button>
+				    
+                    
+                 </form>
+                 </#if>
+                 
+                 <#if facebookLoginEnabled == true && signuppageFacebookOn == true>
+                        <form action="fblogin" class="new_user_session" name="fbgetusertoken" method="post">
+                            <#if redirectURI??>
+                                <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+                            </#if>
+                         <button class="customBtn" type="submit">				     
+					       <span class="buttonText">Sign up with Facebook</span>
+					    </button>
+				    
+                         <!--<input name="commit" type="submit" value="Facebook" class="button button-login button-facebook"/> -->
+                        </form>
+                </#if>
+                <#if netIQLoginEnabled == true && signuppageNetIQOn == true>
+                    <div class="login-page-type" data-title="NetIQ login" id="ssoLoginNetIQ">
+                        <form action="netiqlogin" class="new_user_session" name="netiqgetusertoken" method="post">
+                            <#if redirectURI??>
+                                <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+                            </#if>
+                             <button class="customBtn" type="submit">				     
+					       		<span class="buttonText">Sign up with NetIQ</span>
+					    	 </button>
+					    	 <!--
+                            <input name="commit" type="submit" value="NetIQ" class="button button-login button-netiq"/> -->
+                        </form>
+                    </div>
+                </#if>
+                
+               <#if netIQLoginEnabled == true && signuppageWhydahIntegrationProviderOn == true>
+                <#list whydahLoginIntegrationProviders>
+					    <#items as provider>
+					      <#if provider.enabled == true>
+						    <form action="whydahlogin/${provider.provider}" class="new_user_session" method="post">
+		                        <#if redirectURI??>
+		                          <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+		                        </#if>
+		                        <input type="hidden" name="loginusername" value="" />
+		                        <button class="customBtn" type="submit">
+		                            <#if provider.logo??>
+						            	<#if "${provider.logo}"?starts_with("data:image") || "${provider.logo}"?starts_with("http")>
+						            	   <span class="icon" style="background: url('${provider.logo}') transparent 5px 50% no-repeat;"></span>					            	  
+						            	<#else>
+						            	   <span class="icon" style="background: url('/sso/images/${provider.logo}') transparent 5px 50% no-repeat;"></span>
+						            	</#if>
+						            </#if>	
+		                        	
+				      				<span class="buttonText">Sign up with ${provider.displayText}</span>
+		                        </button>
+		                        <!--
+		                        <input name="commit" type="submit" value="${provider.displayText}" class="button button-login button-${provider.provider}"/> -->
+	                    	</form>  
+	                      </#if>
+					    </#items>
+				
+				</#list>
+				</#if>
+                 
+            
         </div>
     </div>
 </div>

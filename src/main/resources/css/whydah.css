@@ -62,7 +62,7 @@ h4 { margin-top: 1em; }
 }
 
 .login-box {
-    width: 45%;
+    width: 50%;
     max-width: 100%;
     display: inline-block;
     vertical-align: top;
@@ -81,7 +81,7 @@ h4 { margin-top: 1em; }
   }
 
 .login-box {
-    width: 60%;
+    width: 62%;
 }
 
 }

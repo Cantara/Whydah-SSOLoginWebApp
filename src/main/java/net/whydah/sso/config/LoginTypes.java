@@ -34,6 +34,11 @@ public class LoginTypes {
     private boolean enablePersonasShortcut=false;
     private boolean googleLoginEnabled;
     private boolean rebelLoginEnabled;
+    //sign up
+    private boolean signuppageGoogleOn = false;
+    private boolean signuppageFacebookOn = false;
+    private boolean signuppageWhydahIntegrationproviderOn = false;
+    private boolean signuppageNetIQOn = false;
 
     public LoginTypes(Properties properties) {
     	
@@ -46,7 +51,14 @@ public class LoginTypes {
         signupEnabled = TRUE.equalsIgnoreCase(properties.getProperty("signupEnabled"));
         googleLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.google"));
         rebelLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.rebel"));
-
+        
+        //sign up
+        signuppageGoogleOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.google"));
+        signuppageWhydahIntegrationproviderOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.whydah.integration.providers"));
+        signuppageFacebookOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.facebook"));
+        signuppageNetIQOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.netiq"));
+        
+        
         log.debug(String.format("Signup is %6s, Facebook Sign on is %1s, OpenId Sign on is %2s, Omni Sign on is %3s, netIQ Sign on is %4s, User/Password Sign on is %5s."
                 , properties.getProperty("signupEnabled")
                 , properties.getProperty("logintype.facebook")
@@ -91,6 +103,22 @@ public class LoginTypes {
 	
 	public boolean isRebelLoginEnabled() {
 		return rebelLoginEnabled;
+	}
+
+	public boolean isSignuppageGoogleOn() {
+		return signuppageGoogleOn;
+	}
+
+	public boolean isSignuppageFacebookOn() {
+		return signuppageFacebookOn;
+	}
+
+	public boolean isSignuppageWhydahIntegrationproviderOn() {
+		return signuppageWhydahIntegrationproviderOn;
+	}
+
+	public boolean isSignuppageNetIQOn() {
+		return signuppageNetIQOn;
 	}
 	
 	

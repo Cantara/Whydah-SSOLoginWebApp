@@ -74,7 +74,7 @@
                     <#if redirectURI??>
                       <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                     </#if>
-                    <input type="hidden" name="loginusername" value="" id="v2_gg_loginusername" />
+                    <input type="hidden" name="loginusername" value=""  />
                     <button class="customBtn" type="submit">
 				      <span class="icon" style="background: url('/sso/images/g-normal.png') transparent 5px 50% no-repeat;"></span>
 				      <span class="buttonText">Sign in with Google</span>
@@ -119,7 +119,7 @@
 		                        <#if redirectURI??>
 		                          <input type="hidden" name="redirectURI" value="${redirectURI}"/>
 		                        </#if>
-		                        <input type="hidden" name="loginusername" value="" id="v2_rebel_loginusername" />
+		                        <input type="hidden" name="loginusername" value=""  />
 		                        <button class="customBtn" type="submit">
 		                            <#if provider.logo??>
 						            	<#if "${provider.logo}"?starts_with("data:image") || "${provider.logo}"?starts_with("http")>
