@@ -98,7 +98,7 @@ public class WhydahOAuthSSOLoginController {
 		String email = WhydahOAuthSessionManagementHelper.getEmail(httpRequest, selectedProvider); 
 		String subject = WhydahOAuthSessionManagementHelper.getSubject(httpRequest, selectedProvider);
 		String cellPhone = WhydahOAuthSessionManagementHelper.getCellPhone(httpRequest, selectedProvider);
-		String pesonRef = WhydahOAuthSessionManagementHelper.getPersonRef(httpRequest, selectedProvider);
+		String personRef = WhydahOAuthSessionManagementHelper.getPersonRef(httpRequest, selectedProvider);
 		
 		String userticket = UUID.randomUUID().toString();
 
@@ -300,6 +300,7 @@ public class WhydahOAuthSSOLoginController {
 				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, provider_uid, provider_uid, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
 				if(userTokenXml!=null) {
 					credential = new WhydahOAuthUserCredential(provider_uid, userName, provider_uid);
+					personRef = UUID.randomUUID().toString();
 					userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
 				}
 			} else {

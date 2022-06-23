@@ -23,17 +23,6 @@ public class SSORootController {
     @RequestMapping("/")
     public void mainPage(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
     	redirectStrategy.sendRedirect(request, response, "/login" + (request.getQueryString()!=null? ("?" + request.getQueryString()):"") );
-//        log.info("Resolved mainPage - returning login");
-//        SessionDao.instance.addModel_LOGO_URL(model);
-//        SessionDao.instance.addModel_CSRFtoken(model);
-//        SessionDao.instance.setCSP(response);
-//        SessionDao.instance.addModel_LoginTypes(model);
-//
-//
-//        SessionDao.instance.addModel_MYURI(model);
-//        SessionDao.instance.addModel_WHYDAH_VERSION(model);
-//
-//        return "login";
     }
-
+    
 }

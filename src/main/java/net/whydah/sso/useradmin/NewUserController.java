@@ -91,6 +91,8 @@ public class NewUserController {
 			}
 			signupUser.setEmail(email);
 
+			signupUser.setPersonRef(UUID.randomUUID().toString());
+			
 			String userJson = UserIdentityMapper.toJsonWithoutUID(signupUser);
 
 			if (!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
