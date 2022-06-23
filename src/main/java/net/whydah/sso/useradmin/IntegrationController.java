@@ -109,7 +109,7 @@ public class IntegrationController {
 			CommandUpdateUser updatecmd = new CommandUpdateUser(uasServiceUri, 
 					apptokenId, 
 					adminUserTokenId, 
-					uid, json);
+					uid, UserIdentityMapper.toJson(user));
 			return handleResponse(response, model, updatecmd.execute(), updatecmd.getResponseBodyAsByteArray(), updatecmd.getStatusCode());
 		} else {
 			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, 9999, "Failed to get user", "", "");
