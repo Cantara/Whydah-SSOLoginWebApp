@@ -103,12 +103,12 @@ public class IntegrationController {
 				uid);
 		String json = cmd.execute();
 		if(json!=null) {
-			UserIdentity user = UserIdentityMapper.fromUserIdentityJson(cmd.execute());
+			UserIdentity user = UserIdentityMapper.fromUserIdentityJson(json);
 			user.setPersonRef(personRef);
 
 			CommandUpdateUser updatecmd = new CommandUpdateUser(uasServiceUri, 
-					SessionDao.instance.getServiceClient().getMyAppTokenID(), 
-					SessionDao.instance.getUserAdminToken().getUserTokenId(), 
+					apptokenId, 
+					adminUserTokenId, 
 					uid, json);
 			return handleResponse(response, model, updatecmd.execute(), updatecmd.getResponseBodyAsByteArray(), updatecmd.getStatusCode());
 		} else {
