@@ -158,7 +158,7 @@
         <dependency>
             <groupId>com.restfb</groupId>
             <artifactId>restfb</artifactId>
-            <version>2022.5.0</version>
+            <version>2022.6.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
