@@ -89,9 +89,17 @@ public class IntegrationController {
 		log.trace("updateUserIdentity with uid={}", uid);
 		accessCheck(request);
 		
+		String adminUserTokenId = SessionDao.instance.getUserAdminToken().getUserTokenId();
+		if(adminUserTokenId==null) {
+			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, 9999, "Failed connection to the backend server", "", "");
+		}
+		String apptokenId = SessionDao.instance.getServiceClient().getMyAppTokenID();
+		if(apptokenId==null) {
+			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, 9999, "Failed to get apptokenId", "", "");
+		}
 		CommandGetUser cmd = new CommandGetUser(uasServiceUri, 
-				SessionDao.instance.getServiceClient().getMyAppTokenID(), 
-				SessionDao.instance.getUserAdminToken().getUserTokenId(), 
+				apptokenId, 
+				adminUserTokenId, 
 				uid);
 		String json = cmd.execute();
 		if(json!=null) {
@@ -104,7 +112,7 @@ public class IntegrationController {
 					uid, json);
 			return handleResponse(response, model, updatecmd.execute(), updatecmd.getResponseBodyAsByteArray(), updatecmd.getStatusCode());
 		} else {
-			return handleResponse(response, model, cmd.execute(), cmd.getResponseBodyAsByteArray(), cmd.getStatusCode());
+			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, 9999, "Failed to get user", "", "");
 		}
 	}
 	
@@ -156,10 +164,12 @@ public class IntegrationController {
 			throw new AppException(HttpStatus.BAD_REQUEST, 9998, "No authorization header", "","" );
 		}
 		String token = authorization.substring(7);
-		log.info("checking access secret {}", token);
-		String secretKey = AppConfig.readProperties().getProperty("intergation_secret_key");
+		log.info("checking access secret {} against the config");
+		String secretKey = AppConfig.readProperties().getProperty("integration_secret_key");
 		if(!token.equals(secretKey)) {
+			log.error("not matched with {}", secretKey);
 			throw new AppException(HttpStatus.BAD_REQUEST, 9998, "Access denied", "","" );
 		}
+		log.info("access granted");
 	}
 }
