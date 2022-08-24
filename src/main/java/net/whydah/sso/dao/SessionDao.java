@@ -17,6 +17,7 @@ import net.whydah.sso.commands.adminapi.user.CommandUserPasswordLoginEnabled;
 import net.whydah.sso.commands.adminapi.user.role.CommandAddUserRole;
 import net.whydah.sso.commands.adminapi.user.role.CommandDeleteUserRole;
 import net.whydah.sso.commands.adminapi.user.role.CommandGetUserRoles;
+import net.whydah.sso.commands.adminapi.user.role.CommandUpdateUserRole;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.config.LoginTypes;
@@ -25,6 +26,7 @@ import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.helpers.UserXpathHelper;
 import net.whydah.sso.user.mappers.UserAggregateMapper;
 import net.whydah.sso.user.mappers.UserIdentityMapper;
+import net.whydah.sso.user.mappers.UserRoleMapper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
 import net.whydah.sso.user.types.UserAggregate;
 import net.whydah.sso.user.types.UserApplicationRoleEntry;
@@ -39,6 +41,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.hazelcast.map.IMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -116,7 +123,12 @@ public enum SessionDao {
 
 	}
 
-
+	ObjectMapper objectMapper = new ObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+			.configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature(), true)
+			.enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature())
+			.findAndRegisterModules();
 
 	//////ADD BASIC VALUE TO THE MODEL
 
@@ -762,5 +774,48 @@ public enum SessionDao {
 			log.error("Unable to update Whydah", e);
 		}
 
+	}
+	
+	public String saveWhydahRole(String payload) {
+		UserApplicationRoleEntry entry = UserRoleMapper.fromJson(payload);	
+		String json = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), entry.getUserId()).execute();
+		List<UserApplicationRoleEntry> list = UserRoleMapper.fromJsonAsList(json);
+		UserApplicationRoleEntry found = null;
+		for(UserApplicationRoleEntry item : list) {
+			if(item.getApplicationId().equalsIgnoreCase(entry.getApplicationId()) && 
+					item.getOrgName().equalsIgnoreCase(entry.getOrgName()) &&
+					item.getRoleName().equalsIgnoreCase(entry.getRoleName())) {
+				found = item;
+				break;
+			}
+		}
+		if(found!=null) {
+			found.setOrgName(entry.getOrgName());
+			found.setRoleValue(entry.getRoleValue());
+			return new CommandUpdateUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), entry.getUserId(), found.getId(), UserRoleMapper.toJson(found)).execute();
+		} else {
+			return new CommandAddUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), entry.getUserId(), payload).execute();
+		}
+	}
+
+	public Boolean deleteWhydahRole(String uid, String roleId) {
+		return new CommandDeleteUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), uid, roleId).execute();
+	}
+
+	public String findWhydahRole(String uid, String appid, String orgname, String rolename) throws JsonProcessingException {
+		List<UserApplicationRoleEntry> foundList = new ArrayList<UserApplicationRoleEntry>();
+		if(uid!=null) {
+			String json = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), uid).execute();
+			List<UserApplicationRoleEntry> list = UserRoleMapper.fromJsonAsList(json);
+
+			for(UserApplicationRoleEntry item : list) {
+				if((appid==null || item.getApplicationId().equalsIgnoreCase(appid)) && 
+						(orgname ==null || item.getOrgName().equalsIgnoreCase(orgname)) &&
+						(rolename == null || item.getRoleName().equalsIgnoreCase(rolename))) {
+					foundList.add(item);
+				}
+			}
+		}
+		return objectMapper.writeValueAsString(foundList);
 	}
 }

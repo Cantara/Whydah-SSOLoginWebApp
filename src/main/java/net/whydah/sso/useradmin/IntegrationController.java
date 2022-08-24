@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import net.whydah.sso.commands.adminapi.user.CommandGetUser;
 import net.whydah.sso.commands.adminapi.user.CommandUpdateUser;
 import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.errorhandling.AppException;
 import net.whydah.sso.errorhandling.AppExceptionCode;
@@ -114,6 +116,38 @@ public class IntegrationController {
 		} else {
 			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, 9999, "Failed to get user", "", "");
 		}
+	}
+	
+	@Produces(MediaType.APPLICATION_JSON)
+	@RequestMapping(value = "/integration/user/role/assign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+	public String assignRole(HttpServletRequest request, HttpServletResponse response, Model model) throws AppException, IOException {
+		accessCheck(request);
+		String payload = readInput(request.getInputStream());
+		model.addAttribute(ConstantValue.JSON_DATA, SessionDao.instance.saveWhydahRole(payload));
+	    return "json";
+	}
+	
+	@Produces(MediaType.APPLICATION_JSON)
+	@RequestMapping(value = "/integration/user/role/remove", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON)
+	public String deleteRole(HttpServletRequest request, HttpServletResponse response, Model model) throws AppException, IOException {
+		accessCheck(request);
+		String roleId = request.getParameter("roleid");
+		String uid = request.getParameter("uid");
+		model.addAttribute(ConstantValue.JSON_DATA, "{ok:" + (SessionDao.instance.deleteWhydahRole(uid, roleId)?"true}":"false}"));
+	    return "json";
+	}
+	
+	@Produces(MediaType.APPLICATION_JSON)
+	@RequestMapping(value = "/integration/user/role/find", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+	public String findRole(HttpServletRequest request, HttpServletResponse response, Model model) throws AppException, IOException {
+		accessCheck(request);
+		String orgname = request.getParameter("orgname");
+		String appid = request.getParameter("appid");
+		String uid = request.getParameter("uid");
+		String rolename = request.getParameter("rolename");
+		
+		model.addAttribute(ConstantValue.JSON_DATA, SessionDao.instance.findWhydahRole(uid, appid, orgname, rolename));
+	    return "json";
 	}
 	
 	private String handleResponse(HttpServletResponse response, Model model, String result, byte[] raw_response,
