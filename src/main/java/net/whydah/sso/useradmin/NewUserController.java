@@ -150,18 +150,24 @@ public class NewUserController {
 
 			}
 
-		} else if(email == null && username == null && firstName ==null && lastName ==null) {
+		} else if(username == null) {
 			//nothing to do. First time loading
+			
 		} else {
 			
 			model.addAttribute("error", "Missing fields (*) required!" );
 		}
-
+		model.addAttribute("username", username == null?"":username);
+		model.addAttribute("useremail", email == null? "":email);
+		model.addAttribute("firstname", firstName == null?"":firstName);
+		model.addAttribute("lastname", lastName ==null?"":lastName);
+		model.addAttribute("cellphone", cellPhone==null?"":cellPhone);
 		//ModelHelper.setEnabledLoginTypes(model);
 		SessionDao.instance.addModel_LoginTypes(model);
 		CookieManager.clearUserTokenCookies(request, response);
 		//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
 		SessionDao.instance.addModel_CSRFtoken(model);
+		response.setContentType("text/html;charset=UTF-8");
 		return "newuser";
 	}
 

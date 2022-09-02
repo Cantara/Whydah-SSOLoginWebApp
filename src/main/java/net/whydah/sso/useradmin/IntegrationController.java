@@ -7,6 +7,7 @@ import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import net.whydah.sso.commands.adminapi.user.CommandDeleteUser;
 import net.whydah.sso.commands.adminapi.user.CommandGetUser;
 import net.whydah.sso.commands.adminapi.user.CommandUpdateUser;
 import net.whydah.sso.config.AppConfig;
@@ -61,6 +63,27 @@ public class IntegrationController {
 				SessionDao.instance.getUserAdminToken().getUserTokenId(), 
 				uid, json);
 		return handleResponse(response, model, cmd.execute(), cmd.getResponseBodyAsByteArray(), cmd.getStatusCode());
+
+	}
+	
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@RequestMapping(value = "/integration/user/{uid}/", method = RequestMethod.DELETE)
+	public String deleteUserIdentity(
+			@PathVariable("uid") String uid,
+			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+		log.trace("updateUserIdentity with uid={}", uid);
+
+		accessCheck(request);
+		
+		String json = readInput(request.getInputStream());
+		CommandDeleteUser cmd = new CommandDeleteUser(uasServiceUri, 
+				SessionDao.instance.getServiceClient().getMyAppTokenID(), 
+				SessionDao.instance.getUserAdminToken().getUserTokenId(), 
+				uid);
+		boolean result = cmd.execute();
+		model.addAttribute(ConstantValue.JSON_DATA, "{ok:" + (result?"true}":"false}"));
+	    return "json";
 
 	}
 	
