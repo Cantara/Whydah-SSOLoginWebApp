@@ -194,7 +194,7 @@ public class WhydahOAuthSSOLoginController {
 		
 		updateLifeSpanForAuthSession(httpRequest, userTokenXml, provider);
 		setWhydahCookie(httpRequest, httpResponse, userTokenXml);
-		return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+		return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket)  + "&referer_channel=" + provider);
 	}
 
 	private void setWhydahCookie(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String userTokenXml) {
@@ -324,7 +324,7 @@ public class WhydahOAuthSSOLoginController {
 			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), provider, stored_accessToken, resolveAppRoles(null), provider_uid, username, firstName, lastName, email, cellPhone, personRef);
 
 
-			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + provider );
 		} else {
 			return toLogin(model, redirectURI, "failure solving usertokenxml");
 		}
