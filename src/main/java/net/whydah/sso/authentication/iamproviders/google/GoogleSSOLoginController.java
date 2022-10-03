@@ -58,10 +58,19 @@ public class GoogleSSOLoginController {
 //			return "action";
 			return toAction(model, aad_auth_url);
 		}
-
+		
 		if (ggHelper.isAccessTokenExpired(httpRequest)) {
-			log.info("isAccessTokenExpired  {}", httpRequest);
-			ggHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			try {
+				log.info("isAccessTokenExpired  {}", httpRequest);
+				ggHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				log.warn("Cannot refresh token from Google provider. Return login");
+				String aad_auth_url = ggHelper.getAuthRedirect(httpRequest, httpRequest.getParameter(ConstantValue.LOGIN_HINT), httpRequest.getParameter("redirectURI"));
+				model.addAttribute("redirect", aad_auth_url);
+				log.info("Redirecting to {}", aad_auth_url);
+				return "action";
+			}
 		}
 		//return redirectURi with a ticket
 		log.info("googlelogin resolve");
