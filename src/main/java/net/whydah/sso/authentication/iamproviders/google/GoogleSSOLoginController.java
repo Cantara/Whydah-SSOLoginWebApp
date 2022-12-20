@@ -257,7 +257,13 @@ public class GoogleSSOLoginController {
 		}
 
 		if (ggHelper.isAccessTokenExpired(httpRequest)) {
-			ggHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			try {
+				log.info("isAccessTokenExpired  {}", httpRequest);
+				ggHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			} catch(Exception ex) {
+				String aad_auth_url = ggHelper.getAuthRedirect(httpRequest, httpRequest.getParameter("username"), httpRequest.getParameter("redirectURI"));
+				return toAction(model, aad_auth_url);
+			}
 		}
 
 		String userName = httpRequest.getParameter("username");
@@ -375,7 +381,13 @@ public class GoogleSSOLoginController {
 		}
 
 		if (ggHelper.isAccessTokenExpired(httpRequest)) {
-			ggHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			try {
+				log.info("isAccessTokenExpired  {}", httpRequest);
+				ggHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			} catch(Exception ex) {
+				String aad_auth_url = ggHelper.getAuthRedirect(httpRequest, httpRequest.getParameter("username"), httpRequest.getParameter("redirectURI"));
+				return toAction(model, aad_auth_url);
+			}
 		}
 
 		String newRegister = httpRequest.getParameter("newRegister");
