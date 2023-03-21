@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Whydah Login</title>
-    <link rel="stylesheet" href="css/whydah.css" TYPE="text/css"/>
+<title>Whydah Login</title>
+<link rel = "stylesheet" href="css/whydah.css" TYPE="text/css"/>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1"/>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -11,7 +11,7 @@
     <div id="page-content">
         <div id="signup-page">
             <div id="logo">
-                <img src="${logoURL!}" alt="Whydah User Registration"/>
+                <img src="${logoURL!data: image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==}" alt="Whydah User Registration"/>
                 <h2>Register new user</h2>
             </div>
 
