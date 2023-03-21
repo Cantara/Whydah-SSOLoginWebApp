@@ -11,7 +11,7 @@
     <div id="page-content">
         <div id="signup-page">
             <div id="logo">
-                <img src="${logoURL!data: image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==}" alt="Whydah User Registration"/>
+                <img src="${logoURL!/sso/images/single-dot.gif}" alt="Whydah User Registration"/>
                 <h2>Register new user</h2>
             </div>
 
