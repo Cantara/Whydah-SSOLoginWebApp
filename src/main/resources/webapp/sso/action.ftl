@@ -16,7 +16,7 @@
             </#if>
         <#else>
             <div id="logo">
-                <img src="${logoURL}" alt="Site logo"/>
+                <img src="/sso/images/single-dot.gif" alt="Site logo"/>
                 <h2>Redirecting to ${redirect!"/sso/welcome"}</h2>
             </div>
         </#if>
