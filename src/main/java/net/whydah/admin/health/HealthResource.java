@@ -25,7 +25,7 @@ import java.util.Properties;
 
 @Controller
 public class HealthResource {
-    private static WhydahServiceClient serviceClient = SessionDao.instance.getServiceClient();
+    private static WhydahServiceClient serviceClient;// = SessionDao.instance.getServiceClient();
 
     private static final Logger log = LoggerFactory.getLogger(HealthResource.class);
     protected static Properties properties;
@@ -39,6 +39,7 @@ public class HealthResource {
         try {
             properties = AppConfig.readProperties();
             applicationInstanceName = properties.getProperty("applicationname");
+            serviceClient = SessionDao.instance.getServiceClient();
 
         } catch (Exception e){
             log.warn("Unable to create WhydahServiceClient in constructor",e);

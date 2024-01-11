@@ -9,6 +9,7 @@ import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
+import com.hazelcast.map.impl.proxy.MapProxyImpl;
 import com.hazelcast.map.listener.MapListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class HazelcastMapHelper {
 		try {
 			hazelcastInstance = Hazelcast.newHazelcastInstance(hazelcastConfig);
 		} catch(Exception ex) {
-			hazelcastInstance = Hazelcast.newHazelcastInstance();
+			//hazelcastInstance = Hazelcast.newHazelcastInstance();//.bootstrappedInstance();//.newHazelcastInstance();
 		}
 
 	}
@@ -93,7 +94,12 @@ public class HazelcastMapHelper {
 	}
 
 	public static IMap registerMap(String name) {
-		return registerMap(name, null);
+		//IMap<String, String> result = new MapProxyImpl<>(name,null,null,null);
+		try {
+			return registerMap(name, null);
+        } catch (Exception e){
+			return null;
+		}
 	}
 
 	public static ISet registerSet(String name, ItemListener listener) {

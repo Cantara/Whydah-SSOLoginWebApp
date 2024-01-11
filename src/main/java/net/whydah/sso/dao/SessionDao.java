@@ -118,10 +118,13 @@ public enum SessionDao {
             this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
             whydahOauthConfig = new WhydahOauthIntegrationConfig(properties);
         } catch (IOException e) {
+
 			e.printStackTrace();
 		}
 
 	}
+
+
 
 	ObjectMapper objectMapper = new ObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
