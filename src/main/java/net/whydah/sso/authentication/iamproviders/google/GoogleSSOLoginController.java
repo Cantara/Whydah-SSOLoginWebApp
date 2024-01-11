@@ -30,11 +30,12 @@ public class GoogleSSOLoginController {
 	private final static Logger log = LoggerFactory.getLogger(GoogleSSOLoginController.class);
 	protected String LOGOURL = "/sso/images/site-logo.png";
 	@Autowired GoogleAuthHelper ggHelper;
-	private final WhydahServiceClient tokenServiceClient = SessionDao.instance.getServiceClient();
+	private final WhydahServiceClient tokenServiceClient;// = SessionDao.instance.getServiceClient();
 	private String APPID="", APPNAME="";
 	
 	public GoogleSSOLoginController() throws IOException {
 		Properties properties = AppConfig.readProperties();
+		tokenServiceClient = SessionDao.instance.getServiceClient();
 		LOGOURL = properties.getProperty("logourl");
 		APPID = properties.getProperty("applicationid");
 		APPNAME = properties.getProperty("applicationname");
