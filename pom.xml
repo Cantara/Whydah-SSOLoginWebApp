@@ -16,7 +16,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.release>11</maven.compiler.release>
         <java.version>11</java.version>
-        <whydah.admin.sdk.version>2.21.1</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.22.0</whydah.admin.sdk.version>
         <jersey.version>1.19.4</jersey.version>
         <spring.version>5.3.31</spring.version>
         <spring.security-version>5.8.9</spring.security-version>
