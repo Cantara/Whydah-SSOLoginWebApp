@@ -21,7 +21,7 @@
         <spring.version>5.3.31</spring.version>
         <spring.security-version>5.8.9</spring.security-version>
         <jetty.version>9.4.53.v20231009</jetty.version>
-        <slf4j.version>2.0.10</slf4j.version>
+        <slf4j.version>2.0.11</slf4j.version>
         <metrics.version>4.2.23</metrics.version>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
     </properties>
