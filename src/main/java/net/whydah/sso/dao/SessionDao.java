@@ -145,10 +145,12 @@ public enum SessionDao {
         model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
         model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
         model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
+        model.addAttribute(ConstantValue.MICROSOFTLOGIN_ENABLED, enabledLoginTypes.isMicrosoftLoginEnabled());
         
         model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
         
         //sign up
+        model.addAttribute(ConstantValue.SIGNUP_MICROSOFT_ON, enabledLoginTypes.isSignuppageMicrosoftOn());
         model.addAttribute(ConstantValue.SIGNUP_GOOGLE_ON, enabledLoginTypes.isSignuppageGoogleOn());
         model.addAttribute(ConstantValue.SIGNUP_FACEBOOK_ON, enabledLoginTypes.isSignuppageFacebookOn());
         model.addAttribute(ConstantValue.SIGNUP_NETIQ_ON, enabledLoginTypes.isSignuppageNetIQOn());
@@ -197,6 +199,9 @@ public enum SessionDao {
         }
         if (loginType.equalsIgnoreCase(ConstantValue.GOOGLELOGIN_ENABLED)) {
             return enabledLoginTypes.isGoogleLoginEnabled();
+        }
+        if (loginType.equalsIgnoreCase(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
+            return enabledLoginTypes.isMicrosoftLoginEnabled();
         }
         
         return false;

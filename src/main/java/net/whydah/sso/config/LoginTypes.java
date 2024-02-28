@@ -34,11 +34,13 @@ public class LoginTypes {
     private boolean enablePersonasShortcut=false;
     private boolean googleLoginEnabled;
     private boolean rebelLoginEnabled;
+    private boolean microsoftLoginEnabled;
     //sign up
     private boolean signuppageGoogleOn = false;
     private boolean signuppageFacebookOn = false;
     private boolean signuppageWhydahIntegrationproviderOn = false;
     private boolean signuppageNetIQOn = false;
+    private boolean signuppageMicrosoftOn = false;
 
     public LoginTypes(Properties properties) {
     	
@@ -51,22 +53,32 @@ public class LoginTypes {
         signupEnabled = TRUE.equalsIgnoreCase(properties.getProperty("signupEnabled"));
         googleLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.google"));
         rebelLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.rebel"));
+        microsoftLoginEnabled = ENABLED.equalsIgnoreCase(properties.getProperty("logintype.microsoft"));
         
         //sign up
         signuppageGoogleOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.google"));
         signuppageWhydahIntegrationproviderOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.whydah.integration.providers"));
         signuppageFacebookOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.facebook"));
         signuppageNetIQOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.netiq"));
+        signuppageMicrosoftOn = "ON".equalsIgnoreCase(properties.getProperty("signuppage.microsoft"));
         
-        
-        log.debug(String.format("Signup is %6s, Facebook Sign on is %1s, OpenId Sign on is %2s, Omni Sign on is %3s, netIQ Sign on is %4s, User/Password Sign on is %5s."
+        log.debug("Signup is {} "
+        		+ "- Google Sign on is {}"
+        		+ "- Microsoft Sign on is {}"
+        		+ "- Facebook Sign on is {}"
+        		+ "- OpenId Sign on is {}"
+        		+ "- Omni Sign on is {}"
+        		+ "- NetIQ Sign on is {}"
+        		+ "- User/Password Sign on is {}."
                 , properties.getProperty("signupEnabled")
+                , properties.getProperty("logintype.google")
+                , properties.getProperty("logintype.microsoft")
                 , properties.getProperty("logintype.facebook")
-									, properties.getProperty("logintype.openid")
-									, properties.getProperty("logintype.omni")
-                                    , properties.getProperty("logintype.netiq")
+				, properties.getProperty("logintype.openid")
+				, properties.getProperty("logintype.omni")
+                , properties.getProperty("logintype.netiq")
                 , properties.getProperty("logintype.userpassword")
-                , properties.getProperty("signupEnabled")));
+        );
     }
 
     public boolean isSignupEnabled() {
@@ -101,6 +113,10 @@ public class LoginTypes {
 		return googleLoginEnabled;
 	}
 	
+	public boolean isMicrosoftLoginEnabled() {
+		return microsoftLoginEnabled;
+	}
+	
 	public boolean isRebelLoginEnabled() {
 		return rebelLoginEnabled;
 	}
@@ -119,6 +135,10 @@ public class LoginTypes {
 
 	public boolean isSignuppageNetIQOn() {
 		return signuppageNetIQOn;
+	}
+	
+	public boolean isSignuppageMicrosoftOn() {
+		return signuppageMicrosoftOn;
 	}
 	
 	
