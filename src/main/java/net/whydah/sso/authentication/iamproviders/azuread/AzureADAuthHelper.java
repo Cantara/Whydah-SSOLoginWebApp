@@ -156,6 +156,8 @@ public class AzureADAuthHelper {
 					oidcResponse.getAuthorizationCode(),
 					SessionDao.instance.MY_APP_URI.replaceFirst("/$", "") + "/aadauth");
 
+			log.debug("authentication result by authcode {} is {}", oidcResponse.getAuthorizationCode(), result);
+			
 			// validate nonce to prevent reply attacks (code maybe substituted to one with broader access)
 			validateNonce(stateData, getNonceClaimValueFromIdToken(result.idToken()));
 			

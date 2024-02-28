@@ -335,6 +335,7 @@ public class AzureSSOLoginController {
 		//info from 3rd party
 		//IAuthenticationResult auth = AzureSessionManagementHelper.getAuthSessionObject(httpRequest);
 		String accessToken = AzureSessionManagementHelper.getAccessToken(httpRequest);
+		log.debug("access token returned {}", accessToken);
 		JWTClaimsSet claims = JWTParser.parse(accessToken).getJWTClaimsSet();
 		String tenantId = claims.getStringClaim("tid"); //tenant id
 		String oid = claims.getStringClaim("oid"); //principal id
