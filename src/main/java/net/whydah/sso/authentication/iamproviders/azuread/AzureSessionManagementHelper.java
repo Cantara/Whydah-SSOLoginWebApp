@@ -36,8 +36,8 @@ public class AzureSessionManagementHelper {
 	
 	private static boolean byPassRemoval=true;
     static final String FAILED_TO_VALIDATE_MESSAGE = "Failed to validate data received from Azure AD Authorization service - ";
-	private static IMap<String, AzureSessionData> sessions = HazelcastMapHelper.registerMap("sso_aad_auth_sessions");
-	private static IMap<String, StateData> states = HazelcastMapHelper.registerMap("sso_aad_auth_states");
+	private static IMap<String, AzureSessionData> sessions = HazelcastMapHelper.register("sso_aad_auth_sessions");
+	private static IMap<String, StateData> states = HazelcastMapHelper.register("sso_aad_auth_states");
 	
 	
 	public static int countValidSessions() {

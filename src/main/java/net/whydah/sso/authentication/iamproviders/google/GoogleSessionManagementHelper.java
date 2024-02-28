@@ -32,8 +32,8 @@ public class GoogleSessionManagementHelper {
 	private static final Integer STATE_TTL = 86400;
 
 	private static boolean byPassRemoval = true;
-	private static IMap<String, GoogleSessionData> sessions = HazelcastMapHelper.registerMap("sso_google_auth_sessions");
-	private static IMap<String, StateData> states = HazelcastMapHelper.registerMap("sso_google_auth_states");
+	private static IMap<String, GoogleSessionData> sessions = HazelcastMapHelper.register("sso_google_auth_sessions");
+	private static IMap<String, StateData> states = HazelcastMapHelper.register("sso_google_auth_states");
 
 	static final String FAILED_TO_VALIDATE_MESSAGE = "Failed to validate data received from Google Authorization service - ";
 

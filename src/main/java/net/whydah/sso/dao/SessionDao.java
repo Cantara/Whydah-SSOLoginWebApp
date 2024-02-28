@@ -92,8 +92,8 @@ public enum SessionDao {
 		return reportServiceHelper;
 	}
 	
-	private IMap<String, String> csrftokens = HazelcastMapHelper.registerMap("csrftokens_map");
-	private IMap<String, String> username_redirectURI = HazelcastMapHelper.registerMap("username_redirectURI");
+	private IMap<String, String> csrftokens = HazelcastMapHelper.register("csrftokens_map");
+	private IMap<String, String> username_redirectURI = HazelcastMapHelper.register("username_redirectURI");
 
 	private SessionDao() {
 

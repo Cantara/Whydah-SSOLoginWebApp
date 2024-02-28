@@ -32,8 +32,8 @@ public class WhydahOAuthSessionManagementHelper {
 	private static final Integer STATE_TTL = 86400;
 
 	private static boolean byPassRemoval = true;
-	private static IMap<String, WhydahOauthSessionData> sessions = HazelcastMapHelper.registerMap("sso_whydah_auth_sessions");
-	private static IMap<String, StateData> states = HazelcastMapHelper.registerMap("sso_whydah_auth_states");
+	private static IMap<String, WhydahOauthSessionData> sessions = HazelcastMapHelper.register("sso_whydah_auth_sessions");
+	private static IMap<String, StateData> states = HazelcastMapHelper.register("sso_whydah_auth_states");
 
 	static final String FAILED_TO_VALIDATE_MESSAGE = "Failed to validate data received from Google Authorization service - ";
 
