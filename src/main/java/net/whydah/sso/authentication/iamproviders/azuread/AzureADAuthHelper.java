@@ -123,14 +123,14 @@ public class AzureADAuthHelper {
 	public StateData processAuthenticationCodeRedirectAndReturnTheClientRedirectUrl(HttpServletRequest httpRequest)
 			throws Throwable {
 
-		String currentUri = httpRequest.getRequestURL().toString();
-		log.debug("receive callback from AAD {}", currentUri);
-		if (!currentUri.startsWith("https")) {
-			currentUri = currentUri.replaceFirst("http", "https");
-		}
-		String path = httpRequest.getServletPath();
+//		String currentUri = httpRequest.getRequestURL().toString();
+		log.debug("receive callback from AAD {}", httpRequest.getRequestURL().toString());
+//		if (!currentUri.startsWith("https")) {
+//			currentUri = currentUri.replaceFirst("http", "https");
+//		}
+		//String path = httpRequest.getServletPath();
 		String queryStr = httpRequest.getQueryString();
-		String fullUrl = currentUri + (queryStr != null ? "?" + queryStr : "");
+		String fullUrl = SessionDao.instance.MY_APP_URI.replaceFirst("/$", "") + "/aadauth"+ (queryStr != null ? "?" + queryStr : "");
 		log.debug("reolved URI {}", fullUrl);
 
 		Map<String, List<String>> params = new HashMap<>();
@@ -154,7 +154,7 @@ public class AzureADAuthHelper {
 					httpRequest,
 					stateData.getDomain(),
 					oidcResponse.getAuthorizationCode(),
-					currentUri);
+					SessionDao.instance.MY_APP_URI.replaceFirst("/$", "") + "/aadauth");
 
 			// validate nonce to prevent reply attacks (code maybe substituted to one with broader access)
 			validateNonce(stateData, getNonceClaimValueFromIdToken(result.idToken()));
