@@ -1,6 +1,7 @@
 package net.whydah.sso.authentication.whydah;
 
 import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.iamproviders.azuread.AzureADAuthHelper;
 import net.whydah.sso.authentication.iamproviders.google.GoogleAuthHelper;
 import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthHelper;
 import net.whydah.sso.config.AppConfig;
@@ -32,6 +33,7 @@ public class SSOLogoutController {
 
 	@Autowired GoogleAuthHelper ggHelper;
 	@Autowired WhydahOAuthHelper whydahOauthHelper;
+	@Autowired AzureADAuthHelper aadHelper;
 
 	public SSOLogoutController() throws IOException {
 		//        this.tokenServiceClient = new WhydahServiceClient();
@@ -60,6 +62,21 @@ public class SSOLogoutController {
 		log.trace("logout was called. userTokenId={}, redirectUriFromClient={}", userTokenId, redirectUriFromClient);
 
 		if (userTokenId != null && userTokenId.length() > 3) {
+			
+			//try logout from AAD 
+			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
+				String aad_logout;
+				try {
+					aad_logout = aadHelper.logoutRedirect(request, response);
+					if(aad_logout!=null) {
+						response.sendRedirect(aad_logout);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
 			
 			//try logout from Google 
 			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED)) {
