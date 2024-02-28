@@ -92,8 +92,8 @@ public enum SessionDao {
 		return reportServiceHelper;
 	}
 	
-	private static IMap<String, String> csrftokens = HazelcastMapHelper.registerMap("csrftokens_map");
-	private static IMap<String, String> username_redirectURI = HazelcastMapHelper.registerMap("username_redirectURI");
+	private IMap<String, String> csrftokens = HazelcastMapHelper.registerMap("csrftokens_map");
+	private IMap<String, String> username_redirectURI = HazelcastMapHelper.registerMap("username_redirectURI");
 
 	private SessionDao() {
 
@@ -631,12 +631,12 @@ public enum SessionDao {
 	public void addRedirectURIForNewUser(String username, String redirectURI) {
 		if(redirectURI!=null && !redirectURI.equals(DEFAULT_REDIRECT)) {
 			log.debug("add redirectURI= {} for username {}", redirectURI, username);
-			SessionDao.username_redirectURI.put(username, redirectURI);
+			username_redirectURI.put(username, redirectURI);
 		}
 	}
 	
 	public String getRedirectURIForNewUser(String username) {	
-		String redirectURI = SessionDao.username_redirectURI.remove(username);
+		String redirectURI = username_redirectURI.remove(username);
 		log.debug("get redirectURI= {} for username {}", redirectURI, username);
 		return redirectURI;
 	}
