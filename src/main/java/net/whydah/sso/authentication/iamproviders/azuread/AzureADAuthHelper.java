@@ -15,6 +15,7 @@ import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.application.RedirectURI;
 import net.whydah.sso.slack.SlackNotificationService;
+import net.whydah.sso.utils.HttpConnectionHelper;
 import net.whydah.sso.utils.ToStringHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -223,19 +224,17 @@ public class AzureADAuthHelper {
 		}
 	}
 
-	public String logoutRedirect(HttpServletRequest httpRequest, HttpServletResponse response) throws IOException {
+	public void logoutRedirect(HttpServletRequest httpRequest, HttpServletResponse response) throws IOException {
 		
 		if(isAuthenticated(httpRequest)) {
 			httpRequest.getSession().invalidate();
 			AzureSessionManagementHelper.removeSession(httpRequest, response);
-			String endSessionEndpoint = getAuthorityURL(AzureSessionManagementHelper.getSessionSelectedDomain(httpRequest)) + "/oauth2/logout";
+			String endSessionEndpoint = getAuthorityURL(AzureSessionManagementHelper.getSessionSelectedDomain(httpRequest)).replaceFirst("/$","") + "/oauth2/v2.0/logout";
 			String redirectUriFromClient = SessionDao.instance.getFromRequest_RedirectURI(httpRequest);
 			
-			String redirectUrl = MY_APP_URI + (redirectUriFromClient == null ? "/logout" : "/logout?redirectURI=" + redirectUriFromClient);
-			return endSessionEndpoint + "?post_logout_redirect_uri=" +
-			URLEncoder.encode(redirectUrl, "UTF-8");
-		} else {
-			return null;
+			String redirectUrl = MY_APP_URI.replaceFirst("/$","") + (redirectUriFromClient == null ? "/logout" : "/logout?redirectURI=" + redirectUriFromClient);
+			String logoutUrl = redirectUrl = endSessionEndpoint + "?post_logout_redirect_uri=" + URLEncoder.encode(redirectUrl, "UTF-8");
+			HttpConnectionHelper.get(logoutUrl, null, null, null);
 		}
 	}
 

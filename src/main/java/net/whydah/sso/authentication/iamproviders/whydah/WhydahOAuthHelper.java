@@ -320,7 +320,7 @@ public class WhydahOAuthHelper {
 		}
 	}
 
-	public String logoutRedirect(HttpServletRequest httpRequest, HttpServletResponse response, String provider) throws UnsupportedEncodingException {
+	public void logoutRedirect(HttpServletRequest httpRequest, HttpServletResponse response, String provider) throws UnsupportedEncodingException {
 		if(isAuthenticated(httpRequest, provider)) {
 			String token = WhydahOAuthSessionManagementHelper.getAccessToken(httpRequest, provider);
 			httpRequest.getSession().invalidate();
@@ -329,16 +329,16 @@ public class WhydahOAuthHelper {
 			String oauthUrl = properties.getProperty(provider + ".oauth2_url").replaceFirst("/$", "");
 			String oauthClientId = properties.getProperty(provider + ".oauth2_clientid");
 			if(oauthUrl==null || oauthClientId ==null) {
-				return null;
+				return;
 			}
 			
 			
 			String endSessionEndpoint = oauthUrl + "/logout?id_token_hint=" + token;
 			String redirectUriFromClient = SessionDao.instance.getFromRequest_RedirectURI(httpRequest);
 			String redirectUrl = MY_APP_URI + (redirectUriFromClient == null ? "/logout" : "/logout?redirectURI=" + redirectUriFromClient);
-			return endSessionEndpoint + "&post_logout_redirect_uri=" + URLEncoder.encode(redirectUrl, "UTF-8");
+			String logoutUrl = endSessionEndpoint + "&post_logout_redirect_uri=" + URLEncoder.encode(redirectUrl, "UTF-8");
+			HttpConnectionHelper.get(logoutUrl, null, null, null);
 		}
-		return null;
 		
 	}
 

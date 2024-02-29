@@ -65,12 +65,8 @@ public class SSOLogoutController {
 			
 			//try logout from AAD 
 			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
-				String aad_logout;
 				try {
-					aad_logout = aadHelper.logoutRedirect(request, response);
-					if(aad_logout!=null) {
-						response.sendRedirect(aad_logout);
-					}
+					aadHelper.logoutRedirect(request, response);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -90,10 +86,7 @@ public class SSOLogoutController {
 			for(WhydahProvider provider : whydahOauthHelper.getProviders().values()) {
 				if (provider.isEnabled()) {
 					try {
-						String whydahlogout = whydahOauthHelper.logoutRedirect(request, response, provider.getProvider());
-						if(whydahlogout!=null) {
-							response.sendRedirect(whydahlogout);
-						}
+						whydahOauthHelper.logoutRedirect(request, response, provider.getProvider());						
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
