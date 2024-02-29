@@ -179,6 +179,7 @@ public class AzureADAuthHelper {
 	private void commitDataState(HttpServletRequest httpRequest, IAuthenticationResult result) {
 		AzureSessionManagementHelper.setAccount(httpRequest, result.account());
 		AzureSessionManagementHelper.setAccessToken(httpRequest, result.accessToken());
+		AzureSessionManagementHelper.setIdToken(httpRequest, result.idToken());
 		AzureSessionManagementHelper.setExpiresOnDate(httpRequest, result.expiresOnDate());
 	}
 
@@ -229,10 +230,7 @@ public class AzureADAuthHelper {
 			AzureSessionManagementHelper.removeSession(httpRequest, response);
 			String endSessionEndpoint = getAuthorityURL(AzureSessionManagementHelper.getSessionSelectedDomain(httpRequest)) + "/oauth2/logout";
 			String redirectUriFromClient = SessionDao.instance.getFromRequest_RedirectURI(httpRequest);
-			String realEstate = httpRequest.getParameter("real_estate");
-			if(redirectUriFromClient != null && redirectUriFromClient.equalsIgnoreCase("welcome")) {
-				redirectUriFromClient += "&real_estate=" + realEstate;
-			}
+			
 			String redirectUrl = MY_APP_URI + (redirectUriFromClient == null ? "/logout" : "/logout?redirectURI=" + redirectUriFromClient);
 			return endSessionEndpoint + "?post_logout_redirect_uri=" +
 			URLEncoder.encode(redirectUrl, "UTF-8");

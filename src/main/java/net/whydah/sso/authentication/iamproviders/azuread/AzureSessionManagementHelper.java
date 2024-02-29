@@ -169,6 +169,16 @@ public class AzureSessionManagementHelper {
 		return getSessionData(httpRequest).getAccessToken();
 	}
     
+    static void setIdToken(HttpServletRequest httpRequest, String data) {
+    	AzureSessionData sessiondata = getSessionData(httpRequest);
+		sessiondata.setIdToken(data);
+		sessions.put(httpRequest.getSession().getId(), sessiondata);
+	}
+    
+    static String getIdToken(HttpServletRequest httpRequest) {
+		return getSessionData(httpRequest).getIdToken();
+	}
+    
     static void setAccount(HttpServletRequest httpRequest, IAccount data) {
     	AzureSessionData sessiondata = getSessionData(httpRequest);
 		sessiondata.setAccount(data);

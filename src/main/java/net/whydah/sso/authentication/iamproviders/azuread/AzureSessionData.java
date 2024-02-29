@@ -16,6 +16,7 @@ import net.whydah.sso.authentication.iamproviders.StateData;
 public class AzureSessionData extends BaseSessionData implements Serializable {
 
 	private String accessToken;
+	private String idToken;
 	private String aadTokenCache;
 	private IAccount account;
 	private Date expiresOnDate;

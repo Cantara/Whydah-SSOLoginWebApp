@@ -21,6 +21,7 @@ import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.Email;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserCredential;
 
@@ -304,7 +305,7 @@ public class GoogleSSOLoginController {
 		if(lastName ==null || lastName.isEmpty()) {
 			return toLogin(model, redirectURI, "illegal last name");
 		}
-		if(email ==null || email.isEmpty()) {
+		if(email ==null || email.isEmpty() || !Email.isValid(email)) {
 			return toLogin(model, redirectURI, "illegal email");
 		}
 		if(cellPhone ==null || cellPhone.isEmpty()) {
@@ -408,15 +409,13 @@ public class GoogleSSOLoginController {
 				return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
 			}
 		} else {
-			if (SessionDao.instance.checkIfUserExists(userName)) {
-				return toCredentialConfirm(model, redirectURI, userName, "Username already existed!");
-			} else {
-				String firstName= GoogleSessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
-				String lastName = GoogleSessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
-				String email = GoogleSessionManagementHelper.getEmail(httpRequest);
-				
-				return toBasicInfoConfirm(model, redirectURI, userName, firstName, lastName, email, null, false, true);
-			}		
+			
+			String firstName= GoogleSessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
+			String lastName = GoogleSessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
+			String email = GoogleSessionManagementHelper.getEmail(httpRequest);
+			
+			return toBasicInfoConfirm(model, redirectURI, "google-" + email, firstName, lastName, email, null, false, true);
+
 		}
 		
 		/*

@@ -22,12 +22,13 @@
                 <form id="form" action="aadlogin" class="new_user_session" name="aadlogin" method="post">
                     <p>You will be directed to Microsoft login page for authenticating your account.</p>
                     <h4><label for="username">Your Microsoft email</label></h4>
+                    <p>
                     <#if redirectURI??>
 		               	<input type="hidden" name="redirectURI" value="${redirectURI}"/>
 		            </#if>
 		             
                     <input id="loginusername" name="loginusername" size="30" type="text" placeholder="Enter your Microsoft email"/>
-                    
+                    </p>
                     <button id="submitbutton" class="customBtn" type="submit" onclick="submitAction(event);>
 				      <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
 				      <span class="buttonText">Continue to sign in with Microsoft</span>

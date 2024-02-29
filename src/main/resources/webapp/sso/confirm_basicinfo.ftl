@@ -33,7 +33,7 @@
                 <input name="redirectURI" type="hidden" value="${redirectURI!}">
                 <input type="hidden" name="username" value="${username}"/>
                 <input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
-		<input name="newRegister" type="hidden" value="${newRegister!false}">
+				<input name="newRegister" type="hidden" value="${newRegister!false}">
 
                 <label for="username" class="label">${username!}</label>			
                 <label for="firstName" class="label">Fornavn:</label>

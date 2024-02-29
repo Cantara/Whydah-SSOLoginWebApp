@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTParser;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
 import net.whydah.sso.authentication.iamproviders.StateData;
+import net.whydah.sso.authentication.iamproviders.google.GoogleSessionManagementHelper;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
@@ -58,7 +59,11 @@ public class AzureSSOLoginController {
 		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
 			return "login";
 		} else {
-			return "login_with_microsoft";
+			if (aadHelper.isAuthenticated(httpRequest)) {
+				return resolve(httpRequest, httpResponse, model, redirectURI);
+			} else {
+				return "login_with_microsoft";
+			}
 		}
 	}
 
@@ -129,26 +134,30 @@ public class AzureSSOLoginController {
 			if (aadHelper.isAccessTokenExpired(httpRequest)) {
 				aadHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			}
-
+			
+			String newRegister = httpRequest.getParameter("newRegister");
 			String userName = httpRequest.getParameter("username");
 			String pwd = httpRequest.getParameter("password");
 			String redirectURI = httpRequest.getParameter("redirectURI");
-			
 			String userTokenXml = null;
 			String userticket = UUID.randomUUID().toString();
 
-
-			if (userName != null && pwd != null && userName.length() > 0 && pwd.length() > 0) {
-				userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
-			}
-
-			if (userTokenXml != null) {
-				return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
+			if(newRegister.equalsIgnoreCase("false")) {
+				if(userName!=null && pwd!=null && userName.length()>0 && pwd.length()>0) {
+					userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
+				} 
+				if(userTokenXml == null) {
+					return toCredentialConfirm(model, redirectURI, userName, "Login failed. Wrong password!");	
+				} else {
+					return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
+				}
 			} else {
+
 				//info from 3rd party
 				//IAuthenticationResult auth = AzureSessionManagementHelper.getAuthSessionObject(httpRequest);
 				String accessToken = AzureSessionManagementHelper.getAccessToken(httpRequest);
-				JWTClaimsSet claims = JWTParser.parse(accessToken).getJWTClaimsSet();
+				String idToken = AzureSessionManagementHelper.getIdToken(httpRequest);
+				JWTClaimsSet claims = JWTParser.parse(idToken).getJWTClaimsSet();
 				String tenantId = claims.getStringClaim("tid"); //tenant id
 				String oid = claims.getStringClaim("oid"); //principal id
 
@@ -180,16 +189,22 @@ public class AzureSSOLoginController {
 				if (email == null) {
 					if (Email.isValid(account.username())) {
 						email = account.username();
+					} else {
+						return toLogin(model, redirectURI, "failure solving email");
 					}
 				}
 
-				//for now, just prepend the marker aad-misterhuydo@gmail.com for example
-				return toBasicInfoConfirm(model, redirectURI, "aad-" + account.username(), firstName, lastName, email, cellPhone, false);
+				return toBasicInfoConfirm(model, redirectURI, "aad-" + userName, firstName, lastName, email, null, false, true);
+
+
+			
+
 			}
 		} catch (Exception ee) {
 			log.error("confirmExist exception", ee);
+			throw ee;
 		}
-		return null;
+		
 	}
 
 	@RequestMapping("/aad_basicinfo_confirm")
@@ -249,7 +264,8 @@ public class AzureSSOLoginController {
 			//IAuthenticationResult auth = AzureSessionManagementHelper.getAuthSessionObject(httpRequest);
 			
 			String accessToken = AzureSessionManagementHelper.getAccessToken(httpRequest);
-			JWTClaimsSet claims = JWTParser.parse(accessToken).getJWTClaimsSet();
+			String idToken = AzureSessionManagementHelper.getIdToken(httpRequest);
+			JWTClaimsSet claims = JWTParser.parse(idToken).getJWTClaimsSet();
 			String oid = claims.getStringClaim("oid"); //principal id
 
 			IAccount account = AzureSessionManagementHelper.getAccount(httpRequest);
@@ -264,7 +280,7 @@ public class AzureSSOLoginController {
 			if (lastName == null || lastName.isEmpty()) {
 				return toLogin(model, redirectURI, "illegal last name");
 			}
-			if (email == null || email.isEmpty()) {
+			if (email == null || email.isEmpty() || !Email.isValid(email)) {
 				return toLogin(model, redirectURI, "illegal email");
 			}
 			if (cellPhone == null || cellPhone.isEmpty()) {
@@ -279,7 +295,6 @@ public class AzureSSOLoginController {
 			String userticket = UUID.randomUUID().toString();
 			//already found check
 			userTokenXml = tokenServiceClient.getUserToken(credential, userticket);
-
 
 			if (userTokenXml == null) {
 				String personRef = UUID.randomUUID().toString();
@@ -335,13 +350,17 @@ public class AzureSSOLoginController {
 		//info from 3rd party
 		//IAuthenticationResult auth = AzureSessionManagementHelper.getAuthSessionObject(httpRequest);
 		String accessToken = AzureSessionManagementHelper.getAccessToken(httpRequest);
+		String idToken = AzureSessionManagementHelper.getIdToken(httpRequest);
+		String userInfo = aadHelper.getUserInfoFromGraph(accessToken);  //userinfo
 		log.debug("access token returned {}", accessToken);
-		JWTClaimsSet claims = JWTParser.parse(accessToken).getJWTClaimsSet();
+		log.debug("id token returned {}", idToken);
+		
+		JWTClaimsSet claims = JWTParser.parse(idToken).getJWTClaimsSet();
 		String tenantId = claims.getStringClaim("tid"); //tenant id
 		String oid = claims.getStringClaim("oid"); //principal id
 
 		IAccount account = AzureSessionManagementHelper.getAccount(httpRequest);
-		String userInfo = aadHelper.getUserInfoFromGraph(accessToken);  //userinfo
+		//String userInfo = aadHelper.getUserInfoFromGraph(accessToken);  //userinfo
 		String approles = aadHelper.getAppRoleAssignments(accessToken); //app roles of this user
 		log.info("resolve resolving user info tenantId {} - account username {}, home_accountid {}, environemnt {}, userinfo {}, roles {}", tenantId, account.username(), account.homeAccountId(), account.environment(), userInfo, approles);
 
@@ -351,9 +370,9 @@ public class AzureSSOLoginController {
 
 		String firstName = claims.getStringClaim("given_name");
 		String lastName = claims.getStringClaim("family_name");
-		String email = null, cellPhone = null;
+		String email = claims.getStringClaim("email");
+		String cellPhone = null;
 		if (userInfo != null) {
-			email = JsonPath.read(userInfo, "$.mail");
 			cellPhone = JsonPath.read(userInfo, "$.mobilePhone");
 			if (cellPhone != null) {
 				cellPhone = cellPhone.replaceAll(" ", "").trim();
@@ -397,24 +416,19 @@ public class AzureSSOLoginController {
 			if (!SessionDao.instance.checkIfUserExists(account.username())) {
 				log.info("resolve -checkIfUserNameExists-false for:" + account.username());
 				//we should ask user to confirm their info and give their consents as follows
-				return toBasicInfoConfirm(model, redirectURI, account.username(), firstName, lastName, email, cellPhone, false);
+				return toBasicInfoConfirm(model, redirectURI, account.username(), firstName, lastName, email, cellPhone, false, false);
 			} else {
 				log.info("resolve -checkIfUserNameExists-true for:" + account.username());
 				//prompt "username exists. Is it you? Yes/No
 				//if Yes, enter username/password. Otherwise, append the 3rd party marker to the username
 				//                return toBasicInfoConfirm(model, redirectURI, adusername, firstName, lastName, email, cellPhone, false);
-				return toCredentialConfirm(model, redirectURI, account.username());
+				return toCredentialConfirm(model, redirectURI, account.username(), null);
 			}
 
 		} else {
 
-			String personRef = UserTokenXpathHelper.getPersonref(userTokenXml);
-			String username = UserTokenXpathHelper.getUserName(userTokenXml);
-			String current_first_name = UserTokenXpathHelper.getFirstName(userTokenXml);
-			String current_last_name = UserTokenXpathHelper.getLastName(userTokenXml);
-			String current_email = UserTokenXpathHelper.getEmail(userTokenXml);
-			String current_cellphone = UserTokenXpathHelper.getPhoneNumber(userTokenXml);
-
+			log.info("userTokenXml(4):" + userTokenXml);
+			log.info("return confirmUserInfoCheckAndReturn");
 			return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
 		}
 	}
@@ -448,18 +462,21 @@ public class AzureSSOLoginController {
 		return "login";
 	}
 
-	private String toCredentialConfirm(Model model, String redirectURI, String username) {
+	private String toCredentialConfirm(Model model, String redirectURI, String username, String confirmError) {
 		model.addAttribute("redirectURI", redirectURI);
 		model.addAttribute("username", username);
 		model.addAttribute("service", "azuread");
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
-		
+		if(confirmError!=null && !confirmError.isEmpty()) {
+			model.addAttribute("confirmError", confirmError);
+		}
 		return "confirm_credential";
 	}
 
 	private String toBasicInfoConfirm(Model model, String redirectURI, String username, String firstName, String
-			lastName, String email, String cellPhone, boolean userTokenFound) {
+			lastName, String email, String cellPhone, boolean userTokenFound, boolean newRegister) {
+		model.addAttribute("newRegister", String.valueOf(newRegister));
 		model.addAttribute("redirectURI", redirectURI);
 		model.addAttribute("username", username);
 		model.addAttribute("slackuser", "");

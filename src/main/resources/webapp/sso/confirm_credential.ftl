@@ -38,8 +38,8 @@
 	                <input name="redirectURI" type="hidden" value="${redirectURI!}">
 					<input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
 					<input name="newRegister" type="hidden" value="true" />
-					<h4><label for="username">New Username:</label></h4>
-	                <input id="username" name="username" size="30" type="text" placeholder="Username"/s>        
+					
+	                <input id="username" name="username" size="30" type="hidden" value="${username!}">
 	                <input class="button button-login" name="commit" type="submit" value="Register new"/>
 	            </form>
 	        </div>
