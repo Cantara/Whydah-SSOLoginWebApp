@@ -114,7 +114,7 @@ public class LoginController {
 		log.info("userTokenXml(1):" + userTokenXml);
 		if (userTokenXml == null) {
 			//corner case: username is prepended with the 3rd party marker
-			credential = new UserCredential("-" + email, subject);
+			credential = new UserCredential(provider+"-" + email, subject);
 			log.info("UserCredential(2) credential:" + credential);
 			userTokenXml = tokenServiceClient.getUserToken(credential, userticket);
 			log.info("userTokenXml(2):" + userTokenXml);
