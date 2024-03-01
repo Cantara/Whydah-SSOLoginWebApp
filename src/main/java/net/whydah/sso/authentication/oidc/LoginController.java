@@ -380,6 +380,79 @@ public class LoginController {
 		if(newRegister.equalsIgnoreCase("false")) {
 			if(userName!=null && pwd!=null && userName.length()>0 && pwd.length()>0) {
 				userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
+			}
+			if(userTokenXml == null) {
+				return toCredentialConfirm(model, redirectURI, userName, "Login failed. Wrong password!");
+			} else {
+				return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
+			}
+		} else {
+
+			String firstName= sessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
+			String lastName = sessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
+			String email = sessionManagementHelper.getEmail(httpRequest);
+
+			return toBasicInfoConfirm(model, redirectURI, provider+"-" + email, firstName, lastName, email, null, false, true);
+
+		}
+
+		/*
+		if(userName!=null && pwd!=null && userName.length()>0 && pwd.length()>0) {
+			userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
+		}
+
+		if(userTokenXml!=null) {
+			return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
+		} else {
+
+			String firstName= GoogleSessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
+			String lastName = GoogleSessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
+			String email = GoogleSessionManagementHelper.getEmail(httpRequest);
+
+			//for now, just prepend the marker google-misterhuydo@gmail.com for example
+			return toBasicInfoConfirm(model, redirectURI, "google-" +  email, firstName, lastName, email, null, false);
+		}*/
+	}
+}
+	/*
+	public String confirmExist(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable {
+		SessionDao.instance.addModel_CSRFtoken(model);
+		SessionDao.instance.addModel_LOGO_URL(model);
+		SessionDao.instance.addModel_LoginTypes(model);
+		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED)) {
+			return "login";
+		}
+
+		if (!authHelper.isAuthenticated(httpRequest)) {
+			// not authenticated, redirecting to login.microsoft.com so user can authenticate
+
+			String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
+//			model.addAttribute("redirect", aad_auth_url);
+//			log.info("Redirecting to {}", aad_auth_url);
+//			return "action";
+			return toAction(model, aad_auth_url);
+		}
+
+		if (authHelper.isAccessTokenExpired(httpRequest)) {
+			try {
+				log.info("isAccessTokenExpired  {}", httpRequest);
+				//authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+			} catch(Exception ex) {
+				String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
+				return toAction(model, aad_auth_url);
+			}
+		}
+
+		String newRegister = httpRequest.getParameter("newRegister");
+		String userName = httpRequest.getParameter("username");
+		String pwd = httpRequest.getParameter("password");
+		String redirectURI = httpRequest.getParameter("redirectURI");
+		String userTokenXml =null;
+		String userticket = UUID.randomUUID().toString();
+
+		if(newRegister.equalsIgnoreCase("false")) {
+			if(userName!=null && pwd!=null && userName.length()>0 && pwd.length()>0) {
+				userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
 			} 
 			if(userTokenXml == null) {
 				return toCredentialConfirm(model, redirectURI, userName, "Login failed. Wrong password!");	
@@ -390,14 +463,14 @@ public class LoginController {
 			if (SessionDao.instance.checkIfUserExists(userName)) {
 				return toCredentialConfirm(model, redirectURI, userName, "Username already existed!");
 			} else {
-				String firstName= sessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
+				String firstName = sessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
 				String lastName = sessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
 				String email = sessionManagementHelper.getEmail(httpRequest);
-				
-				return toBasicInfoConfirm(model, redirectURI, userName, firstName, lastName, email, null, false, true);
-			}		
+
+				//return toBasicInfoConfirm(model, redirectURI, userName, firstName, lastName, email, null, false, true);
+				return toBasicInfoConfirm(model, redirectURI, "google-" + email, firstName, lastName, email, null, false, true);
+			}
 		}
-		
 		/*
 		if(userName!=null && pwd!=null && userName.length()>0 && pwd.length()>0) {
 			userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
@@ -406,13 +479,14 @@ public class LoginController {
 		if(userTokenXml!=null) {
 			return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
 		} else {
-			
-			String firstName= SessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
-			String lastName = SessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
-			String email = SessionManagementHelper.getEmail(httpRequest);
+
+			String firstName= sessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
+			String lastName = sessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
+			String email = sessionManagementHelper.getEmail(httpRequest);
 
 			//for now, just prepend the marker -misterhuydo@gmail.com for example
-			return toBasicInfoConfirm(model, redirectURI, "-" +  email, firstName, lastName, email, null, false);
-		}*/
+			return toBasicInfoConfirm(model, redirectURI, provider + "-" +  email, firstName, lastName, email, null, false, true);
+		}
 	}
 }
+		 */
