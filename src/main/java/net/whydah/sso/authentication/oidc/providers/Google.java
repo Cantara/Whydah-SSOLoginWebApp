@@ -3,6 +3,8 @@ package net.whydah.sso.authentication.oidc.providers;
 import com.nimbusds.oauth2.sdk.GeneralException;
 import net.whydah.sso.authentication.oidc.LoginController;
 import net.whydah.sso.config.AppConfig;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import java.util.Properties;
 public class Google {
     public static final String provider = "google";
 
+    
     private final LoginController controller;
 
     public Google() throws IOException, GeneralException, URISyntaxException {

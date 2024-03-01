@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.naming.ServiceUnavailableException;
@@ -39,7 +40,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 
-@Component
 public class AuthHelper {
 
 
@@ -54,6 +54,7 @@ public class AuthHelper {
 	private final URI ssoCallBack;
 	//private final String ssoCallBackEscaped;
 	private final String[] scopes;
+	
 	private final SessionManagementHelper sessionManagementHelper;
 	private final ClientAuthentication clientAuth;
 	private final IDTokenValidator validator;
