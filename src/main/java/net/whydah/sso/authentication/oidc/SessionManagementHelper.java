@@ -27,8 +27,8 @@ public class SessionManagementHelper {
 	private static final Integer STATE_TTL = 86400;
 
 	private static boolean byPassRemoval = true;
-	private static IMap<String, SessionData> sessions = HazelcastMapHelper.registerMap("sso_oidc_auth_sessions");
-	private static IMap<String, StateData> states = HazelcastMapHelper.registerMap("sso_oidc_auth_states");
+	private static IMap<String, SessionData> sessions = HazelcastMapHelper.register("sso_oidc_auth_sessions");
+	private static IMap<String, StateData> states = HazelcastMapHelper.register("sso_oidc_auth_states");
 
 	private final String failedToValidateMessage;
 	private final String provider;
