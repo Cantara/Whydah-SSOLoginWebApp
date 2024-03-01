@@ -23,9 +23,15 @@ public class StateData implements Serializable{
         this.expirationDate = expirationDate;
         this.redirectURI = redirectURI;
     }
-    
+	public StateData(String state, String nonce, String redirectURI, Date expirationDate) {
+		this.nonce = nonce;
+		this.expirationDate = expirationDate;
+		this.redirectURI = redirectURI;
+		this.state = state;
+	}
+
     public StateData(String domain, String state, String nonce, String redirectURI, Date expirationDate) {
-    	this.setDomain(domain);
+    	this.domain = domain;
         this.nonce = nonce;
         this.expirationDate = expirationDate;
         this.redirectURI = redirectURI;
