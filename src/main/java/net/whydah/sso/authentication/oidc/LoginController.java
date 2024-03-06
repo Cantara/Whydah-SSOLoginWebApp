@@ -26,29 +26,36 @@ public class LoginController {
 	private final WhydahServiceClient tokenServiceClient;
 	private final String appId;
 	private final String provider;
-	private final String loginEnabled;
-
+	//private final String loginEnabled;
+	private final boolean loginEnabled;
 	private final AuthHelper authHelper;
 	private final SessionManagementHelper sessionManagementHelper;
 
-	public LoginController(String provider, String logoUrl, String issuerUrl, String appId, String appSecret, String appUri) throws GeneralException, IOException, URISyntaxException {
+	public LoginController(String provider, String logoUrl, String issuerUrl, String appId, String appSecret, String appUri, boolean enabled) throws GeneralException, IOException, URISyntaxException {
 		this.provider = provider;
-		this.loginEnabled = provider+".enabled";
+		//this.loginEnabled = provider+".enabled";
+		this.loginEnabled = enabled;
 		this.tokenServiceClient = SessionDao.instance.getServiceClient();
 		this.logoUrl = logoUrl;
 		this.appId = appId;
 		this.sessionManagementHelper = new SessionManagementHelper(provider);
-		this.authHelper = new AuthHelper(appUri, provider, issuerUrl, appId, appSecret, new String[]{"openid"}, this.sessionManagementHelper);
+		if (this.loginEnabled) {
+			this.authHelper = new AuthHelper(appUri, provider, issuerUrl, appId, appSecret, new String[]{"openid"}, this.sessionManagementHelper);
+			SessionDao.instance.addOIDCProvider(provider);
+		} else {
+			this.authHelper = null;
+		}
 	}
 
-	@RequestMapping("/login")
+	//@RequestMapping("/login")
 	public String login(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable {
 		log.trace(provider + "login  start");
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		model.addAttribute(ConstantValue.LOGO_URL, logoUrl);
-		if (!SessionDao.instance.isLoginTypeEnabled(loginEnabled)) {
+		if (!loginEnabled) {
+		//if (!SessionDao.instance.isLoginTypeEnabled(loginEnabled)) {
 			log.trace(provider + "login  return login");
 			return "login";
 		}
@@ -63,7 +70,7 @@ public class LoginController {
 		if (authHelper.isAccessTokenExpired(httpRequest)) {
 			try {
 				log.info("isAccessTokenExpired  {}", httpRequest);
-				//authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+				authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			} catch(Exception ex) {
 				ex.printStackTrace();
 				log.warn("Cannot refresh token from  provider. Return login");
@@ -78,13 +85,14 @@ public class LoginController {
 		return resolve(httpRequest, httpResponse, model, httpRequest.getParameter("redirectURI"));
 	}
 
-	@RequestMapping("/auth")
+	//@RequestMapping("/auth")
 	public String authenticate(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable {
 		log.info("auth  start");
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_LoginTypes(model);
-		if (!SessionDao.instance.isLoginTypeEnabled(loginEnabled)) {
+		if (!loginEnabled) {
+		//if (!SessionDao.instance.isLoginTypeEnabled(loginEnabled)) {
 			return "login";
 		}
 		//get the original redirectURI
@@ -219,12 +227,12 @@ public class LoginController {
 		return "action";
 	}
 
-	@RequestMapping("/basicinfo_confirm")
+	//@RequestMapping("/basicinfo_confirm")
 	public String confirmBasicInfo(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable {
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_LoginTypes(model);
-		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED)) {
+		if (!loginEnabled) {
 			return "login";
 		}
 		if (!authHelper.isAuthenticated(httpRequest)) {
@@ -239,7 +247,7 @@ public class LoginController {
 		if (authHelper.isAccessTokenExpired(httpRequest)) {
 			try {
 				log.info("isAccessTokenExpired  {}", httpRequest);
-				//authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+				authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			} catch(Exception ex) {
 				String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
 				return toAction(model, aad_auth_url);
@@ -341,7 +349,7 @@ public class LoginController {
 		return approles;
 	}
 
-	@RequestMapping("/credential_confirm")
+	//@RequestMapping("/credential_confirm")
 	public String confirmExist(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable {
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
@@ -363,7 +371,7 @@ public class LoginController {
 		if (authHelper.isAccessTokenExpired(httpRequest)) {
 			try {
 				log.info("isAccessTokenExpired  {}", httpRequest);
-				//authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+				authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			} catch(Exception ex) {
 				String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
 				return toAction(model, aad_auth_url);

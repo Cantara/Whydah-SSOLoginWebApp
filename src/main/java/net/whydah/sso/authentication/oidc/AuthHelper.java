@@ -32,10 +32,7 @@ import javax.naming.ServiceUnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
@@ -44,7 +41,7 @@ public class AuthHelper {
 
 
 	final static Logger log = LoggerFactory.getLogger(AuthHelper.class);
-	
+
 	private final String appUri;
 	private final String provider;
 	private final ClientID providerAppId;
@@ -54,7 +51,7 @@ public class AuthHelper {
 	private final URI ssoCallBack;
 	//private final String ssoCallBackEscaped;
 	private final String[] scopes;
-	
+
 	private final SessionManagementHelper sessionManagementHelper;
 	private final ClientAuthentication clientAuth;
 	private final IDTokenValidator validator;
@@ -64,7 +61,7 @@ public class AuthHelper {
 		this.appUri = appUri;
 		this.provider = provider;
 		this.providerMetadata = OIDCProviderMetadata.resolve(new Issuer(issuerURL));
-		this.providerAppId = new ClientID( providerAppId);
+		this.providerAppId = new ClientID(providerAppId);
 		//this.providerAppIdEscaped = URLEncoder.encode(providerAppId, StandardCharsets.UTF_8);
 		this.providerAppSecret = new Secret(providerAppSecret);
 		this.scopes = scopes;
@@ -178,10 +175,22 @@ public class AuthHelper {
 
 		return stateData.getRedirectURI();
 	}
+
+	private static URI getFullURL(HttpServletRequest request) throws URISyntaxException {
+		StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
+		String queryString = request.getQueryString();
+
+		if (queryString == null) {
+			return new URI(requestURL.toString());
+		} else {
+			return new URI (requestURL.append('?').append(queryString).toString());
+		}
+	}
+
 	public String processAuthenticationCodeRedirectAndReturnTheClientRedirectUrl(HttpServletRequest httpRequest) throws Throwable {
 		AuthenticationResponse ar;
 		try {
-			ar = AuthenticationResponseParser.parse(new URI(httpRequest.getRequestURI()));
+			ar = AuthenticationResponseParser.parse(getFullURL(httpRequest));
 		} catch (com.nimbusds.oauth2.sdk.ParseException | URISyntaxException e) {
 			throw new Exception(e);
 		}
@@ -233,7 +242,9 @@ public class AuthHelper {
 	private void commitDataState(HttpServletRequest httpRequest, JWT idToken, AccessToken accessToken, RefreshToken refreshToken) throws ParseException {
 		JWTClaimsSet claims = idToken.getJWTClaimsSet();
 		sessionManagementHelper.setAccessToken(httpRequest, accessToken.getValue());
-		sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
+		if (refreshToken != null) {
+			sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
+		}
 		sessionManagementHelper.setExpiryTimeSeconds(httpRequest, claims.getExpirationTime().toInstant().getEpochSecond());
 		sessionManagementHelper.setSubject(httpRequest, claims.getSubject());
 
@@ -253,21 +264,51 @@ public class AuthHelper {
 		return !isValid;
 	}
 
-	/*
 	public void updateAuthDataUsingSilentFlow(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Throwable {
-		GoogleAuthResult result = getAuthResultBySilentFlow(httpRequest, httpResponse);
-		commitDataState(httpRequest, result);
+		String rt = sessionManagementHelper.getRefreshToken(httpRequest);
+		if (rt == null || rt.isEmpty() || rt.isBlank()) {
+			//Throw error?
+			//Log error?
+			return;
+		}
+		RefreshToken refreshToken = new RefreshToken(rt);
+		AuthorizationGrant refreshTokenGrant = new RefreshTokenGrant(refreshToken);
+		// Retrieve token
+		TokenRequest request = new TokenRequest(providerMetadata.getTokenEndpointURI(), clientAuth, refreshTokenGrant);
+
+		TokenResponse tr = OIDCTokenResponseParser.parse(request.toHTTPRequest().send());
+
+		if (!tr.indicatesSuccess()) {
+			throw new Exception(tr.toErrorResponse().toString());
+		}
+
+		OIDCTokenResponse successResponse = (OIDCTokenResponse)tr.toSuccessResponse();
+
+		// Get the ID and access token, the server may also return a refresh token
+		//JWT idToken = successResponse.getOIDCTokens().getIDToken();
+		AccessToken accessToken = successResponse.getOIDCTokens().getAccessToken();
+		refreshToken = successResponse.getOIDCTokens().getRefreshToken();
+
+		// Don't think we want to use these claims, seems to be more of a hassle than using the id token directly
+		//ClaimsSet claims = validator.validate(idToken, new Nonce(stateData.getNonce()));
+
+		//commitDataState(httpRequest, idToken, accessToken, refreshToken);
+		sessionManagementHelper.setAccessToken(httpRequest, accessToken.getValue());
+		if (refreshToken != null) {
+			sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
+		}
 	}
 
+	/*
 	private AuthResult getAuthResultBySilentFlow(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
 			throws Throwable {
 
-		
+
 		try {
 			String refreshToken =  sessionManagementHelper.getRefreshToken(httpRequest);
 
 			return new AuthResult(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), tokenResponse.parseIdToken());
-			
+
 		} catch (Exception e) {
 			throw new ServiceUnavailableException("authentication result was null");
 		}
@@ -310,7 +351,7 @@ public class AuthHelper {
 			String refreshToken = tokenResponse.getRefreshToken();
 			GoogleIdToken idToken = tokenResponse.parseIdToken();
 			result = new GoogleAuthResult(accessToken, refreshToken, idToken);
-			
+
 		} catch (Exception e) {
 			StringWriter strWriter = new StringWriter();
 			e.printStackTrace(new PrintWriter(strWriter));

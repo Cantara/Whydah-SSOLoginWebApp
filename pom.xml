@@ -16,7 +16,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.release>11</maven.compiler.release>
         <java.version>11</java.version>
-        <whydah.admin.sdk.version>2.22.0</whydah.admin.sdk.version>
+        <whydah.admin.sdk.version>2.23.7</whydah.admin.sdk.version>
         <jersey.version>1.19.4</jersey.version>
         <spring.version>5.3.32</spring.version>
         <spring.security-version>5.8.9</spring.security-version>
@@ -152,15 +152,15 @@
             <artifactId>oauth2-oidc-sdk</artifactId>
             <version>11.10.1</version>
             <exclusions>
-        <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </exclusion>
-    </exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -193,18 +193,22 @@
         </dependency>
 
         <!-- SLF4J API -->
+        <!--
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+        -->
 
         <!-- SLF4J Log4j Implementation -->
+        <!--
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>2.0.12</version>
         </dependency>
+        -->
 
 
         <dependency>

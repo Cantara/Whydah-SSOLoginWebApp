@@ -165,6 +165,10 @@ public enum SessionDao {
         if(enabledLoginTypes.isPersonasShortcutEnabled()) {
         	model.addAttribute("personas", personaService.getPersonasCredentials());
         }
+
+		for (String provider : enabledLoginTypes.getOIDCProvidersEnabled()) {
+			model.addAttribute("oidcProvider"+provider.substring(0, 1).toUpperCase() + provider.substring(1)+"Enabled", true);
+		}
         
         
 		return model;
@@ -825,5 +829,9 @@ public enum SessionDao {
 			}
 		}
 		return objectMapper.writeValueAsString(foundList);
+	}
+
+	public void addOIDCProvider(String provider) {
+		enabledLoginTypes.addOIDCProvider(provider);
 	}
 }
