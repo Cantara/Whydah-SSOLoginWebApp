@@ -11,7 +11,6 @@ import net.whydah.sso.user.types.UserCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -112,6 +111,7 @@ public class LoginController {
 		String firstName = sessionManagementHelper.getFirstName(httpRequest); //(String) payload.get("given_name");
 		String lastName = sessionManagementHelper.getLastName(httpRequest); //(String) payload.get("family_name");
 		String email = sessionManagementHelper.getEmail(httpRequest);
+		String phoneNumber = sessionManagementHelper.getPhoneNumber(httpRequest);
 		String subject = sessionManagementHelper.getSubject(httpRequest);
 
 		String userticket = UUID.randomUUID().toString();
@@ -139,7 +139,7 @@ public class LoginController {
 			if (!SessionDao.instance.checkIfUserExists(email)) {
 				//we should ask user to confirm their info and give their consents as follows
 				log.info("return toBasicInfoConfirm");
-				return toBasicInfoConfirm(model, redirectURI, email, firstName, lastName, email, null, false, false);
+				return toBasicInfoConfirm(model, redirectURI, email, firstName, lastName, email, phoneNumber, false, false);
 			} else {
 				//prompt "username exists. Is it you? Yes/No
 				//if Yes, enter username/password. Otherwise, append the 3rd party marker to the username
@@ -400,9 +400,10 @@ public class LoginController {
 
 			String firstName= sessionManagementHelper.getFirstName(httpRequest);//(String) payload.get("given_name");
 			String lastName = sessionManagementHelper.getLastName(httpRequest);//(String) payload.get("family_name");
+			String phoneNumber = sessionManagementHelper.getPhoneNumber(httpRequest);
 			String email = sessionManagementHelper.getEmail(httpRequest);
 
-			return toBasicInfoConfirm(model, redirectURI, provider+"-" + email, firstName, lastName, email, null, false, true);
+			return toBasicInfoConfirm(model, redirectURI, provider+"-" + email, firstName, lastName, email, phoneNumber, false, true);
 
 		}
 

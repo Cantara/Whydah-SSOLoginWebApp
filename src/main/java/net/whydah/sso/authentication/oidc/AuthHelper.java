@@ -250,6 +250,7 @@ public class AuthHelper {
 
 		// Not sure if this is the best way to do it, could be better to get the user info and use that object. However, that seems like a extra neetwork call
 		sessionManagementHelper.setEmail(httpRequest, claims.getStringClaim("email"));
+		sessionManagementHelper.setPhoneNumber(httpRequest, claims.getStringClaim("phone_number"));
 		sessionManagementHelper.setFirstName(httpRequest, claims.getStringClaim("given_name"));
 		sessionManagementHelper.setLastName(httpRequest, claims.getStringClaim("family_name"));
 	}

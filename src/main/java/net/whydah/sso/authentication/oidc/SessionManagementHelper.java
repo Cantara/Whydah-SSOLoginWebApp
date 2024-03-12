@@ -10,7 +10,6 @@ import net.whydah.sso.utils.HazelcastMapHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -154,6 +153,12 @@ public class SessionManagementHelper {
 		sessions.put(httpRequest.getSession().getId(), sessiondata);
 	}
 
+	void setPhoneNumber(HttpServletRequest httpRequest, String data) {
+		SessionData sessiondata = getSessionData(httpRequest);
+		sessiondata.setPhoneNumber(data);
+		sessions.put(httpRequest.getSession().getId(), sessiondata);
+	}
+
 	void setFirstName(HttpServletRequest httpRequest, String data) {
 		SessionData sessiondata = getSessionData(httpRequest);
 		sessiondata.setFirstName(data);
@@ -190,6 +195,10 @@ public class SessionManagementHelper {
 
 	String getEmail(HttpServletRequest httpRequest) {
 		return getSessionData(httpRequest).getEmail();
+	}
+
+	String getPhoneNumber(HttpServletRequest httpRequest) {
+		return getSessionData(httpRequest).getPhoneNumber();
 	}
 
 	String getFirstName(HttpServletRequest httpRequest) {

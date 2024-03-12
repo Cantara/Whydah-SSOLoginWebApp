@@ -15,6 +15,7 @@ public class SessionData extends BaseSessionData implements Serializable {
 	private String subject;
 	private String firstName;
 	private String lastName;
+	private String phoneNumber;
 
 	//OIDC "extra"
 	private String email;
