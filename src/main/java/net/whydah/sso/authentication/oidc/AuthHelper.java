@@ -9,6 +9,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.auth.*;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.State;
@@ -241,20 +242,20 @@ public class AuthHelper {
 	}
 
 	private void commitDataState(HttpServletRequest httpRequest, JWT idToken, AccessToken accessToken, RefreshToken refreshToken) throws Exception {
-		UserInfoRequest userInfoReq = new UserInfoRequest(providerMetadata.getUserInfoEndpointURI(), accessToken);
-		UserInfoResponse userInfoResponse = UserInfoResponse.parse(userInfoReq.toHTTPRequest().send());
+		HTTPResponse httpResponse = new UserInfoRequest(providerMetadata.getUserInfoEndpointURI(), accessToken).toHTTPRequest().send();
+		UserInfoResponse userInfoResponse = UserInfoResponse.parse(httpResponse);
 
-		if (userInfoResponse instanceof UserInfoErrorResponse) {
-			ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
+		if (!userInfoResponse.indicatesSuccess()) {
+			ErrorObject error = userInfoResponse.toErrorResponse().getErrorObject();
 			throw new Exception(String.format("Request for userinfo failed: %s - %s",
 					error.getCode(),
 					error.getDescription()));
 		}
 
-		UserInfoSuccessResponse successResponse = (UserInfoSuccessResponse) userInfoResponse;
+		UserInfoSuccessResponse successResponse = userInfoResponse.toSuccessResponse();
 		UserInfo ui = successResponse.getUserInfo();
 		JWTClaimsSet claimsJWT = idToken.getJWTClaimsSet();
-		log.debug("Claims \n{}, {}, {}, {}", ui.getEmailAddress(), ui.getPhoneNumber(), ui.getGivenName(), ui.getFamilyName());
+		log.debug("Claims - {}: {}, {}, {}, {}", provider, ui.getEmailAddress(), ui.getPhoneNumber(), ui.getGivenName(), ui.getFamilyName());
 		sessionManagementHelper.setAccessToken(httpRequest, accessToken.getValue());
 		if (refreshToken != null) {
 			sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
