@@ -17,6 +17,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.openid.connect.sdk.*;
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSet;
+import com.nimbusds.openid.connect.sdk.claims.ClaimsSetRequest;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
@@ -52,7 +53,8 @@ public class AuthHelper {
 	private final OIDCProviderMetadata providerMetadata;
 	private final URI ssoCallBack;
 	//private final String ssoCallBackEscaped;
-	private final String[] scopes;
+	private final Scope scopes;
+	private final OIDCClaimsRequest claims;
 
 	private final SessionManagementHelper sessionManagementHelper;
 	private final ClientAuthentication clientAuth;
@@ -66,7 +68,23 @@ public class AuthHelper {
 		this.providerAppId = new ClientID(providerAppId);
 		//this.providerAppIdEscaped = URLEncoder.encode(providerAppId, StandardCharsets.UTF_8);
 		this.providerAppSecret = new Secret(providerAppSecret);
-		this.scopes = this.providerMetadata.getScopes().toStringList().stream().filter(s1 -> Arrays.stream(scopes).anyMatch(s2 -> s2.equalsIgnoreCase(s1))).toArray(String[]::new);
+		this.scopes = new Scope(this.providerMetadata.getScopes().toStringList().stream().filter(s1 -> Arrays.stream(scopes).anyMatch(s2 -> s2.equalsIgnoreCase(s1))).toArray(String[]::new));
+		if (this.providerMetadata.getClaims().isEmpty()) {
+			claims = null;
+		} else {
+			ClaimsSetRequest claimsSetRequest = new ClaimsSetRequest();
+			List<String> wantedClaims = List.of("name", "email", "name", "phoneNumber", "openid");
+			for (String claim: this.providerMetadata.getClaims()) {
+				for (String wantedClaim: wantedClaims) {
+					if (!wantedClaim.equalsIgnoreCase(claim)) {
+						continue;
+					}
+					claimsSetRequest.add(wantedClaim);
+				}
+			}
+			//Might want to move this to IdToken to potentially reduce a request
+			claims = new OIDCClaimsRequest().withUserInfoClaimsRequest(claimsSetRequest);
+		}
 		//this.scopes = scopes;
 		this.sessionManagementHelper = sessionManagementHelper;
 		//this.ssoCallBack = ssoCallBack;
@@ -106,9 +124,10 @@ public class AuthHelper {
 	public String getAuthorizationCodeUrl(String state, String nonce) {
 		AuthenticationRequest ar = new AuthenticationRequest.Builder(
 				new ResponseType("code"),
-				new Scope(scopes),
+				scopes,
 				providerAppId,
 				ssoCallBack)
+				.claims(claims)
 				.endpointURI(providerMetadata.getAuthorizationEndpointURI())
 				.state(new State(state))
 				.nonce(new Nonce(nonce))
