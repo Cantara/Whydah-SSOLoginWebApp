@@ -171,7 +171,7 @@ public class AuthHelper {
 		// Don't think we want to use these claims, seems to be more of a hassle than using the id token directly
 		ClaimsSet claims = validator.validate(idToken, new Nonce(stateData.getNonce()));
 
-		commitDataState(null, idToken, accessToken, refreshToken);
+		commitDataState(null, idToken, accessToken, refreshToken, claims);
 
 		return stateData.getRedirectURI();
 	}
@@ -223,7 +223,7 @@ public class AuthHelper {
 		// Don't think we want to use these claims, seems to be more of a hassle than using the id token directly
 		ClaimsSet claims = validator.validate(idToken, new Nonce(stateData.getNonce()));
 
-		commitDataState(httpRequest, idToken, accessToken, refreshToken);
+		commitDataState(httpRequest, idToken, accessToken, refreshToken, claims);
 
 		return stateData.getRedirectURI();
 	}
@@ -239,14 +239,17 @@ public class AuthHelper {
 		//return isPostRequest && containsErrorData || containsCode || containIdToken;
 	}
 
-	private void commitDataState(HttpServletRequest httpRequest, JWT idToken, AccessToken accessToken, RefreshToken refreshToken) throws ParseException {
-		JWTClaimsSet claims = idToken.getJWTClaimsSet();
+	private void commitDataState(HttpServletRequest httpRequest, JWT idToken, AccessToken accessToken, RefreshToken refreshToken, ClaimsSet claims) throws ParseException {
+		JWTClaimsSet claimsJWT = idToken.getJWTClaimsSet();
+		log.debug("Claims \n{}\n{}, {}, {}, {}\n{}, {}, {}, {}", claimsJWT.getClaims().keySet().toArray().toString(),
+				claims.getStringClaim("email"), claims.getStringClaim("phone_number"), claims.getStringClaim("given_name"), claims.getStringClaim("family_name"),
+				claimsJWT.getStringClaim("email"), claimsJWT.getStringClaim("phone_number"), claimsJWT.getStringClaim("given_name"), claimsJWT.getStringClaim("family_name"));
 		sessionManagementHelper.setAccessToken(httpRequest, accessToken.getValue());
 		if (refreshToken != null) {
 			sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
 		}
-		sessionManagementHelper.setExpiryTimeSeconds(httpRequest, claims.getExpirationTime().toInstant().getEpochSecond());
-		sessionManagementHelper.setSubject(httpRequest, claims.getSubject());
+		sessionManagementHelper.setExpiryTimeSeconds(httpRequest, claimsJWT.getExpirationTime().toInstant().getEpochSecond());
+		sessionManagementHelper.setSubject(httpRequest, claimsJWT.getSubject());
 
 		// Not sure if this is the best way to do it, could be better to get the user info and use that object. However, that seems like a extra neetwork call
 		sessionManagementHelper.setEmail(httpRequest, claims.getStringClaim("email"));
