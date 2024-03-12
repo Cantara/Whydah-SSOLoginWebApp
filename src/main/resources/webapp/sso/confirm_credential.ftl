@@ -23,7 +23,7 @@
                 <input type="radio" name="accepted" value="yes" checked="checked" onclick="radioCheck(this)">Yes, it is me<br>
                 <input type="radio" name="accepted" value="no" onclick="radioCheck(this)"> No, register new<br>
 
-	            <form name="existinguser_form" method="POST" class="new_user_session" accept-charset="utf-8" action="${service?switch('azuread', '/sso/aad_credential_confirm', 'google', '/sso/google_credential_confirm', 'whydah', '/sso/whydah_credential_confirm' )}">
+	            <form name="existinguser_form" method="POST" class="new_user_session" accept-charset="utf-8" action="${service?switch('azuread', '/sso/aad_credential_confirm', 'google', '/sso/google_credential_confirm', 'whydah', '/sso/whydah_credential_confirm', 'oidcProviderVipps', '/sso/vipps/credential_confirm', 'oidcProviderGoogle', '/sso/google/credential_confirm', 'oidcProviderMicrosoft', '/sso/microsoft/credential_confirm'  )}">
 	                <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
 	                <input name="redirectURI" type="hidden" value="${redirectURI!}">
 					<input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">

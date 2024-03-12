@@ -28,7 +28,7 @@
               <p class="error">${signupError!}</p>
             </#if>
 			
-            <form method="POST" class="new_user_session" action="${service?switch('azuread', '/sso/aad_basicinfo_confirm', 'google', '/sso/google_basicinfo_confirm', 'whydah', '/sso/whydah_basicinfo_confirm' )}" accept-charset="utf-8">
+            <form method="POST" class="new_user_session" action="${service?switch('azuread', '/sso/aad_basicinfo_confirm', 'google', '/sso/google_basicinfo_confirm', 'whydah', '/sso/whydah_basicinfo_confirm', 'oidcProviderVipps', '/sso/vipps/basicinfo_confirm', 'oidcProviderGoogle', '/sso/google/basicinfo_confirm', 'oidcProviderMicrosoft', '/sso/microsoft/basicinfo_confirm' )}" accept-charset="utf-8">
                 <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                 <input name="redirectURI" type="hidden" value="${redirectURI!}">
                 <input type="hidden" name="username" value="${username}"/>

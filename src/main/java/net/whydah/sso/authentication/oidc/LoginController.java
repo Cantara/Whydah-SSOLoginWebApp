@@ -26,6 +26,7 @@ public class LoginController {
 	private final WhydahServiceClient tokenServiceClient;
 	private final String appId;
 	private final String provider;
+	private final String service;
 	//private final String loginEnabled;
 	private final boolean loginEnabled;
 	private final AuthHelper authHelper;
@@ -33,6 +34,7 @@ public class LoginController {
 
 	public LoginController(String provider, String logoUrl, String issuerUrl, String appId, String appSecret, String appUri, boolean enabled) throws GeneralException, IOException, URISyntaxException {
 		this.provider = provider;
+		this.service = "oidcProvider"+provider.substring(0, 1).toUpperCase() + provider.substring(1);
 		//this.loginEnabled = provider+".enabled";
 		this.loginEnabled = enabled;
 		this.tokenServiceClient = SessionDao.instance.getServiceClient();
@@ -174,7 +176,7 @@ public class LoginController {
 		model.addAttribute("cellPhone", cellPhone!=null?cellPhone:"");
 		model.addAttribute("firstName", firstName!=null?firstName:"");
 		model.addAttribute("lastName", lastName!=null?lastName:"");
-		model.addAttribute("service", "");
+		model.addAttribute("service", this.service);
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
 
@@ -188,7 +190,7 @@ public class LoginController {
 	private String toCredentialConfirm(Model model, String redirectURI, String username, String confirmError) {
 		model.addAttribute("redirectURI", redirectURI);
 		model.addAttribute("username", username);
-		model.addAttribute("service", "");
+		model.addAttribute("service", this.service);
 		if(confirmError!=null && !confirmError.isEmpty()) {
 			model.addAttribute("confirmError", confirmError);
 		}
