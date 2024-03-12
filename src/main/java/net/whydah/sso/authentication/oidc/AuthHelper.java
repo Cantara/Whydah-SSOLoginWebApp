@@ -66,7 +66,8 @@ public class AuthHelper {
 		this.providerAppId = new ClientID(providerAppId);
 		//this.providerAppIdEscaped = URLEncoder.encode(providerAppId, StandardCharsets.UTF_8);
 		this.providerAppSecret = new Secret(providerAppSecret);
-		this.scopes = scopes;
+		this.scopes = this.providerMetadata.getScopes().toStringList().stream().filter(s1 -> Arrays.stream(scopes).anyMatch(s2 -> s2.equalsIgnoreCase(s1))).toArray(String[]::new);
+		//this.scopes = scopes;
 		this.sessionManagementHelper = sessionManagementHelper;
 		//this.ssoCallBack = ssoCallBack;
 		this.ssoCallBack = new URI(appUri.replaceFirst("/$", "") + "/" + this.provider + "/auth");
@@ -255,7 +256,7 @@ public class AuthHelper {
 		UserInfoSuccessResponse successResponse = userInfoResponse.toSuccessResponse();
 		UserInfo ui = successResponse.getUserInfo();
 		JWTClaimsSet claimsJWT = idToken.getJWTClaimsSet();
-		log.debug("Claims - {}: {}, {}, {}, {}", provider, ui.getEmailAddress(), ui.getPhoneNumber(), ui.getGivenName(), ui.getFamilyName());
+		log.debug("Claims - {}: {}, {}, {}, {}, {}", provider, claimsJWT.getSubject(), ui.getEmailAddress(), ui.getPhoneNumber(), ui.getGivenName(), ui.getFamilyName());
 		sessionManagementHelper.setAccessToken(httpRequest, accessToken.getValue());
 		if (refreshToken != null) {
 			sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
