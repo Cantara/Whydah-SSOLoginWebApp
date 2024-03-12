@@ -16,6 +16,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.openid.connect.sdk.*;
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSet;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
 import net.whydah.sso.authentication.iamproviders.StateData;
@@ -171,7 +172,7 @@ public class AuthHelper {
 		// Don't think we want to use these claims, seems to be more of a hassle than using the id token directly
 		ClaimsSet claims = validator.validate(idToken, new Nonce(stateData.getNonce()));
 
-		commitDataState(null, idToken, accessToken, refreshToken, claims);
+		commitDataState(null, idToken, accessToken, refreshToken);
 
 		return stateData.getRedirectURI();
 	}
@@ -223,7 +224,7 @@ public class AuthHelper {
 		// Don't think we want to use these claims, seems to be more of a hassle than using the id token directly
 		ClaimsSet claims = validator.validate(idToken, new Nonce(stateData.getNonce()));
 
-		commitDataState(httpRequest, idToken, accessToken, refreshToken, claims);
+		commitDataState(httpRequest, idToken, accessToken, refreshToken);
 
 		return stateData.getRedirectURI();
 	}
@@ -239,11 +240,21 @@ public class AuthHelper {
 		//return isPostRequest && containsErrorData || containsCode || containIdToken;
 	}
 
-	private void commitDataState(HttpServletRequest httpRequest, JWT idToken, AccessToken accessToken, RefreshToken refreshToken, ClaimsSet claims) throws ParseException {
+	private void commitDataState(HttpServletRequest httpRequest, JWT idToken, AccessToken accessToken, RefreshToken refreshToken) throws Exception {
+		UserInfoRequest userInfoReq = new UserInfoRequest(providerMetadata.getUserInfoEndpointURI(), accessToken);
+		UserInfoResponse userInfoResponse = UserInfoResponse.parse(userInfoReq.toHTTPRequest().send());
+
+		if (userInfoResponse instanceof UserInfoErrorResponse) {
+			ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
+			throw new Exception(String.format("Request for userinfo failed: %s - %s",
+					error.getCode(),
+					error.getDescription()));
+		}
+
+		UserInfoSuccessResponse successResponse = (UserInfoSuccessResponse) userInfoResponse;
+		UserInfo ui = successResponse.getUserInfo();
 		JWTClaimsSet claimsJWT = idToken.getJWTClaimsSet();
-		log.debug("Claims \n{}\n{}, {}, {}, {}\n{}, {}, {}, {}", claimsJWT.getClaims().keySet().toArray().toString(),
-				claims.getStringClaim("email"), claims.getStringClaim("phone_number"), claims.getStringClaim("given_name"), claims.getStringClaim("family_name"),
-				claimsJWT.getStringClaim("email"), claimsJWT.getStringClaim("phone_number"), claimsJWT.getStringClaim("given_name"), claimsJWT.getStringClaim("family_name"));
+		log.debug("Claims \n{}, {}, {}, {}", ui.getEmailAddress(), ui.getPhoneNumber(), ui.getGivenName(), ui.getFamilyName());
 		sessionManagementHelper.setAccessToken(httpRequest, accessToken.getValue());
 		if (refreshToken != null) {
 			sessionManagementHelper.setRefreshToken(httpRequest, refreshToken.getValue());
@@ -252,10 +263,10 @@ public class AuthHelper {
 		sessionManagementHelper.setSubject(httpRequest, claimsJWT.getSubject());
 
 		// Not sure if this is the best way to do it, could be better to get the user info and use that object. However, that seems like a extra neetwork call
-		sessionManagementHelper.setEmail(httpRequest, claims.getStringClaim("email"));
-		sessionManagementHelper.setPhoneNumber(httpRequest, claims.getStringClaim("phone_number"));
-		sessionManagementHelper.setFirstName(httpRequest, claims.getStringClaim("given_name"));
-		sessionManagementHelper.setLastName(httpRequest, claims.getStringClaim("family_name"));
+		sessionManagementHelper.setEmail(httpRequest, ui.getEmailAddress());//claims.getStringClaim("email"));
+		sessionManagementHelper.setPhoneNumber(httpRequest, ui.getPhoneNumber());//claims.getStringClaim("phone_number"));
+		sessionManagementHelper.setFirstName(httpRequest, ui.getGivenName());//claims.getStringClaim("given_name"));
+		sessionManagementHelper.setLastName(httpRequest, ui.getFamilyName());//claims.getStringClaim("family_name"));
 	}
 
 	public boolean isAuthenticated(HttpServletRequest request) {
