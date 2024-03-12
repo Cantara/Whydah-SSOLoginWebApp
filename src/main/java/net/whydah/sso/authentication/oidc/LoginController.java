@@ -30,6 +30,7 @@ public class LoginController {
 	private final boolean loginEnabled;
 	private final AuthHelper authHelper;
 	private final SessionManagementHelper sessionManagementHelper;
+	private final String welcomeURL;
 
 	public LoginController(String provider, String logoUrl, String issuerUrl, String appId, String appSecret, String appUri, boolean enabled) throws GeneralException, IOException, URISyntaxException {
 		this.provider = provider;
@@ -45,6 +46,11 @@ public class LoginController {
 			SessionDao.instance.addOIDCProvider(provider);
 		} else {
 			this.authHelper = null;
+		}
+		if (appUri.charAt(appUri.length()-1) == '/') {
+			welcomeURL = appUri + "welcome";
+		} else {
+			welcomeURL = appUri + "/welcome";
 		}
 	}
 
@@ -105,7 +111,7 @@ public class LoginController {
 	private String resolve(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model, String redirectURI) throws Exception {
 		log.info("auth resolve");
 		if (redirectURI == null || redirectURI.contentEquals("")) {
-			redirectURI = "welcome";
+			redirectURI = welcomeURL;
 		}
 
 		String firstName = sessionManagementHelper.getFirstName(httpRequest); //(String) payload.get("given_name");
@@ -274,7 +280,7 @@ public class LoginController {
 			slackuser = "unknown";
 		}
 		if (redirectURI == null || redirectURI.isEmpty()) {
-			redirectURI = "welcome";
+			redirectURI = welcomeURL;
 		}
 
 		//AuthResult auth = SessionManagementHelper.getAuthSessionObject(httpRequest);
