@@ -4,6 +4,7 @@ import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.azuread.AzureADAuthHelper;
 import net.whydah.sso.authentication.iamproviders.google.GoogleAuthHelper;
 import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthHelper;
+import net.whydah.sso.authentication.oidc.Provider;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
@@ -91,6 +92,15 @@ public class SSOLogoutController {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				}
+			}
+			for (Provider oidcProvider : SessionDao.instance.getOIDCProvidersEnabled()) {
+				try {
+					oidcProvider.logout(request, response);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					//throw new RuntimeException(e);
 				}
 			}
 

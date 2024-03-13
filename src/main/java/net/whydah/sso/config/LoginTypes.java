@@ -1,5 +1,6 @@
 package net.whydah.sso.config;
 
+import net.whydah.sso.authentication.oidc.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class LoginTypes {
     private boolean signuppageWhydahIntegrationproviderOn = false;
     private boolean signuppageNetIQOn = false;
     private boolean signuppageMicrosoftOn = false;
-	private final Set<String> oidcProvidersEnabled = new HashSet<>();
+	private final Set<Provider> oidcProvidersEnabled = new HashSet<>();
 
     public LoginTypes(Properties properties) {
 		enablePersonasShortcut = TRUE.equalsIgnoreCase(properties.getProperty("logintype.personasshortcut"));
@@ -139,15 +140,11 @@ public class LoginTypes {
 		return signuppageMicrosoftOn;
 	}
 
-	public void addOIDCProvider(String provider) {
+	public void addOIDCProvider(Provider provider) {
 		oidcProvidersEnabled.add(provider);
 	}
 
-	public boolean isOIDCProviderEnabled(String provider) {
-		return oidcProvidersEnabled.contains(provider);
-	}
-
-	public Set<String> getOIDCProvidersEnabled() {
+	public Set<Provider> getOIDCProvidersEnabled() {
 		return oidcProvidersEnabled;//not sure i like this, would like a copy.
 	}
 }

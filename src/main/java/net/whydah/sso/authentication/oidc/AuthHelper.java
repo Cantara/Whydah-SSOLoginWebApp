@@ -24,6 +24,7 @@ import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
 import net.whydah.sso.authentication.iamproviders.StateData;
 import net.whydah.sso.authentication.iamproviders.google.GoogleAuthResult;
 import net.whydah.sso.ddd.model.application.RedirectURI;
+import net.whydah.sso.utils.HttpConnectionHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.session.Session;
 import org.slf4j.Logger;
@@ -40,9 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 
-public class AuthHelper {
-
-
+public class AuthHelper implements Provider {
 	final static Logger log = LoggerFactory.getLogger(AuthHelper.class);
 
 	private final String appUri;
@@ -437,5 +436,25 @@ public class AuthHelper {
 
 	public static String newState() {
 		return new State().getValue();
+	}
+
+	public void logout(HttpServletRequest httpRequest, HttpServletResponse response) throws IOException {
+		if (!isAuthenticated(httpRequest)) {
+			return;
+		}
+		String token = sessionManagementHelper.getAccessToken(httpRequest);
+		httpRequest.getSession().invalidate();
+		sessionManagementHelper.removeSession(httpRequest, response);
+		URI revoke = providerMetadata.getRevocationEndpointURI();
+		if (revoke != null) {
+			//Would like to replace this with nimbusds specific impl, however can't find it.
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("Content-type", "application/x-www-form-urlencoded");
+			HttpConnectionHelper.get(revoke.toString() + "?token=" + token, null, params, null);
+		}
+	}
+
+	public String provider() {
+		return this.provider;
 	}
 }

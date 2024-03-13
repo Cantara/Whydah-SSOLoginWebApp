@@ -6,6 +6,7 @@ import net.whydah.sso.application.types.Application;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthHelper;
 import net.whydah.sso.authentication.iamproviders.whydah.WhydahOauthIntegrationConfig;
+import net.whydah.sso.authentication.oidc.Provider;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.basehelpers.JsonPathHelper;
 import net.whydah.sso.commands.adminapi.user.CommandGetUserAggregate;
@@ -166,8 +167,8 @@ public enum SessionDao {
         	model.addAttribute("personas", personaService.getPersonasCredentials());
         }
 
-		for (String provider : enabledLoginTypes.getOIDCProvidersEnabled()) {
-			model.addAttribute("oidcProvider"+provider.substring(0, 1).toUpperCase() + provider.substring(1)+"Enabled", true);
+		for (Provider oidcProvider : enabledLoginTypes.getOIDCProvidersEnabled()) {
+			model.addAttribute("oidcProvider"+oidcProvider.provider().substring(0, 1).toUpperCase() + oidcProvider.provider().substring(1)+"Enabled", true);
 		}
         
         
@@ -831,7 +832,11 @@ public enum SessionDao {
 		return objectMapper.writeValueAsString(foundList);
 	}
 
-	public void addOIDCProvider(String provider) {
+	public void addOIDCProvider(Provider provider) {
 		enabledLoginTypes.addOIDCProvider(provider);
+	}
+
+	public Set<Provider> getOIDCProvidersEnabled() {
+		return enabledLoginTypes.getOIDCProvidersEnabled();
 	}
 }

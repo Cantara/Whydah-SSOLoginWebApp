@@ -43,7 +43,7 @@ public class LoginController {
 		this.sessionManagementHelper = new SessionManagementHelper(provider);
 		if (this.loginEnabled) {
 			this.authHelper = new AuthHelper(appUri, provider, issuerUrl, appId, appSecret, new String[]{"openid", "name", "phoneNumber", "email", "profile"}, this.sessionManagementHelper);
-			SessionDao.instance.addOIDCProvider(provider);
+			SessionDao.instance.addOIDCProvider(this.authHelper);
 		} else {
 			this.authHelper = null;
 		}
