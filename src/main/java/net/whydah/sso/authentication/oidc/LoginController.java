@@ -110,7 +110,7 @@ public class LoginController {
 
 	private String resolve(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model, String redirectURI) throws Exception {
 		log.info("auth resolve");
-		if (redirectURI == null || redirectURI.contentEquals("")) {
+		if (redirectURI == null || redirectURI.contentEquals("") || redirectURI.equalsIgnoreCase("welcome")) {
 			redirectURI = welcomeURL;
 		}
 
@@ -279,7 +279,7 @@ public class LoginController {
 		if (slackuser == null || slackuser.isEmpty()) {
 			slackuser = "unknown";
 		}
-		if (redirectURI == null || redirectURI.isEmpty()) {
+		if (redirectURI == null || redirectURI.isEmpty() || redirectURI.equalsIgnoreCase("welcome")) {
 			redirectURI = welcomeURL;
 		}
 
