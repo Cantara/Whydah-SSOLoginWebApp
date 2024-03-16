@@ -149,6 +149,7 @@ public class AzureSSOLoginController {
 				if(userTokenXml == null) {
 					return toCredentialConfirm(model, redirectURI, userName, "Login failed. Wrong password!");	
 				} else {
+					
 					return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
 				}
 			} else {
@@ -288,7 +289,7 @@ public class AzureSSOLoginController {
 			}
 			String domain = AzureSessionManagementHelper.getSessionSelectedDomain(httpRequest);
 			if(domain == null) {
-				domain = extractDomain(userName);
+				domain = extractDomain(email);
 			}
 
 			AzureADUserCredential credential = new AzureADUserCredential(oid, userName, oid);
@@ -317,7 +318,7 @@ public class AzureSSOLoginController {
 					log.error("Unable to persist roles to whydah");
 				}
 
-				return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+				return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + domain );
 			} else {
 
 				return toLogin(model, redirectURI, "failure solving usertokenxml");
@@ -429,6 +430,7 @@ public class AzureSSOLoginController {
 
 			log.info("userTokenXml(4):" + userTokenXml);
 			log.info("return confirmUserInfoCheckAndReturn");
+			
 			return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket, userTokenXml);
 		}
 	}
@@ -451,7 +453,10 @@ public class AzureSSOLoginController {
 		
 		updateLifeSpanForAuthSession(httpRequest, userTokenXml);
 		setWhydahCookie(httpRequest, httpResponse, userTokenXml);
-		return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+		
+		String email = UserTokenXpathHelper.getEmail(userTokenXml);
+		String domain = extractDomain(email);
+		return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + domain);
 	}
 
 	private String toLogin(Model model, String redirectURI, String error) {

@@ -216,7 +216,15 @@ public class GoogleSSOLoginController {
 		
 		updateLifeSpanForAuthSession(httpRequest, userTokenXml);
 		setWhydahCookie(httpRequest, httpResponse, userTokenXml);
-		return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+		
+		String email = UserTokenXpathHelper.getEmail(userTokenXml);
+		String domain = extractDomain(email);
+		if(domain!= null && !domain.equals("gmail.com")) {
+			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + domain);
+		} else {
+			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+		}
+		
 	}
 
 	private void setWhydahCookie(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String userTokenXml) {
@@ -337,8 +345,12 @@ public class GoogleSSOLoginController {
 			SessionDao.instance.saveRoleDatatoWhydah(uid, APPID, APPNAME, "Whydah", "PersonId", personRef);
 			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), "google", stored_accessToken, resolveAppRoles(null), stored_subject, username, firstName, lastName, email, cellPhone, personRef);
 
-
-			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+			String domain = extractDomain(stored_email);
+			if(domain!= null && !domain.equals("gmail.com")) {
+				return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + domain);
+			} else {
+				return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket));
+			}
 		} else {
 
 			return toLogin(model, redirectURI, "failure solving usertokenxml");

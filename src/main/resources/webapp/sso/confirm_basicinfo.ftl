@@ -32,9 +32,11 @@
                 <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                 <input name="redirectURI" type="hidden" value="${redirectURI!}">
                 <input name="username" type="hidden" value="${username!}"/>
-                <input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
+                <#if whydahOauth2Provider??>
+                	<input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
+                </#if>
+                
 				<input name="newRegister" type="hidden" value="${newRegister!false}">
-
                 <label for="username" class="label">${username!}</label>			
                 <label for="firstName" class="label">Fornavn:</label>
                 <input id="firstName" class="input" name="firstName" size="30" type="text" placeholder="Kari" value="${firstName!}"/>
