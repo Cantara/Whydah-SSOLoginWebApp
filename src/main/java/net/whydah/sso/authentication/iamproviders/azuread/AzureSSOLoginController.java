@@ -59,11 +59,7 @@ public class AzureSSOLoginController {
 		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
 			return "login";
 		} else {
-			if (aadHelper.isAuthenticated(httpRequest)) {
-				return resolve(httpRequest, httpResponse, model, redirectURI);
-			} else {
-				return "login_with_microsoft";
-			}
+			return "login_with_microsoft";
 		}
 	}
 

@@ -225,7 +225,7 @@ public class AzureSessionManagementHelper {
 			sessions.put(sessionid, session);
 		} else {
 			//try detecting sessionid in cookie
-			sessionid = SessionCookieHelper.getSessionCookie("google", httpRequest); 
+			sessionid = SessionCookieHelper.getSessionCookie("aad", httpRequest); 
 			if(sessionid!=null && sessions.containsKey(sessionid)) {
 				AzureSessionData session = sessions.get(sessionid);
 				session.setEndOfUserTokenLifeMs(endOfTokenLifeMs);
