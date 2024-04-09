@@ -77,7 +77,7 @@
                     <input type="hidden" name="loginusername" value=""  />
                     <button class="customBtn" type="submit">
 				      <span class="icon" style="background: url('/sso/images/g-normal.png') transparent 5px 50% no-repeat;"></span>
-				      <span class="buttonText">Sign in with Google</span>
+				      <span class="buttonText">Continue with Google</span>
 				    </button>
 				    
                     
@@ -92,7 +92,7 @@
                    
                     <button class="customBtn" type="submit">
 				      <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
-				      <span class="buttonText">Sign in with Azure AD</span>
+				      <span class="buttonText">Continue with Azure AD</span>
 				    </button>
 				    
                  </form>
@@ -105,7 +105,7 @@
                                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                             </#if>
                          <button class="customBtn" type="submit">				     
-					       <span class="buttonText">Sign in with Facebook</span>
+					       <span class="buttonText">Continue with Facebook</span>
 					    </button>
 				    
                          <!--<input name="commit" type="submit" value="Facebook" class="button button-login button-facebook"/> -->
@@ -118,7 +118,7 @@
                                 <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                             </#if>
                              <button class="customBtn" type="submit">				     
-					       		<span class="buttonText">Sign in with NetIQ</span>
+					       		<span class="buttonText">Continue with NetIQ</span>
 					    	 </button>
 					    	 <!--
                             <input name="commit" type="submit" value="NetIQ" class="button button-login button-netiq"/> -->
@@ -144,7 +144,7 @@
 						            	</#if>
 						            </#if>	
 		                        	
-				      				<span class="buttonText">Sign in with ${provider.displayText}</span>
+				      				<span class="buttonText">Continue with ${provider.displayText}</span>
 		                        </button>
 		                        <!--
 		                        <input name="commit" type="submit" value="${provider.displayText}" class="button button-login button-${provider.provider}"/> -->
@@ -165,7 +165,7 @@
                         <input type="hidden" name="loginusername" value=""  />
                         <button class="customBtn" type="submit">
                             <span class="icon" style="background: url('/sso/images/g-normal.png') transparent 5px 50% no-repeat;"></span>
-                            <span class="buttonText">Sign in with Google</span>
+                            <span class="buttonText">Continue with Google</span>
 				        </button>
                     </form>
                 </#if>
@@ -177,7 +177,7 @@
 
                         <button class="customBtn" type="submit">
                             <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
-                            <span class="buttonText">Sign in with Microsoft</span>
+                            <span class="buttonText">Continue with Microsoft</span>
 				        </button>
 
                     </form>
