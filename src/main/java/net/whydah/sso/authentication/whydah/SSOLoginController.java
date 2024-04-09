@@ -229,6 +229,14 @@ public class SSOLoginController {
 		} else {
 			redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);
 		}
+
+		// Attempt for a workaround for space instead of + in email seen from invite flows
+		try {
+			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
+		} catch (Exception e){
+			log.error("Exception in email from usertoken xml.getEmail");
+			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml).replace(" ","+"));
+		}
 		// Action use redirect...
 		model.addAttribute(ConstantValue.REDIRECT, redirectURI);
 		model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
