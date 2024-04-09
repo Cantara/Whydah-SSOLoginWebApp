@@ -10,6 +10,7 @@ import net.whydah.sso.commands.adminapi.user.CommandResetUserPassword;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.Email;
 import net.whydah.sso.errorhandling.AppException;
 import net.whydah.sso.errorhandling.AppExceptionCode;
 import net.whydah.sso.user.mappers.UserIdentityMapper;
@@ -70,8 +71,10 @@ public class NewUserController {
 		String firstName = request.getParameter("firstname");
 		String lastName = request.getParameter("lastname");
 		String cellPhone = request.getParameter("cellphone");
+		
 		log.trace("signup requested user - email: {} and username: {}", email, username);
-		if (email != null && username != null && firstName !=null && lastName !=null) {
+		if (email != null && Email.isValid(email) && username != null && firstName !=null && lastName !=null) {
+			
 			UserIdentity signupUser = new UserIdentity(UUID.randomUUID().toString());
 			signupUser.setUsername(username.trim());
 			if (firstName != null) {
@@ -154,8 +157,11 @@ public class NewUserController {
 			//nothing to do. First time loading
 			
 		} else {
-			
-			model.addAttribute("error", "Missing fields (*) required!" );
+			if(!Email.isValid(email)) {
+				model.addAttribute("error", "Email is invalid" );
+			} else {
+				model.addAttribute("error", "Missing fields (*) required!" );
+			}
 		}
 		model.addAttribute("username", username == null?"":username);
 		model.addAttribute("useremail", email == null? "":email);

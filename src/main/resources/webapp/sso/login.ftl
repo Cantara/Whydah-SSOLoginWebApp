@@ -92,7 +92,7 @@
                    
                     <button class="customBtn" type="submit">
 				      <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
-				      <span class="buttonText">Sign in with Microsoft</span>
+				      <span class="buttonText">Sign in with Azure AD</span>
 				    </button>
 				    
                  </form>

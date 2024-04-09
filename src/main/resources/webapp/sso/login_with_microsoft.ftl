@@ -31,7 +31,7 @@
                     </p>
                     <button id="submitbutton" class="customBtn" type="submit" onclick="submitAction(event);>
 				      <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
-				      <span class="buttonText">Continue to sign in with Microsoft</span>
+				      <span class="buttonText">Continue with Azure AD</span>
 				    </button>
                 
                 </form>

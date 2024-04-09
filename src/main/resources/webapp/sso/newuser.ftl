@@ -33,7 +33,13 @@
                 <input id="lastname" name="lastname" size="30" type="text" placeholder="Lastname" value="${lastname!}" required/>
 
                 <h4><label for="user">Email (*):</label></h4>
-                <input id="useremail" name="useremail" size="30" type="email" placeholder="Email" value="${useremail!}" required/>
+                <#if useremail?? && useremail?has_content>
+               		 <input id="useremail" name="useremail" size="30" type="email" placeholder="Email" value="${useremail!}" readonly/>
+                <#else>
+                 	<input id="useremail" name="useremail" size="30" type="email" placeholder="Email" value="" required/>
+                
+                </#if>
+                
 
                 <h4><label for="cellphone">Cell phone: (optional)</label></h4>
                 <input id="cellphone" name="cellphone" size="30" type="text" placeholder="Cellphone" value="${cellphone!}"/>
@@ -46,7 +52,7 @@
             
             <br/><hr/>
                 
-                <#if googleLoginEnabled == true && signupageGoogleOn == true>
+                <#if googleLoginEnabled == true && signuppageGoogleOn == true>
                 <form action="googlelogin" class="new_user_session" name="googlelogin" method="post">
                     <#if redirectURI??>
                       <input type="hidden" name="redirectURI" value="${redirectURI}"/>
@@ -58,6 +64,20 @@
 				    </button>
 				    
                     
+                 </form>
+                 </#if>
+                
+                <#if microsoftLoginEnabled == true  && signuppageMicrosoftOn == true>
+                <form action="aadprelogin" class="new_user_session" name="aadprelogin" method="post">
+                    <#if redirectURI??>
+                      <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+                    </#if>
+                   
+                    <button class="customBtn" type="submit">
+				      <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
+				      <span class="buttonText">Sign up with Azure AD</span>
+				    </button>
+				    
                  </form>
                  </#if>
                  

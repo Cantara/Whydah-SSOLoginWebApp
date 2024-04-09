@@ -63,8 +63,8 @@ public class ConstantValue {
 	public static final String WHYDAH_LOGININTEGRATION_PROVIDERS = "whydahLoginIntegrationProviders";
 	
 	//for signup page
-	public static final String SIGNUP_GOOGLE_ON = "signupageGoogleOn";
-	public static final String SIGNUP_MICROSOFT_ON = "signupageMicrosoftOn";
+	public static final String SIGNUP_GOOGLE_ON = "signuppageGoogleOn";
+	public static final String SIGNUP_MICROSOFT_ON = "signuppageMicrosoftOn";
 	public static final String SIGNUP_WHYDAH_INTEGRATION_PROVIDERS_ON = "signuppageWhydahIntegrationProviderOn";
 	public static final String SIGNUP_FACEBOOK_ON = "signuppageFacebookOn";
 	public static final String SIGNUP_NETIQ_ON = "signuppageNetIQOn";
