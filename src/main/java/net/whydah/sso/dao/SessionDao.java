@@ -422,12 +422,31 @@ public enum SessionDao {
 
 	public String getCSRFtoken() {
 		String csrftoken = UUID.randomUUID().toString();
-		csrftokens.put(csrftoken, csrftoken);
+		csrftokens.put(csrftoken, String.valueOf(System.currentTimeMillis()));
 		return csrftoken;
 	}
+	
+	private boolean isValidUUID(String s) {
+        try {
+            UUID.fromString(s);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 	public boolean validCSRFToken(String csrftoken) {
-		return csrftokens.containsKey(csrftoken);
+		boolean valid = false;
+		if(csrftokens.containsKey(csrftoken)) {
+			
+			if(isValidUUID(csrftokens.get(csrftoken)) || (System.currentTimeMillis() - Long.valueOf(csrftokens.get(csrftoken)) >= 3*60*1000)) {
+				csrftokens.remove(csrftoken);	
+				return false;				
+			}
+			
+			valid = true;
+		}	
+		return valid;
 	}
 
 	public WhydahServiceClient getServiceClient() {
