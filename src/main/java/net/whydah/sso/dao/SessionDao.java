@@ -63,7 +63,7 @@ public enum SessionDao {
 	instance;
 
 	public final String DEFAULT_REDIRECT = "welcome";
-	protected final static Logger log = LoggerFactory.getLogger(SessionDao.class);
+	protected  Logger log = LoggerFactory.getLogger(SessionDao.class);
 	private WhydahServiceClient serviceClient=null;
 	protected String LOGOURL = "/sso/images/site-logo.png";
 	protected String whydahVersion = ServerRunner.version;
@@ -121,6 +121,7 @@ public enum SessionDao {
         } catch (IOException e) {
 
 			e.printStackTrace();
+			log.error("Exception in Sessiondao setup",e);
 		}
 
 	}
