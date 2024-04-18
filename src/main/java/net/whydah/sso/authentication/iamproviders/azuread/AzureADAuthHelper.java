@@ -264,25 +264,26 @@ public class AzureADAuthHelper {
 
 		//IAuthenticationResult result =  AzureSessionManagementHelper.getAuthSessionObject(httpRequest);
 
-		String tokencache = AzureSessionManagementHelper.getTokenCache(httpRequest);
+		//String tokencache = AzureSessionManagementHelper.getTokenCache(httpRequest);
 		IAccount account = AzureSessionManagementHelper.getAccount(httpRequest);
 		IConfidentialClientApplication app = createClientApplicationSilentFlow(httpRequest);
+		
+		IAuthenticationResult result;
+		
+		try {
+		    SilentParameters silentParameters =
+		            SilentParameters
+		                    .builder(Collections.singleton("User.Read"), account)
+		                    .build();
 
-		if (tokencache != null) {
-			app.tokenCache().deserialize(tokencache);
+		    // try to acquire token silently. This call will fail since the token cache
+		    // does not have any data for the user you are trying to acquire a token for
+		    result = app.acquireTokenSilently(silentParameters).join();
+		} catch (Exception ex) {
+			throw ex;
 		}
-
-		SilentParameters parameters = SilentParameters.builder(
-				Collections.singleton("User.Read"),
-				account).build();
-
-		CompletableFuture<IAuthenticationResult> future = app.acquireTokenSilently(parameters);
-		IAuthenticationResult updatedResult = future.get();
-
-		//update session with latest token cache
-		AzureSessionManagementHelper.setTokenCache(httpRequest, app.tokenCache().serialize());
-
-		return updatedResult;
+		
+		return result;
 	}
 
 	private void validateNonce(StateData stateData, String nonce) throws Exception {
