@@ -16,6 +16,7 @@
             </div>
 
         <div class="login-box">
+
 			<a href="${redirectURI}"><img src="/sso/images/history-back.svg" alt="back" /></a>
             <#if error??><p class="error">${error!}</p></#if>
 
@@ -47,6 +48,7 @@
                 <p>You will receive an email with instructions of how to set your password.</p> !-->
 
                 <input class="button button-login" name="commit" type="submit" value="Register"/>
+                <p>If you already have an account <a href="${redirectURI}">click here</a> </p> 
 
             </form>
             
