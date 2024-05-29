@@ -1,18 +1,10 @@
 package net.whydah.sso.authentication.whydah;
 
-import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.UserNameAndPasswordCredential;
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
-import net.whydah.sso.dao.ConstantValue;
-import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.ddd.model.user.Password;
-import net.whydah.sso.ddd.model.user.UserName;
-import net.whydah.sso.ddd.model.user.UserTokenId;
-import net.whydah.sso.errorhandling.AppException;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.user.types.UserCredential;
-import net.whydah.sso.utils.SignupHelper;
-import net.whydah.sso.utils.FreeMarkerHelper;
+import java.io.IOException;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +12,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
-
-import java.io.IOException;
-import java.util.UUID;
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.UserNameAndPasswordCredential;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.Password;
+import net.whydah.sso.ddd.model.user.UserName;
+import net.whydah.sso.errorhandling.AppException;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.user.mappers.UserTokenMapper;
+import net.whydah.sso.user.types.UserCredential;
+import net.whydah.sso.user.types.UserToken;
+import net.whydah.sso.utils.SignupHelper;
 
 @Controller
 public class SSOLoginController {
@@ -43,7 +42,7 @@ public class SSOLoginController {
 
 			String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
 			boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
-
+			String userTicket = request.getParameter("userticket");
 
 			SessionDao.instance.updateApplinks();
 			SessionDao.instance.addModel_LOGO_URL(model);
@@ -55,53 +54,68 @@ public class SSOLoginController {
 			model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
 
 			CookieManager.addSecurityHTTPHeaders(response);
+			String userTokenId = CookieManager.getUserTokenIdFromCookie(request);
 
-			//usertokenId = cookieManager.getUserTokenIdFromCookie(request, response);
-			String userTokenIdFromCookie = CookieManager.getUserTokenIdFromCookie(request);
-			log.trace("login: redirectURI={}, SessionCheck={}, userTokenIdFromCookie={}", redirectURI, sessionCheckOnly, userTokenIdFromCookie);
+			log.trace("login: redirectURI={}, SessionCheck={}, userTokenIdFromCookie={}", redirectURI, sessionCheckOnly, userTokenId);
 
-			UserTokenId whydahUserTokenId = null;
-			if ("logout".equalsIgnoreCase(userTokenIdFromCookie)) {
-				log.info("userTokenId={} from cookie. TODO: should probably clear the logout cookie here?", userTokenIdFromCookie);
-				CookieManager.clearUserTokenCookies(request, response);
-				//usertokenId = WhydahUserTokenId.invalidTokenId();
-			} else if (userTokenIdFromCookie != null && SessionDao.instance.getServiceClient().verifyUserTokenId(userTokenIdFromCookie)) {
-				log.trace("userTokenId={} from cookie verified OK.", userTokenIdFromCookie);
-				whydahUserTokenId = new UserTokenId(userTokenIdFromCookie);
-			} else {
-				CookieManager.clearUserTokenCookies(request, response);
-			}
 
-			if (whydahUserTokenId != null) {
-				log.trace("login - whydahUserTokenId={} is valid", whydahUserTokenId);
+			 String userTokenXml = null;
+			 if (userTicket != null) {
+				 userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTicket(userTicket);
+				 if (userTokenXml != null) {
+					 userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
+					 log.debug("User ticket found, override with new user token id");
+				 } else {
+					 log.debug("User ticket not found");
+				 }
+			 }
+			 
+			 if (shouldClearUserToken(userTokenId)) {
+				 userTokenId = clearUserToken(request, response, userTokenId); // Will set userTokenId to null
+			 }
 
-				if (ConstantValue.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)) {
-					log.trace("login - Did not find any sensible redirectURI, using /welcome");
-					model.addAttribute(ConstantValue.REDIRECT, redirectURI);
-					//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-					SessionDao.instance.addModel_CSRFtoken(model);
-					log.info("login - Redirecting to {}", redirectURI);
-					return "action";
-					//return Response.ok(FreeMarkerHelper.createBody("/action.ftl", model.asMap())).build();
-				}
-				String userTicket = UUID.randomUUID().toString();
-				if (SessionDao.instance.getServiceClient().createTicketForUserTokenID(userTicket, whydahUserTokenId.toString())){
-					log.info("login - created new userticket={} for usertokenid={}",userTicket, whydahUserTokenId);
-					String referer_channel = request.getParameter("referer_channel");
-					if(referer_channel!=null) {
-						redirectURI = prependRefererToRedirectURI(redirectURI, referer_channel);
-					}
-					redirectURI = prependRefererToRedirectURI(redirectURI, userTicket);
+			 if (userTokenId != null) {
+				 if (userTokenXml == null) {
+					 userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
+				 }
+				 
+				 if(userTokenXml!=null) {
+					 storeUserTokenInCookie(request, response, userTokenXml);
+					 
+					 log.debug("login - redirecting request");
+						
+					 if (ConstantValue.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)) {
+						 log.trace("login - Did not find any sensible redirectURI, using /welcome");
+						 model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+						 SessionDao.instance.addModel_CSRFtoken(model);
+						 log.info("login - Redirecting to {}", redirectURI);
+						 return "action";
+					 } else {
+						 log.info("login - created new userticket={} for usertokenid={}", userTicket, userTokenId);
 
-					// Action use redirect - not redirectURI
-					model.addAttribute(ConstantValue.REDIRECT, redirectURI);
-					log.info("login - Redirecting to {}", redirectURI);
-					//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-					SessionDao.instance.addModel_CSRFtoken(model);
-					return "action";
-					//return Response.ok(FreeMarkerHelper.createBody("/action.ftl", model.asMap())).build();
-				}
-			}
+						 if (SessionDao.instance.getServiceClient().createTicketForUserTokenID(userTicket, userTokenId)) {
+							 redirectURI = prependTicketToRedirectURI(redirectURI, userTicket);
+							 log.debug("Created a new user ticket [userTicket={}, userTokenId={}]", userTicket, userTokenId);
+						 } else {
+							 log.warn("Can not create ticket [userTokenId={}]", userTokenId);
+						 }
+					        
+						 String referer_channel = request.getParameter("referer_channel");
+						 if(referer_channel!=null) {
+							 redirectURI = prependRefererToRedirectURI(redirectURI, referer_channel);
+						 }
+						 redirectURI = prependRefererToRedirectURI(redirectURI, userTicket);
+						 model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+						 log.info("login - Redirecting to {}", redirectURI);
+						 SessionDao.instance.addModel_CSRFtoken(model);
+						 return "action";
+					 }   
+					 
+				 }
+				 
+				    
+			 }
+
 
 			// Added return is sessioncheck only and no cookie found
 			if (sessionCheckOnly) {
@@ -125,6 +139,34 @@ public class SSOLoginController {
 		return "login";
 	}
 	
+	
+	
+	private UserToken storeUserTokenInCookie(HttpServletRequest request,
+			HttpServletResponse response, String userTokenXml) {
+		UserToken loginUserToken = UserTokenMapper.fromUserTokenXml(userTokenXml);
+		Integer tokenRemainingLifetimeSeconds = SessionDao.instance.getServiceClient().calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+		CookieManager.createAndSetUserTokenCookie(loginUserToken.getUserTokenId(), tokenRemainingLifetimeSeconds * 1000, request, response);
+		return loginUserToken;
+	}
+	
+	 private String clearUserToken(HttpServletRequest request, HttpServletResponse response, String userTokenId) {
+	        log.info("Clearing user token [userTokenId={}]", userTokenId);
+	        CookieManager.clearUserTokenCookies(request, response);
+	        return null;
+	    }
+	
+	private boolean shouldClearUserToken(String userTokenId) {
+		return isLogoutUserTokenId(userTokenId) || isInvalidUserTokenId(userTokenId);
+	}
+	
+	private boolean isLogoutUserTokenId(String userTokenId) {
+        return "logout".equalsIgnoreCase(userTokenId);
+    }
+	
+	private boolean isInvalidUserTokenId(String userTokenId) {
+        return userTokenId != null && !SessionDao.instance.getServiceClient().verifyUserTokenId(userTokenId);
+    }
+
 	String prependTicketToRedirectURI(String redirectURI, String userticket) {
 		String[] parts = redirectURI.split("\\?", 2);
 		String r ="";
