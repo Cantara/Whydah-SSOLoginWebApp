@@ -161,6 +161,20 @@ public class LoginController {
 		// append the ticket and return to our client
 		return resolve(httpRequest, httpResponse, model, redirectURI);
 	}
+	
+	private String formatPhoneNumber(String phonenumber) {
+		
+		phonenumber = phonenumber.replace(" ", "");
+		if(phonenumber.length()>=11 && phonenumber.startsWith("+47")) {
+			phonenumber = phonenumber.replace("+47", "");
+		}
+		if(phonenumber.length()>=10 && phonenumber.startsWith("47")) {
+			phonenumber = phonenumber.replace("47", "");
+		}
+		
+		phonenumber = phonenumber.replace("+","");
+		return phonenumber;
+	}
 
 	private String resolve(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model,
 			String redirectURI) throws Exception {
@@ -171,7 +185,15 @@ public class LoginController {
 		String phoneNumber = sessionManagementHelper.getPhoneNumber(httpRequest);
 		String subject = sessionManagementHelper.getSubject(httpRequest);
 	
+		
+		phoneNumber = formatPhoneNumber(phoneNumber);
+		
 		String username = String.valueOf(sessionManagementHelper.getClaim(httpRequest, jwtClaimAsUserName));
+		if(jwtClaimAsUserName.equalsIgnoreCase("phone_number")) {
+			if(username!=null) {
+				username = formatPhoneNumber(username);
+			}
+		}
 		
 		if(username==null) {
 			//to ssolwa login page
@@ -332,12 +354,17 @@ public class LoginController {
 		String lastName = httpRequest.getParameter("lastName");
 		String email = httpRequest.getParameter("email");
 		String cellPhone = httpRequest.getParameter("cellPhone");
-		if (cellPhone != null) {
-			cellPhone = cellPhone.replaceAll(" ", "").trim();
-			if (cellPhone.length() == 8) {
-				cellPhone = "+47" + cellPhone;
-			}
-		}
+		
+		//use same as 1881
+		cellPhone = formatPhoneNumber(cellPhone);
+		
+//		if (cellPhone != null) {
+//			cellPhone = cellPhone.replaceAll(" ", "").trim();
+//			if (cellPhone.length() == 8) {
+//				cellPhone = "+47" + cellPhone;
+//			}
+//		}
+		
 		String redirectURI = httpRequest.getParameter("redirectURI");
 		String slackuser = httpRequest.getParameter("slackuser");
 
@@ -357,7 +384,12 @@ public class LoginController {
 		String stored_userinfo_jsson = sessionManagementHelper.getUserInfoJsonstring(httpRequest);
 		String stored_username = String.valueOf(sessionManagementHelper.getClaim(httpRequest, jwtClaimAsUserName));
 		
-
+		if(jwtClaimAsUserName.equalsIgnoreCase("phone_number")) {
+			if(stored_username!=null) {
+				stored_username = formatPhoneNumber(stored_username);
+			}
+		}
+		
 		if (userName == null || (!userName.equalsIgnoreCase(stored_username))) {
 			// misuse -to ssolwa login page
 			return toAction(model, redirectURI);
