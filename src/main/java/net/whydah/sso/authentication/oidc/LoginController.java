@@ -266,7 +266,7 @@ public class LoginController {
 		model.addAttribute("jwtClaimAsUserName", this.jwtClaimAsUserName);
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
-
+		SessionDao.instance.addModel_LOGO_URL(model);
 		if (!userTokenFound) {
 			// register process, we show consents here
 		}
@@ -284,6 +284,7 @@ public class LoginController {
 		}
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
+		SessionDao.instance.addModel_LOGO_URL(model);
 		return "confirm_credential";
 	}
 	

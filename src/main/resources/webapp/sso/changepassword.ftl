@@ -2,9 +2,10 @@
 <html>
 <head>
     <title>Whydah Login - Change Password</title>
-    <link rel="stylesheet" href="../css/whydah.css" TYPE="text/css"/>
+    <link rel="stylesheet" href="/sso/css/whydah.css" TYPE="text/css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <meta charset="utf-8"/>
+    <link rel="icon" href="/sso/images/favicon.ico" type="image/x-icon"/>
 </head>
 <body>
 <div id="page-content">

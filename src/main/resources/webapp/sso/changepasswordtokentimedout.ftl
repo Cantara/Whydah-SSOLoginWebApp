@@ -4,6 +4,7 @@
 	<title>Whydah Login - Change password</title>
     <link rel="stylesheet" href="../css/whydah.css" TYPE="text/css"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     <link rel="icon" href="/sso/images/favicon.ico" type="image/x-icon"/>
 </head>
 <body>
 <div id="page-content">

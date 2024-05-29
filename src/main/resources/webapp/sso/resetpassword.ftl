@@ -3,7 +3,7 @@
     <head>
         <title>Whydah Reset Password</title>
         <link rel="stylesheet" href="css/whydah.css" TYPE="text/css"/>
-        
+         <link rel="icon" href="/sso/images/favicon.ico" type="image/x-icon"/>
         <meta charset="utf-8"/>
        
     </head>

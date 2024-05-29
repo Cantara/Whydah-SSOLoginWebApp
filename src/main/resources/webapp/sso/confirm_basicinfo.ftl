@@ -7,7 +7,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1"/>
     <script src="/sso/js/jquery-1.11.1.min.js"></script>
-   
+    <link rel="icon" href="/sso/images/favicon.ico" type="image/x-icon"/>
 </head>
 
 <body>
