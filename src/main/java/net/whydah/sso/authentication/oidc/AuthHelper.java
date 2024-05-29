@@ -1,50 +1,70 @@
 package net.whydah.sso.authentication.oidc;
 
-import com.google.api.client.googleapis.auth.oauth2.*;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.JWTParser;
-import com.nimbusds.oauth2.sdk.*;
-import com.nimbusds.oauth2.sdk.auth.*;
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
+import com.nimbusds.oauth2.sdk.AuthorizationGrant;
+import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.GeneralException;
+import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
+import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenResponse;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
+import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
-import com.nimbusds.openid.connect.sdk.*;
+import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
+import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+import com.nimbusds.openid.connect.sdk.Nonce;
+import com.nimbusds.openid.connect.sdk.OIDCClaimsRequest;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
+import com.nimbusds.openid.connect.sdk.UserInfoRequest;
+import com.nimbusds.openid.connect.sdk.UserInfoResponse;
+import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSet;
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSetRequest;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
+
 import net.whydah.sso.authentication.iamproviders.StateData;
-import net.whydah.sso.authentication.iamproviders.google.GoogleAuthResult;
+import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.application.RedirectURI;
 import net.whydah.sso.utils.HttpConnectionHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.server.session.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.naming.ServiceUnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.util.*;
 
 public class AuthHelper implements Provider {
 	final static Logger log = LoggerFactory.getLogger(AuthHelper.class);
 
-	private final String appUri;
 	private final String provider;
 	private final ClientID providerAppId;
 	//private final String providerAppIdEscaped;
@@ -59,16 +79,16 @@ public class AuthHelper implements Provider {
 	private final ClientAuthentication clientAuth;
 	private final IDTokenValidator validator;
 
-	public AuthHelper(String appUri, String provider, String issuerURL, String providerAppId, String providerAppSecret,
+	public AuthHelper(String provider, String issuerURL, String providerAppId, String providerAppSecret,
 					  String[] scopes, SessionManagementHelper sessionManagementHelper) throws GeneralException, IOException, URISyntaxException {
-		this.appUri = appUri;
+	
 		this.provider = provider;
 		this.providerMetadata = OIDCProviderMetadata.resolve(new Issuer(issuerURL));
 		this.providerAppId = new ClientID(providerAppId);
 		//this.providerAppIdEscaped = URLEncoder.encode(providerAppId, StandardCharsets.UTF_8);
 		this.providerAppSecret = new Secret(providerAppSecret);
 		this.scopes = new Scope(this.providerMetadata.getScopes().toStringList().stream().filter(s1 -> Arrays.stream(scopes).anyMatch(s2 -> s2.equalsIgnoreCase(s1))).toArray(String[]::new));
-		if (this.providerMetadata.getClaims().isEmpty()) {
+		if (this.providerMetadata.getClaims()==null || this.providerMetadata.getClaims().isEmpty()) {
 			claims = null;
 		} else {
 			ClaimsSetRequest claimsSetRequest = new ClaimsSetRequest();
@@ -87,7 +107,7 @@ public class AuthHelper implements Provider {
 		//this.scopes = scopes;
 		this.sessionManagementHelper = sessionManagementHelper;
 		//this.ssoCallBack = ssoCallBack;
-		this.ssoCallBack = new URI(appUri.replaceFirst("/$", "") + "/" + this.provider + "/auth");
+		this.ssoCallBack = new URI(SessionDao.instance.MY_APP_URI.replaceFirst("/$", "") + "/" + this.provider + "/auth");
 		//this.ssoCallBackEscaped = URLEncoder.encode(this.ssoCallBack.toString(), StandardCharsets.UTF_8);
 		// Not sure how to decide witch one to use.
 		//this.clientAuth = new ClientSecretBasic(this.providerAppId, this.providerAppSecret);
@@ -102,9 +122,6 @@ public class AuthHelper implements Provider {
 		//Slightly unsure about what validator to use, there is also one for HMAC with the client secret. Could be a bool?
 		if (this.providerMetadata.getJWKSet() != null) {
 			this.validator = new IDTokenValidator(this.providerMetadata.getIssuer(), this.providerAppId, alg, this.providerMetadata.getJWKSet());
-		} else if (false) {
-			//This is a validator for HMAC
-			this.validator = new IDTokenValidator(this.providerMetadata.getIssuer(), this.providerAppId, alg, this.providerAppSecret);
 		} else {
 			this.validator = new IDTokenValidator(this.providerMetadata.getIssuer(), this.providerAppId, alg, this.providerMetadata.getJWKSetURI().toURL());
 		}
@@ -116,7 +133,7 @@ public class AuthHelper implements Provider {
 		String state = newState();//UUID.randomUUID().toString();
 		String nonce = newNonce();//UUID.randomUUID().toString();
 		RedirectURI clientRedirectURI = new RedirectURI(redirectURI);
-		SessionManagementHelper.storeStateAndNonceInStates(state, nonce, clientRedirectURI.getInput());
+		sessionManagementHelper.storeStateAndNonceInStates(state, nonce, clientRedirectURI.getInput());
 		return getAuthorizationCodeUrl(state, nonce);
 	}
 
@@ -174,7 +191,7 @@ public class AuthHelper implements Provider {
 		// Retrieve token
 		TokenRequest request = new TokenRequest(providerMetadata.getTokenEndpointURI(), clientAuth, codeGrant);
 		log.debug(request.toHTTPRequest().getBody());
-		var response = request.toHTTPRequest().send();
+		HTTPResponse response = request.toHTTPRequest().send();
 		log.debug(response.getBody());
 		TokenResponse tr = OIDCTokenResponseParser.parse(response);
 
@@ -287,6 +304,8 @@ public class AuthHelper implements Provider {
 		sessionManagementHelper.setPhoneNumber(httpRequest, ui.getPhoneNumber());//claims.getStringClaim("phone_number"));
 		sessionManagementHelper.setFirstName(httpRequest, ui.getGivenName());//claims.getStringClaim("given_name"));
 		sessionManagementHelper.setLastName(httpRequest, ui.getFamilyName());//claims.getStringClaim("family_name"));
+		sessionManagementHelper.setUserInfoJsonString(httpRequest, ui.toJSONString());
+		sessionManagementHelper.setClaimsSet(httpRequest, ui.toJWTClaimsSet().toJSONObject());
 	}
 
 	public boolean isAuthenticated(HttpServletRequest request) {

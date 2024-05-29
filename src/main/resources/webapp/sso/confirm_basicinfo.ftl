@@ -28,29 +28,33 @@
               <p class="error">${signupError!}</p>
             </#if>
 			
-            <form method="POST" class="new_user_session" action="${service?switch('azuread', '/sso/aad_basicinfo_confirm', 'google', '/sso/google_basicinfo_confirm', 'whydah', '/sso/whydah_basicinfo_confirm', 'oidcProviderVipps', '/sso/vipps/basicinfo_confirm', 'oidcProviderGoogle', '/sso/google/basicinfo_confirm', 'oidcProviderMicrosoft', '/sso/microsoft/basicinfo_confirm' )}" accept-charset="utf-8">
+			<#assign pa = "/sso/${provider}/basicinfo_confirm">
+            <form method="POST" class="new_user_session" action="${pa}" accept-charset="utf-8">
                 <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
                 <input name="redirectURI" type="hidden" value="${redirectURI!}">
                 <input name="username" type="hidden" value="${username!}"/>
-                <#if whydahOauth2Provider??>
-                	<input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
-                </#if>
-                
-				<input name="newRegister" type="hidden" value="${newRegister!false}">
-                <label for="username" class="label">${username!}</label>			
+                     
+                <label for="username" class="label">${username!}</label>
+                <br/>			
                 <label for="firstName" class="label">Fornavn:</label>
                 <input id="firstName" class="input" name="firstName" size="30" type="text" placeholder="Kari" value="${firstName!}"/>
+                
                 <label for="lastName" class="label">Etternavn:</label>
                 <input id="lastName" class="input" name="lastName" size="30" type="text" placeholder="Normann" value="${lastName!}"/>
-		<label for="email" class="label">E-post:</label>
-		<#if email??>
-                       <input id="email" class="input" name="email" size="30" type="text" placeholder="Your email" value="${email!}" readonly/>
+                
+                <label for="email" class="label">E-post:</label>
+                <#if jwtClaimAsUserName == "email">
+				  	<input id="email" class="input" name="email" size="30" type="text" placeholder="Your email" value="${email!}" readonly/>
+				<#else>
+					<input id="email" class="input" name="email" size="30" type="text" placeholder="Your email" value="${email!} "/>
+                 </#if>
+                
+                <label for="cellphone" class="label">Mobilnummer (required):</label>
+                <#if jwtClaimAsUserName == "phone_number">
+                	<input id="cellPhone" class="input" name="cellPhone" size="30" type="text" placeholder="+47 999 99 999" value="${cellPhone!}" readonly/>
                 <#else>
-                       <input id="email" class="input" name="email" size="30" type="text" placeholder="Your email" value="${email!} "/>
+                	<input id="cellPhone" class="input" name="cellPhone" size="30" type="text" placeholder="+47 999 99 999" value="${cellPhone!}"/>
                 </#if>
-		<label for="cellphone" class="label">Mobilnummer (required):</label>
-                <input id="cellPhone" class="input" name="cellPhone" size="30" type="text" placeholder="+47 999 99 999" value="${cellPhone!}"/>
-                		    
                 <input id="confirm" class="button button-login" name="commit" type="submit" value="Confirm"/>
             </form>
         </div>

@@ -87,7 +87,11 @@ public class SSOLoginController {
 				String userTicket = UUID.randomUUID().toString();
 				if (SessionDao.instance.getServiceClient().createTicketForUserTokenID(userTicket, whydahUserTokenId.toString())){
 					log.info("login - created new userticket={} for usertokenid={}",userTicket, whydahUserTokenId);
-					redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);
+					String referer_channel = request.getParameter("referer_channel");
+					if(referer_channel!=null) {
+						redirectURI = prependRefererToRedirectURI(redirectURI, referer_channel);
+					}
+					redirectURI = prependRefererToRedirectURI(redirectURI, userTicket);
 
 					// Action use redirect - not redirectURI
 					model.addAttribute(ConstantValue.REDIRECT, redirectURI);
@@ -120,6 +124,30 @@ public class SSOLoginController {
 		//return Response.ok(FreeMarkerHelper.createBody("/login.ftl", model.asMap())).build();
 		return "login";
 	}
+	
+	String prependTicketToRedirectURI(String redirectURI, String userticket) {
+		String[] parts = redirectURI.split("\\?", 2);
+		String r ="";
+		if(parts.length==2) {
+			r = parts[0] + "?userticket=" + userticket + "&" + parts[1]; 
+		} else {
+			r = parts[0] + "?userticket=" + userticket;
+		}
+		return r;
+	}
+	
+	String prependRefererToRedirectURI(String redirectURI, String referer_channel) {
+		String[] parts = redirectURI.split("\\?", 2);
+		String r ="";
+		if(parts.length==2) {
+			r = parts[0] + "?referer_channel=" + referer_channel + "&" + parts[1]; 
+		} else {
+			r = parts[0] + "?referer_channel=" + referer_channel;
+		}
+		return r;
+	}
+	
+	
 
 	@RequestMapping("/welcome")
 	public String welcome(HttpServletRequest request, HttpServletResponse response,Model model) {

@@ -1,174 +1,221 @@
 package net.whydah.sso.authentication.oidc;
 
-import com.nimbusds.oauth2.sdk.GeneralException;
-import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
-import net.whydah.sso.dao.ConstantValue;
-import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.user.types.UserCredential;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Properties;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.UUID;
+import com.nimbusds.oauth2.sdk.GeneralException;
+
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
+import net.whydah.sso.authentication.iamproviders.WhydahProvider;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import net.whydah.sso.user.types.UserCredential;
 
 public class LoginController {
 
 	private final static Logger log = LoggerFactory.getLogger(LoginController.class);
-	protected final String logoUrl;
-	private final WhydahServiceClient tokenServiceClient;
-	private final String appId;
-	private final String provider;
-	private final String service;
-	// private final String loginEnabled;
-	private final boolean loginEnabled;
-	private final AuthHelper authHelper;
-	private final SessionManagementHelper sessionManagementHelper;
-	private final String welcomeURL;
 
-	public LoginController(String provider, String logoUrl, String issuerUrl, String appId, String appSecret,
-			String appUri, boolean enabled) throws GeneralException, IOException, URISyntaxException {
+	private final WhydahServiceClient tokenServiceClient;
+	private final String provider;
+	private final boolean loginEnabled;
+	private AuthHelper authHelper;
+	private SessionManagementHelper sessionManagementHelper;
+	private String jwtClaimAsUserName = "sub";
+
+	public LoginController(String provider) throws GeneralException, IOException, URISyntaxException {
 		this.provider = provider;
-		this.service = "oidcProvider" + provider.substring(0, 1).toUpperCase() + provider.substring(1);
-		// this.loginEnabled = provider+".enabled";
-		this.loginEnabled = enabled;
+		Properties properties = AppConfig.readProperties();
 		this.tokenServiceClient = SessionDao.instance.getServiceClient();
-		this.logoUrl = logoUrl;
-		this.appId = appId;
-		this.sessionManagementHelper = new SessionManagementHelper(provider);
+		//this.service = "oidcProvider" + provider.substring(0, 1).toUpperCase() + provider.substring(1);
+		String enabled = properties.getProperty(provider + ".enabled");
+		this.loginEnabled =  enabled!=null && enabled.equals("true");
 		if (this.loginEnabled) {
-			this.authHelper = new AuthHelper(appUri, provider, issuerUrl, appId, appSecret,
+			this.sessionManagementHelper = new SessionManagementHelper(provider);
+			String issuerUrl = properties.getProperty(provider + ".issuerUrl");
+			String clientId = properties.getProperty(provider + ".clientId");
+			if(issuerUrl==null || issuerUrl.isEmpty()) {
+				throw new RuntimeException("azuread.issuerUrl required in the app config");
+			}
+			if(clientId==null || clientId.isEmpty()) {
+				throw new RuntimeException("azuread.clientId required in the app config");
+			}
+			String clientSecret = properties.getProperty(provider + ".clientSecret");
+			if(properties.containsKey(provider + ".jwtClaimAsUserName")) {
+				jwtClaimAsUserName = properties.getProperty(provider + ".jwtClaimAsUserName");
+			}
+			if(provider.equalsIgnoreCase("azuread")) {
+				String tenantId = properties.getProperty(provider + ".tenantId");
+				if(tenantId==null || tenantId.isEmpty()) {
+					throw new RuntimeException("azuread.tenantId required in the app config");
+				}
+				issuerUrl +=  "f8cdef31-a31e-4b4a-93e4-5f571e91255a" + "/v2.0";
+			}
+			this.authHelper = new AuthHelper(provider, issuerUrl, clientId, clientSecret,
 					new String[] { "openid", "name", "phoneNumber", "email", "profile" }, this.sessionManagementHelper);
 			SessionDao.instance.addOIDCProvider(this.authHelper);
 		} else {
 			this.authHelper = null;
 		}
-		if (appUri.charAt(appUri.length() - 1) == '/') {
-			welcomeURL = appUri + "welcome";
+		
+	}
+	
+	public LoginController(WhydahProvider whydahProvider) throws GeneralException, IOException, URISyntaxException {
+		this.tokenServiceClient = SessionDao.instance.getServiceClient();
+		
+		this.provider = whydahProvider.getProvider();
+		
+		this.loginEnabled =  whydahProvider.isEnabled();
+		if (this.loginEnabled) {
+			this.sessionManagementHelper = new SessionManagementHelper(provider);
+			
+			String issuerUrl = whydahProvider.getOauthUrl();
+			String clientId = whydahProvider.getOauthClientId();
+			String clientSecret = "NOTSET";
+			if(issuerUrl==null || issuerUrl.isEmpty()) {
+				throw new RuntimeException(provider + ".issuerUrl required in the app config");
+			}
+			if(clientId==null || clientId.isEmpty()) {
+				throw new RuntimeException(provider + ".clientId required in the app config");
+			}
+			this.authHelper = new AuthHelper(provider, issuerUrl, clientId, clientSecret,
+					new String[] { "openid", "name", "phoneNumber", "email", "profile" }, this.sessionManagementHelper);
+			SessionDao.instance.addOIDCProvider(this.authHelper);
 		} else {
-			welcomeURL = appUri + "/welcome";
+			this.authHelper = null;
 		}
 	}
 
-	// @RequestMapping("/login")
+
 	public String login(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model)
 			throws Throwable {
-		log.trace(provider + "login  start");
+		
+		log.info("provider {} - login start", provider);
+		
+		String redirectURI = httpRequest.getParameter("redirectURI");
+        
+        String params ="";
+        
+        if(redirectURI!=null) {
+        	params += (params.equals("")?"":"&") + "redirectURI=" + redirectURI;
+        }
+        
+        String ssolwaReDirectURI = SessionDao.instance.LOGIN_URI + (params.equals("")?"":("?" + params));
+        
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
-		model.addAttribute(ConstantValue.LOGO_URL, logoUrl);
 		if (!loginEnabled) {
-			// if (!SessionDao.instance.isLoginTypeEnabled(loginEnabled)) {
-			log.trace(provider + "login  return login");
-			return "login";
+			//to login page
+			log.warn("provider {} is not enabled. Redirect to SSOLWA login page {}", provider, ssolwaReDirectURI);
+			return toAction(model, ssolwaReDirectURI);
 		}
 		if (!authHelper.isAuthenticated(httpRequest)) {
-			String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
-//			model.addAttribute("redirect", aad_auth_url);
-//			log.info("Redirecting to {}", aad_auth_url);
-//			return "action";
-			return toAction(model, aad_auth_url);
+			String auth_url = authHelper.getAuthRedirect(ssolwaReDirectURI);
+			return toAction(model, auth_url);
 		}
 
 		if (authHelper.isAccessTokenExpired(httpRequest)) {
 			try {
-				log.info("isAccessTokenExpired  {}", httpRequest);
+				
+				log.info("provider {} - Session expired, using silent flow", provider);
 				authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			} catch (Exception ex) {
 				ex.printStackTrace();
-				log.warn("Cannot refresh token from  provider. Return login");
-				String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
-				model.addAttribute("redirect", aad_auth_url);
-				log.info("Redirecting to {}", aad_auth_url);
-				return "action";
+				String auth_url = authHelper.getAuthRedirect(ssolwaReDirectURI);
+				log.warn("provider {} - Cannot use silent flow. Redirect to {}", provider, auth_url);
+				return toAction(model, auth_url);
 			}
 		}
 		// return redirectURi with a ticket
-		log.info("login resolve");
-		return resolve(httpRequest, httpResponse, model, httpRequest.getParameter("redirectURI"));
+		log.info("provider {} - Seesion OK - Resolving login", provider);
+		return resolve(httpRequest, httpResponse, model, ssolwaReDirectURI);
 	}
 
-	// @RequestMapping("/auth")
 	public String authenticate(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model)
 			throws Throwable {
-		log.info("auth  start");
+		log.info("provider {} - authentication process start", provider);
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_LoginTypes(model);
-		if (!loginEnabled) {
-			// if (!SessionDao.instance.isLoginTypeEnabled(loginEnabled)) {
-			return "login";
-		}
+		
 		// get the original redirectURI
 		String redirectURI = authHelper.processAuthenticationCodeRedirectAndReturnTheClientRedirectUrl(httpRequest);
+		
+		if (!loginEnabled) {
+			log.warn("provider {} is not enabled. Redirect to SSOLWA login page {}", provider, redirectURI);
+			return toAction(model, redirectURI);
+		}
+		
 		// append the ticket and return to our client
 		return resolve(httpRequest, httpResponse, model, redirectURI);
 	}
 
 	private String resolve(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model,
 			String redirectURI) throws Exception {
-		log.info("auth resolve");
-		if (redirectURI == null || redirectURI.contentEquals("") || redirectURI.equalsIgnoreCase("welcome")) {
-			redirectURI = welcomeURL;
-		}
-
+		
 		String firstName = sessionManagementHelper.getFirstName(httpRequest); // (String) payload.get("given_name");
 		String lastName = sessionManagementHelper.getLastName(httpRequest); // (String) payload.get("family_name");
 		String email = sessionManagementHelper.getEmail(httpRequest);
 		String phoneNumber = sessionManagementHelper.getPhoneNumber(httpRequest);
 		String subject = sessionManagementHelper.getSubject(httpRequest);
+	
+		String username = String.valueOf(sessionManagementHelper.getClaim(httpRequest, jwtClaimAsUserName));
+		
+		if(username==null) {
+			//to ssolwa login page
+			return toAction(model, redirectURI);
+		}
 
 		String userticket = UUID.randomUUID().toString();
 
-		UserCredential credential = new UserCredential(email, subject);
-		log.info("UserCredential credential {}", credential);
+		UserCredential credential = new UserCredential(username, subject);
+		log.info("provider {} - Check user credential {}", provider, credential);
 
 		// already found check
 		String userTokenXml = tokenServiceClient.getUserToken(credential, userticket);
-		log.info("userTokenXml(1):" + userTokenXml);
+		log.info("provider {} - UserTokenXml returned: {}", provider, userTokenXml);
+		
 		if (userTokenXml == null) {
-			// corner case: username is prepended with the 3rd party marker
-			credential = new UserCredential(provider + "-" + email, subject);
-			log.info("UserCredential(2) credential:" + credential);
-			userTokenXml = tokenServiceClient.getUserToken(credential, userticket);
-			log.info("userTokenXml(2):" + userTokenXml);
-		}
-
-		if (userTokenXml == null) {
-			log.info("userTokenXml(3)");
-
-			// register a cookie that contains sessionid which can be used on other server
-			// instances
+			// register a cookie that contains sessionid which can be used on other server instances
 			registerAuthCookie(httpRequest, httpResponse);
 
-			if (!SessionDao.instance.checkIfUserExists(email)) {
+			if (!SessionDao.instance.checkIfUserExists(username)) {
 				// we should ask user to confirm their info and give their consents as follows
-				log.info("return toBasicInfoConfirm");
-				return toBasicInfoConfirm(model, redirectURI, email, firstName, lastName, email, phoneNumber, false,
-						false);
+				log.info("provider {} - Return to BasicInfoConfirm", provider);
+				return toBasicInfoConfirm(model, redirectURI, username, firstName, lastName, email, phoneNumber, false);
+			
 			} else {
-				// prompt "username exists. Is it you? Yes/No
-				// if Yes, enter username/password. Otherwise, append the 3rd party marker to
-				// the username
-				log.info("return toCredentialConfirm");
-
-				return toCredentialConfirm(model, redirectURI, email, null);
+				log.info("provider {} - Found username {} exists", provider, username);
+				//try if a session existing for this trusted client
+				userTokenXml = tokenServiceClient.logOnBySharedSecrect(username, userticket);
+				if(userTokenXml!=null) {
+					return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
+							userTokenXml);
+				} else {
+					
+					return toCredentialConfirm(model, redirectURI, subject, username, null);
+				}
+				
 			}
 
 		} else {
-			log.info("userTokenXml(4):" + userTokenXml);
-			log.info("return confirmUserInfoCheckAndReturn");
 			return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
 					userTokenXml);
 		}
 	}
+	
 
 	// add this session to cookie, which can be used on other server instances
 	/*
@@ -180,12 +227,12 @@ public class LoginController {
 	 */
 	private void registerAuthCookie(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		String sessionid = httpRequest.getSession().getId();
-		SessionCookieHelper.addSessionCookie("", sessionid, httpResponse);
+		SessionCookieHelper.addSessionCookie(provider, sessionid, httpResponse);
 	}
 
 	private String toBasicInfoConfirm(Model model, String redirectURI, String username, String firstName,
-			String lastName, String email, String cellPhone, boolean userTokenFound, boolean newRegister) {
-		model.addAttribute("newRegister", String.valueOf(newRegister));
+			String lastName, String email, String cellPhone, boolean userTokenFound) {
+		
 		model.addAttribute("redirectURI", redirectURI);
 		model.addAttribute("username", username);
 		model.addAttribute("slackuser", "");
@@ -193,7 +240,8 @@ public class LoginController {
 		model.addAttribute("cellPhone", cellPhone != null ? cellPhone : "");
 		model.addAttribute("firstName", firstName != null ? firstName : "");
 		model.addAttribute("lastName", lastName != null ? lastName : "");
-		model.addAttribute("service", this.service);
+		model.addAttribute("provider", this.provider);
+		model.addAttribute("jwtClaimAsUserName", this.jwtClaimAsUserName);
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
 
@@ -203,28 +251,31 @@ public class LoginController {
 		return "confirm_basicinfo";
 	}
 
-	private String toCredentialConfirm(Model model, String redirectURI, String username, String confirmError) {
+	private String toCredentialConfirm(Model model, String redirectURI, String clientId, String username, String loginErrorType) {
+		
 		model.addAttribute("redirectURI", redirectURI);
 		model.addAttribute("username", username);
-		model.addAttribute("service", this.service);
-		if (confirmError != null && !confirmError.isEmpty()) {
-			model.addAttribute("confirmError", confirmError);
+		model.addAttribute("clientId", clientId);
+		model.addAttribute("provider", this.provider);
+		if (loginErrorType != null) {
+			model.addAttribute("loginErrorType", loginErrorType);
 		}
 		SessionDao.instance.addModel_LoginTypes(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
 		return "confirm_credential";
 	}
+	
 
 	private String confirmUserInfoCheckAndReturn(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
 			Model model, String redirectURI, String userticket, String userTokenXml) {
-
+		
+		String r = appendTicketToRedirectURI(redirectURI, userticket);
+		log.info("provider {} - Login resolved sucessfully. Redirect to {}", provider, r);
 		updateLifeSpanForAuthSession(httpRequest, userTokenXml);
-		setWhydahCookie(httpRequest, httpResponse, userTokenXml);
-		String email = UserTokenXpathHelper.getEmail(userTokenXml);
-		String domain = extractDomain(email);
-		return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + domain );
+		setWhydahCookie(httpRequest, httpResponse, userTokenXml);	
+		return toAction(model, r);
 	}
-
+	
 	private void setWhydahCookie(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
 			String userTokenXml) {
 		String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
@@ -234,16 +285,8 @@ public class LoginController {
 				httpResponse);
 	}
 
-	private String toLogin(Model model, String redirectURI, String error) {
-		model.addAttribute("redirectURI", redirectURI);
-		model.addAttribute("loginError", "Login error: Could not create or authenticate user due to " + error);
-		SessionDao.instance.addModel_LoginTypes(model);
-		SessionDao.instance.addModel_CSRFtoken(model);
-		return "login";
-	}
-
 	private String toAction(Model model, String redirectURI) {
-		log.info("Redirecting to {}", redirectURI);
+		log.info("provider {} - Redirecting to {}", provider, redirectURI);
 		model.addAttribute("redirect", redirectURI);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_CSRFtoken(model);
@@ -258,32 +301,29 @@ public class LoginController {
 		return domain;
 	}
 
-	// @RequestMapping("/basicinfo_confirm")
 	public String confirmBasicInfo(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model)
 			throws Throwable {
+		
+		log.info("provider {} - ConfirmBasicInfo request", provider);
+		
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_LoginTypes(model);
-		if (!loginEnabled) {
-			return "login";
-		}
+		
 		if (!authHelper.isAuthenticated(httpRequest)) {
-			// not authenticated, redirecting to login.microsoft.com so user can
-			// authenticate
-			String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
-//			model.addAttribute("redirect", aad_auth_url);
-//			log.info("Redirecting to {}", aad_auth_url);
-//			return "action";
-			return toAction(model, aad_auth_url);
+			String auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
+			log.warn("provider {} - Session Not found - Redirect {}", provider, auth_url);
+			return toAction(model, auth_url);
 		}
 
 		if (authHelper.isAccessTokenExpired(httpRequest)) {
 			try {
-				log.info("isAccessTokenExpired  {}", httpRequest);
+				log.warn("provider {} - Session Expired. Use silent flow", provider);
 				authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			} catch (Exception ex) {
-				String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
-				return toAction(model, aad_auth_url);
+				String auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
+				log.warn("provider {} - Can not use silent flow. Return to {}", provider, auth_url);
+				return toAction(model, auth_url);
 			}
 		}
 
@@ -304,41 +344,42 @@ public class LoginController {
 		if (slackuser == null || slackuser.isEmpty()) {
 			slackuser = "unknown";
 		}
-		if (redirectURI == null || redirectURI.isEmpty() || redirectURI.equalsIgnoreCase("welcome")) {
-			redirectURI = welcomeURL;
+		if (redirectURI == null || redirectURI.isEmpty()) {
+			redirectURI = SessionDao.instance.LOGIN_URI;
+		}
+		
+		if (!loginEnabled) {
+			return toAction(model, redirectURI);
 		}
 
-		// AuthResult auth = SessionManagementHelper.getAuthSessionObject(httpRequest);
-		String stored_email = sessionManagementHelper.getEmail(httpRequest);
-		String stored_subject = sessionManagementHelper.getSubject(httpRequest);
+		String stored_sub = sessionManagementHelper.getSubject(httpRequest);
 		String stored_accessToken = sessionManagementHelper.getAccessToken(httpRequest);
+		String stored_userinfo_jsson = sessionManagementHelper.getUserInfoJsonstring(httpRequest);
+		String stored_username = String.valueOf(sessionManagementHelper.getClaim(httpRequest, jwtClaimAsUserName));
+		
 
-		if (userName == null || (!userName.equalsIgnoreCase(stored_email)
-				&& !userName.equalsIgnoreCase(provider + "-" + stored_email))) {
-			// misuse - illegal access check
-			return toLogin(model, redirectURI, "illegal username");
-		}
-		if (firstName == null || firstName.isEmpty()) {
-			return toLogin(model, redirectURI, "illegal first name");
-		}
-		if (lastName == null || lastName.isEmpty()) {
-			return toLogin(model, redirectURI, "illegal last name");
-		}
+		if (userName == null || (!userName.equalsIgnoreCase(stored_username))) {
+			// misuse -to ssolwa login page
+			return toAction(model, redirectURI);
+		}		
 		if (email == null || email.isEmpty()) {
-			return toLogin(model, redirectURI, "illegal email");
+			// misuse -to ssolwa login page
+			return toAction(model, redirectURI);
 		}
 		if (cellPhone == null || cellPhone.isEmpty()) {
-			return toLogin(model, redirectURI, "illegal cell phone");
+			// misuse -to ssolwa login page
+			return toAction(model, redirectURI);
 		}
 
-		UserCredential credential = new UserCredential(userName, stored_subject);
+		UserCredential credential = new UserCredential(userName, stored_sub);
 		String userticket = UUID.randomUUID().toString();
 		// already found check
 		String userTokenXml = tokenServiceClient.getUserToken(credential, userticket);
 
 		if (userTokenXml == null) {
 			String personRef = UUID.randomUUID().toString();
-			userTokenXml = tokenServiceClient.createAndLogonUser("", stored_accessToken, null, stored_subject, userName,
+			
+			userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, stored_userinfo_jsson, stored_sub, userName,
 					firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
 		}
 
@@ -350,22 +391,47 @@ public class LoginController {
 
 			setWhydahCookie(httpRequest, httpResponse, userTokenXml);
 			updateLifeSpanForAuthSession(httpRequest, userTokenXml);
-
-			SessionDao.instance.saveRoleDatatoWhydah(uid, appId, provider, "Whydah", "PersonId", personRef);
-			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml),
-					"", stored_accessToken, resolveAppRoles(null), stored_subject, username, firstName, lastName, email,
-					cellPhone, personRef);
-
 			
-			String domain = extractDomain(email);
+			SessionDao.instance.saveRoleDatatoWhydah(uid, "PersonId", personRef);
 			
-			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + domain);
+			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(
+					UserTokenXpathHelper.getUserID(userTokenXml),
+					provider, 
+					stored_accessToken, 
+					resolveAppRoles(null), 
+					stored_userinfo_jsson, 
+					stored_sub,
+					username, 
+					firstName, 
+					lastName, 
+					email,
+					cellPhone, 
+					personRef);
+
+	
+		
+			
+			//String domain = extractDomain(email);
+			
+			return toAction(model, appendTicketToRedirectURI(redirectURI, userticket));
 		} else {
-
-			return toLogin(model, redirectURI, "failure solving usertokenxml");
+			// to ssolwa login page
+			return toAction(model, redirectURI);
 		}
 
 	}
+	
+	String appendTicketToRedirectURI(String redirectURI, String userticket) {
+		String[] parts = redirectURI.split("\\?", 2);
+		String r ="";
+		if(parts.length==2) {
+			r = parts[0] + "?userticket=" + userticket + "&" + parts[1]; 
+		} else {
+			r = parts[0] + "?userticket=" + userticket;
+		}
+		return r;
+	}
+	
 
 	private void updateLifeSpanForAuthSession(HttpServletRequest httpRequest, String userTokenXml) {
 		Long tokenTimestampMsSinceEpoch = UserTokenXpathHelper.getTimestamp(userTokenXml);
@@ -384,153 +450,56 @@ public class LoginController {
 		}
 		return approles;
 	}
-
-	// @RequestMapping("/credential_confirm")
+	
 	public String confirmExist(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model)
 			throws Throwable {
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_LoginTypes(model);
-		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED)) {
-			return "login";
-		}
+		
 
 		if (!authHelper.isAuthenticated(httpRequest)) {
-			// not authenticated, redirecting to login.microsoft.com so user can
-			// authenticate
-
-			String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
-//			model.addAttribute("redirect", aad_auth_url);
-//			log.info("Redirecting to {}", aad_auth_url);
-//			return "action";
-			return toAction(model, aad_auth_url);
+			String auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
+			log.warn("provider {} - Session Not found - Redirect {}", provider, auth_url);
+			return toAction(model, auth_url);
 		}
 
 		if (authHelper.isAccessTokenExpired(httpRequest)) {
 			try {
-				log.info("isAccessTokenExpired  {}", httpRequest);
+				log.warn("provider {} - Session Expired. Use silent flow", provider);
 				authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
 			} catch (Exception ex) {
-				String aad_auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
-				return toAction(model, aad_auth_url);
+				String auth_url = authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI"));
+				log.warn("provider {} - Can not use silent flow. Return to {}", provider, auth_url);
+				return toAction(model, auth_url);
 			}
 		}
+		
+		
 
-		String newRegister = httpRequest.getParameter("newRegister");
+		String clientId = httpRequest.getParameter("clientId");
 		String userName = httpRequest.getParameter("username");
 		String pwd = httpRequest.getParameter("password");
 		String redirectURI = httpRequest.getParameter("redirectURI");
 		String userTokenXml = null;
 		String userticket = UUID.randomUUID().toString();
-
-		if (newRegister.equalsIgnoreCase("false")) {
-			if (userName != null && pwd != null && userName.length() > 0 && pwd.length() > 0) {
-				userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
-			}
-			if (userTokenXml == null) {
-				return toCredentialConfirm(model, redirectURI, userName, "Login failed. Wrong password!");
-			} else {
-				return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
-						userTokenXml);
-			}
-		} else {
-
-			String firstName = sessionManagementHelper.getFirstName(httpRequest);// (String) payload.get("given_name");
-			String lastName = sessionManagementHelper.getLastName(httpRequest);// (String) payload.get("family_name");
-			String phoneNumber = sessionManagementHelper.getPhoneNumber(httpRequest);
-			String email = sessionManagementHelper.getEmail(httpRequest);
-
-			return toBasicInfoConfirm(model, redirectURI, provider + "-" + email, firstName, lastName, email,
-					phoneNumber, false, true);
-
+		
+		if (!this.loginEnabled) {
+			log.warn("provider {} is not enabled. Redirect to SSOLWA login page {}", provider, redirectURI);
+			return toAction(model, redirectURI);
+		}
+		
+		if (userName != null && pwd != null && userName.length() > 0 && pwd.length() > 0) {
+			userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName, pwd), userticket);
 		}
 
-		/*
-		 * if(userName!=null && pwd!=null && userName.length()>0 && pwd.length()>0) {
-		 * userTokenXml = tokenServiceClient.getUserToken(new UserCredential(userName,
-		 * pwd), userticket); }
-		 * 
-		 * if(userTokenXml!=null) { return confirmUserInfoCheckAndReturn(httpRequest,
-		 * httpResponse, model, redirectURI, userticket, userTokenXml); } else {
-		 * 
-		 * String firstName=
-		 * GoogleSessionManagementHelper.getFirstName(httpRequest);//(String)
-		 * payload.get("given_name"); String lastName =
-		 * GoogleSessionManagementHelper.getLastName(httpRequest);//(String)
-		 * payload.get("family_name"); String email =
-		 * GoogleSessionManagementHelper.getEmail(httpRequest);
-		 * 
-		 * //for now, just prepend the marker google-misterhuydo@gmail.com for example
-		 * return toBasicInfoConfirm(model, redirectURI, "google-" + email, firstName,
-		 * lastName, email, null, false); }
-		 */
+		if (userTokenXml == null) {
+			return toCredentialConfirm(model, redirectURI, clientId, userName, "password");
+		} else {
+			return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
+					userTokenXml);
+		}
 	}
+	
 }
-/*
- * public String confirmExist(HttpServletRequest httpRequest,
- * HttpServletResponse httpResponse, Model model) throws Throwable {
- * SessionDao.instance.addModel_CSRFtoken(model);
- * SessionDao.instance.addModel_LOGO_URL(model);
- * SessionDao.instance.addModel_LoginTypes(model); if
- * (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED))
- * { return "login"; }
- * 
- * if (!authHelper.isAuthenticated(httpRequest)) { // not authenticated,
- * redirecting to login.microsoft.com so user can authenticate
- * 
- * String aad_auth_url =
- * authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI")); //
- * model.addAttribute("redirect", aad_auth_url); //
- * log.info("Redirecting to {}", aad_auth_url); // return "action"; return
- * toAction(model, aad_auth_url); }
- * 
- * if (authHelper.isAccessTokenExpired(httpRequest)) { try {
- * log.info("isAccessTokenExpired  {}", httpRequest);
- * //authHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse); }
- * catch(Exception ex) { String aad_auth_url =
- * authHelper.getAuthRedirect(httpRequest.getParameter("redirectURI")); return
- * toAction(model, aad_auth_url); } }
- * 
- * String newRegister = httpRequest.getParameter("newRegister"); String userName
- * = httpRequest.getParameter("username"); String pwd =
- * httpRequest.getParameter("password"); String redirectURI =
- * httpRequest.getParameter("redirectURI"); String userTokenXml =null; String
- * userticket = UUID.randomUUID().toString();
- * 
- * if(newRegister.equalsIgnoreCase("false")) { if(userName!=null && pwd!=null &&
- * userName.length()>0 && pwd.length()>0) { userTokenXml =
- * tokenServiceClient.getUserToken(new UserCredential(userName, pwd),
- * userticket); } if(userTokenXml == null) { return toCredentialConfirm(model,
- * redirectURI, userName, "Login failed. Wrong password!"); } else { return
- * confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI,
- * userticket, userTokenXml); } } else { if
- * (SessionDao.instance.checkIfUserExists(userName)) { return
- * toCredentialConfirm(model, redirectURI, userName,
- * "Username already existed!"); } else { String firstName =
- * sessionManagementHelper.getFirstName(httpRequest);//(String)
- * payload.get("given_name"); String lastName =
- * sessionManagementHelper.getLastName(httpRequest);//(String)
- * payload.get("family_name"); String email =
- * sessionManagementHelper.getEmail(httpRequest);
- * 
- * //return toBasicInfoConfirm(model, redirectURI, userName, firstName,
- * lastName, email, null, false, true); return toBasicInfoConfirm(model,
- * redirectURI, "google-" + email, firstName, lastName, email, null, false,
- * true); } } /* if(userName!=null && pwd!=null && userName.length()>0 &&
- * pwd.length()>0) { userTokenXml = tokenServiceClient.getUserToken(new
- * UserCredential(userName, pwd), userticket); }
- * 
- * if(userTokenXml!=null) { return confirmUserInfoCheckAndReturn(httpRequest,
- * httpResponse, model, redirectURI, userticket, userTokenXml); } else {
- * 
- * String firstName=
- * sessionManagementHelper.getFirstName(httpRequest);//(String)
- * payload.get("given_name"); String lastName =
- * sessionManagementHelper.getLastName(httpRequest);//(String)
- * payload.get("family_name"); String email =
- * sessionManagementHelper.getEmail(httpRequest);
- * 
- * //for now, just prepend the marker -misterhuydo@gmail.com for example return
- * toBasicInfoConfirm(model, redirectURI, provider + "-" + email, firstName,
- * lastName, email, null, false, true); } } }
- */
+

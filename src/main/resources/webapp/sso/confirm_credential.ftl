@@ -16,46 +16,26 @@
 
 	        <div class="login-box">
 	
-	            <#if confirmError??>
-	              <p class="error">${confirmError!}</p>
+	            <#if loginErrorType??>
+	              <#assign pa = "wrong ${loginErrorType}!">
+	              <p class="error">${pa}</p>
 	            </#if>
 				
-                <input type="radio" name="accepted" value="yes" checked="checked" onclick="radioCheck(this)">Yes, it is me<br>
-                <input type="radio" name="accepted" value="no" onclick="radioCheck(this)"> No, register new<br>
-
-	            <form name="existinguser_form" method="POST" class="new_user_session" accept-charset="utf-8" action="${service?switch('azuread', '/sso/aad_credential_confirm', 'google', '/sso/google_credential_confirm', 'whydah', '/sso/whydah_credential_confirm', 'oidcProviderVipps', '/sso/vipps/credential_confirm', 'oidcProviderGoogle', '/sso/google/credential_confirm', 'oidcProviderMicrosoft', '/sso/microsoft/credential_confirm' )}">
+				<#assign pa = "/sso/${provider}/credential_confirm">
+	            <form name="existinguser_form" method="POST" class="new_user_session" accept-charset="utf-8" action="${pa}">
 	                <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
 	                <input name="redirectURI" type="hidden" value="${redirectURI!}">
-	                <#if whydahOauth2Provider??>
-						<input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
-					</#if>
+	                <input id="clientId" name="clientId" size="30" type="hidden" value="${clientId!}">
 					<input id="username" name="username" size="30" type="hidden" value="${username!}">
 	                <input id="password" name="password" size="30" type="password" placeholder="Password"/>
+	                
 					<input name="newRegister" type="hidden" value="false" />
 	                <input class="button button-login" name="commit" type="submit" value="Confirm"/>
 	 		       
 	            </form>
-                <form name="newuser_form" method="POST" class="new_user_session" accept-charset="utf-8" action="${service?switch('azuread', '/sso/aad_credential_confirm', 'google', '/sso/google_credential_confirm', 'whydah', '/sso/whydah_credential_confirm', 'oidcProviderVipps', '/sso/vipps/credential_confirm', 'oidcProviderGoogle', '/sso/google/credential_confirm', 'oidcProviderMicrosoft', '/sso/microsoft/credential_confirm' )}">
-	                <input name="CSRFtoken" type="hidden" value="${CSRFtoken!}">
-	                <input name="redirectURI" type="hidden" value="${redirectURI!}">
-	                <#if whydahOauth2Provider??>
-						<input name="whydahOauth2Provider" type="hidden" value="${whydahOauth2Provider!}">
-					</#if>
-					<input name="newRegister" type="hidden" value="true" />
-					
-	                <input id="username" name="username" size="30" type="hidden" value="${username!}">
-	                <input class="button button-login" name="commit" type="submit" value="Register new"/>
-	            </form>
-	        </div>
+        
+	       </div>
 </div>
-<script>
-    document.newuser_form.style.display = 'none';
-    function radioCheck(myRadio) {
-    
-        document.existinguser_form.style.display = myRadio.value === 'yes'? "block" :"none";
-        document.newuser_form.style.display = myRadio.value === 'no'? "block" :"none";
-    }
 
-</script>
 </body>
 </html>

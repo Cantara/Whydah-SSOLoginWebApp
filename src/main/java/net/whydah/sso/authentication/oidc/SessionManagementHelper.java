@@ -3,13 +3,16 @@
 
 package net.whydah.sso.authentication.oidc;
 
-import com.hazelcast.map.IMap;
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
 import net.whydah.sso.authentication.iamproviders.StateData;
+import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.utils.HazelcastMapHelper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hazelcast.map.IMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,8 +30,8 @@ public class SessionManagementHelper {
 	private static final Integer STATE_TTL = 86400;
 
 	private static boolean byPassRemoval = true;
-	private static IMap<String, SessionData> sessions = HazelcastMapHelper.register("sso_oidc_auth_sessions");
-	private static IMap<String, StateData> states = HazelcastMapHelper.register("sso_oidc_auth_states");
+	private IMap<String, SessionData> sessions;
+	private IMap<String, StateData> states;
 
 	private final String failedToValidateMessage;
 	private final String provider;
@@ -36,14 +39,17 @@ public class SessionManagementHelper {
 	public SessionManagementHelper(String provider) {
 		this.provider = provider;
 		failedToValidateMessage = "Failed to validate data received from Authorization service - " + provider;
+		sessions = HazelcastMapHelper.register(provider + "sso_oidc_auth_sessions");
+		states = HazelcastMapHelper.register(provider + "sso_oidc_auth_states");
+		
 	}
 
-	public static int countValidSessions() {
+	public int countValidSessions() {
 		removeExpiredSessions();
 		return sessions.size();
 	}
 	
-	public static int countStates() {
+	public  int countStates() {
 		return states.size();
 	}
 
@@ -94,7 +100,7 @@ public class SessionManagementHelper {
 	}
 
 
-	private static StateData removeStateFromStates(String state) {
+	private  StateData removeStateFromStates(String state) {
 		log.debug("entry - removeStateFromStates:" + state);
 		
 			Iterator<Map.Entry<String, StateData>> it = states.entrySet().iterator();
@@ -125,7 +131,7 @@ public class SessionManagementHelper {
 		sessions.remove(httpRequest.getSession().getId());
 	}
 
-	static void storeStateAndNonceInStates(String state, String nonce, String redirectUri) {
+	 void storeStateAndNonceInStates(String state, String nonce, String redirectUri) {
 		states.put(state, new StateData(state, nonce, redirectUri, new Date()));
 	}
 
@@ -213,7 +219,7 @@ public class SessionManagementHelper {
 		return getSessionData(httpRequest).getSubject();
 	}
 
-	public static List<String> removeExpiredSessions() {
+	public List<String> removeExpiredSessions() {
 		List<String> removedSessionIds = new ArrayList<String>();
 		Iterator<Map.Entry<String, SessionData>> it = sessions.entrySet().iterator();
 		Date currTime = new Date();
@@ -227,6 +233,13 @@ public class SessionManagementHelper {
 		return removedSessionIds;
 	}
 
+	String getUserInfoJsonstring(HttpServletRequest httpRequest) {
+		return getSessionData(httpRequest).getUserInfoJsonString();
+	}
+	
+	Object getClaim(HttpServletRequest httpRequest, String claimName) {
+		return getSessionData(httpRequest).getClaimsSet().get(claimName);
+	}
 	
 	public void updateLifeSpanForSession(HttpServletRequest httpRequest, Long endOfTokenLifeMs) {
 		
@@ -245,6 +258,20 @@ public class SessionManagementHelper {
 				sessions.put(sessionid, session);
 			}
 		}
+	}
+
+	public void setUserInfoJsonString(HttpServletRequest httpRequest, String userinfoJsonString) {
+		SessionData sessiondata = getSessionData(httpRequest);
+		sessiondata.setUserInfoJsonString(userinfoJsonString);
+		sessions.put(httpRequest.getSession().getId(), sessiondata);
+		
+	}
+
+	public void setClaimsSet(HttpServletRequest httpRequest, Map<String, Object> claimSets) {
+		SessionData sessiondata = getSessionData(httpRequest);
+		sessiondata.setClaimsSet(claimSets);
+		sessions.put(httpRequest.getSession().getId(), sessiondata);
+		
 	}
 
 

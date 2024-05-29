@@ -1,9 +1,10 @@
 package net.whydah.sso.authentication.oidc;
 
-import lombok.Data;
-import net.whydah.sso.authentication.iamproviders.BaseSessionData;
-
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import lombok.Data;
 
 @Data
 public class SessionData extends BaseSessionData implements Serializable {
@@ -19,4 +20,7 @@ public class SessionData extends BaseSessionData implements Serializable {
 
 	//OIDC "extra"
 	private String email;
+	
+	private String userInfoJsonString;
+	private Map<String, Object> claimsSet = new HashMap<>();
 }

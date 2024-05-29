@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.ddd.model.user.UserTokenId;
 
 public class SessionCookieHelper {
 	public static String REFERENCE_NAME = "auth_sessionid";

@@ -295,7 +295,7 @@ public class AzureSSOLoginController {
 
 			if (userTokenXml == null) {
 				String personRef = UUID.randomUUID().toString();
-				userTokenXml = tokenServiceClient.createAndLogonUser("aad", accessToken, approles, oid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+				userTokenXml = tokenServiceClient.createAndLogonUser("aad", accessToken, approles, "", oid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
 			}
 
 			if (userTokenXml != null) {
@@ -308,8 +308,8 @@ public class AzureSSOLoginController {
 
 				
 				try {
-					SessionDao.instance.saveRoleDatatoWhydah(uid, APPID, APPNAME, "Whydah", "PersonId", personRef);			
-					SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), "aad", accessToken, resolveAppRoles(approles), oid, username, firstName, lastName, email, cellPhone, personRef);
+					SessionDao.instance.saveRoleDatatoWhydah(uid, "PersonId", personRef);			
+					SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), "aad", accessToken, resolveAppRoles(approles), "", oid, username, firstName, lastName, email, cellPhone, personRef);
 				} catch (Exception e) {
 					log.error("Unable to persist roles to whydah");
 				}

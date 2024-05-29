@@ -1,28 +1,34 @@
 package net.whydah.sso.authentication.whydah.clients;
 
+import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
+import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
+import static com.sun.jersey.api.client.ClientResponse.Status.OK;
+
+import java.io.IOException;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.restfb.types.User;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
+import net.whydah.sso.authentication.oidc.CommandSTSLogonUserBySharedSecrect;
 import net.whydah.sso.commands.userauth.CommandLogonUserByUserCredential;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.config.ApplicationMode;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.session.baseclasses.BaseDevelopmentWhydahServiceClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import java.io.IOException;
-import java.util.Properties;
-
-import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
 public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
@@ -184,7 +190,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         return sb.toString();
     }
     
-    public String createAndLogonUser(String provider, String accessToken, String appRoles, String userId, String username, String firstName, String lastName, String email, String cellPhone, String personRef, net.whydah.sso.user.types.UserCredential userCredential, String userticket, HttpServletRequest request) {
+    public String createAndLogonUser(String provider, String accessToken, String appRoles, String userinfoJsonString, String userId, String username, String firstName, String lastName, String email, String cellPhone, String personRef, net.whydah.sso.user.types.UserCredential userCredential, String userticket, HttpServletRequest request) {
 		log.debug("createAndLogonUser - apptokenid: {}", getMyAppTokenID());
 
 		WebResource createUserResource = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
@@ -193,7 +199,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 		formData.add("apptoken", getMyAppTokenXml());
 		formData.add("usercredential", userCredential.toXML());
-		String userXml = getUserXml(provider, accessToken, appRoles, userId, firstName, lastName, username, email, cellPhone, personRef);
+		String userXml = getUserXml(provider, accessToken, appRoles, userinfoJsonString, userId, firstName, lastName, username, email, cellPhone, personRef);
 		formData.add("userxml", userXml);
 		log.trace("createAndLogonUser with User XML: " + userXml +"\nformData:\n"+formData);
 		log.info("createAndLogonUser username=" + username);
@@ -224,9 +230,11 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 		return null;
 	}
 
-	private String getProviderAccessTokenTag(String provider, String accessToken) {
+    private String getProviderAccessTokenTag(String provider, String accessToken) {
 		if(provider!=null) {
-			if(provider.equalsIgnoreCase("aad")) {
+			if(provider.equalsIgnoreCase("vipps")) {
+				return "		 <vippsAccessToken>" + accessToken + "</vippsAccessToken>";
+			} else if(provider.equalsIgnoreCase("aad")) {
 				return "		 <aadAccessToken>" + accessToken + "</aadAccessToken>";
 			} else if(provider.equalsIgnoreCase("fb")) {
 				return "		 <fbAccessToken>" + accessToken + "</fbAccessToken>";
@@ -241,7 +249,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 		return "";
 	}
 	
-	public String getUserXml(String provider, String accessToken, String appRoles, String userId, String firstName, String lastName, String username, String email, String cellPhone, String personRef) {
+	public String getUserXml(String provider, String accessToken, String appRoles, String userinfoJson, String userId, String firstName, String lastName, String username, String email, String cellPhone, String personRef) {
 		StringBuilder strb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n ");
 		strb.append("<user>\n");
 		strb.append("    <params>\n");
@@ -254,13 +262,24 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 		strb.append("        <email>").append(email).append( "</email>\n");
 		strb.append("        <cellPhone>").append(cellPhone).append( "</cellPhone>\n");
 		strb.append("        <personRef>").append(personRef).append( "</personRef>\n");
+		strb.append("        <userinfoJson>").append(userinfoJson).append( "</userinfoJson>\n");
 		strb.append("    </params> \n");
 		strb.append("</user>\n");
 		log.info(strb.toString());
 		return strb.toString();
 	}
 
-
+	public String logOnBySharedSecrect(String username, String userticket) {
+		return new CommandSTSLogonUserBySharedSecrect(
+				uri_securitytoken_service,
+				getMyAppTokenID(),
+				getMyAppTokenXml(),
+				SessionDao.instance.getUserAdminToken().getUserTokenId(),
+				username,
+				SessionDao.instance.SSOLWA_STS_SHARED_SECRECT,
+				userticket
+				).execute();
+	}
 }
 
 

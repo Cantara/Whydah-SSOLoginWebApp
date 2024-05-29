@@ -26,13 +26,7 @@ public class Vipps implements Provider {
 
     @Autowired
     public Vipps() throws IOException, GeneralException, URISyntaxException {
-        Properties properties = AppConfig.readProperties();
-        this.controller = new LoginController(provider, properties.getProperty(provider+".logoUrl"),
-                properties.getProperty(provider+".issuerUrl"),
-                properties.getProperty(provider+".appId"), properties.getProperty(provider+".appSecret"),
-                properties.getProperty("myuri"),
-                Objects.equals(properties.getProperty(provider + ".enabled"), "true"));
-
+        this.controller = new LoginController(provider);
     }
 
     @RequestMapping("/" + provider + "/login")

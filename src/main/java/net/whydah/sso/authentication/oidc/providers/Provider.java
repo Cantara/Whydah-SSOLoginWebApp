@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface Provider {
+	
     String login(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable;
 
     String authenticate(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) throws Throwable;

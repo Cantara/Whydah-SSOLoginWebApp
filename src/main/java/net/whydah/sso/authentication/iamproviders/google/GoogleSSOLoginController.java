@@ -328,7 +328,7 @@ public class GoogleSSOLoginController {
 
 		if (userTokenXml == null) {	
 			String personRef = UUID.randomUUID().toString();
-			userTokenXml = tokenServiceClient.createAndLogonUser("google", stored_accessToken, null, stored_subject, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
+			userTokenXml = tokenServiceClient.createAndLogonUser("google", stored_accessToken, null, "", stored_subject, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
 		} 
 
 
@@ -342,8 +342,8 @@ public class GoogleSSOLoginController {
 			updateLifeSpanForAuthSession(httpRequest, userTokenXml);
 
 
-			SessionDao.instance.saveRoleDatatoWhydah(uid, APPID, APPNAME, "Whydah", "PersonId", personRef);
-			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), "google", stored_accessToken, resolveAppRoles(null), stored_subject, username, firstName, lastName, email, cellPhone, personRef);
+			SessionDao.instance.saveRoleDatatoWhydah(uid, "PersonId", personRef);
+			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), "google", stored_accessToken, resolveAppRoles(null), "", stored_subject, username, firstName, lastName, email, cellPhone, personRef);
 
 			String domain = extractDomain(stored_email);
 			if(domain!= null && !domain.equals("gmail.com")) {

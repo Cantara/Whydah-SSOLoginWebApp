@@ -1,34 +1,32 @@
 package net.whydah.sso.authentication.oidc.providers;
 
-import com.nimbusds.oauth2.sdk.GeneralException;
-import net.whydah.sso.authentication.oidc.LoginController;
-import net.whydah.sso.config.AppConfig;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Objects;
-import java.util.Properties;
+import com.nimbusds.oauth2.sdk.GeneralException;
+
+import net.whydah.sso.authentication.oidc.LoginController;
+import net.whydah.sso.config.AppConfig;
 
 @Controller
 public class Microsoft implements Provider {
-    public static final String provider = "microsoft";
+    public static final String provider = "azuread";
 
     private final LoginController controller;
 
     @Autowired
     public Microsoft() throws IOException, GeneralException, URISyntaxException {
         Properties properties = AppConfig.readProperties();
-        this.controller = new LoginController(provider, properties.getProperty(provider+".logoUrl"),
-                "https://login.microsoftonline.com/{tenantid}/v2.0",
-                properties.getProperty(provider+".appId"), properties.getProperty(provider+".appSecret"),
-                properties.getProperty("myuri"),
-                Objects.equals(properties.getProperty(provider + ".enabled"), "true"));
+        this.controller = new LoginController(provider);
     }
 
     @RequestMapping("/" + provider + "/login")

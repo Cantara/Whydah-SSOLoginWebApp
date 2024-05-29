@@ -65,35 +65,35 @@ public class SSOLogoutController {
 		if (userTokenId != null && userTokenId.length() > 3) {
 			
 			//try logout from AAD 
-			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
-				try {
-					aadHelper.logoutRedirect(request, response);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
+//			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
+//				try {
+//					aadHelper.logoutRedirect(request, response);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//			}
 			
 			//try logout from Google 
-			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED)) {
-				try {
-					ggHelper.logoutRedirect(request, response);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			for(WhydahProvider provider : whydahOauthHelper.getProviders().values()) {
-				if (provider.isEnabled()) {
-					try {
-						whydahOauthHelper.logoutRedirect(request, response, provider.getProvider());						
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
+//			if (SessionDao.instance.isLoginTypeEnabled(ConstantValue.GOOGLELOGIN_ENABLED)) {
+//				try {
+//					ggHelper.logoutRedirect(request, response);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//			for(WhydahProvider provider : whydahOauthHelper.getProviders().values()) {
+//				if (provider.isEnabled()) {
+//					try {
+//						whydahOauthHelper.logoutRedirect(request, response, provider.getProvider());						
+//					} catch (Exception e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}
 			for (Provider oidcProvider : SessionDao.instance.getOIDCProvidersEnabled()) {
 				try {
 					oidcProvider.logout(request, response);

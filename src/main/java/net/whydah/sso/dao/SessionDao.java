@@ -84,6 +84,7 @@ public enum SessionDao {
 	PersonaServiceHelper personaService;
 	
 	WhydahOauthIntegrationConfig whydahOauthConfig;
+	public String SSOLWA_STS_SHARED_SECRECT;
 	
 	public CRMHelper getCRMHelper(){
 		return crmHelper;
@@ -101,6 +102,7 @@ public enum SessionDao {
 		try {
 
 			properties = AppConfig.readProperties();
+			this.SSOLWA_STS_SHARED_SECRECT = properties.getProperty("ssolwa_sts_shared_secrect");
 			this.LOGOURL = properties.getProperty("logourl", LOGOURL);
 			MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
             LOGOUT_ACTION_URI = MY_APP_URI + "logoutaction";
@@ -141,22 +143,22 @@ public enum SessionDao {
 		
 		model.addAttribute(ConstantValue.SIGNUPENABLED, enabledLoginTypes.isSignupEnabled());
 		model.addAttribute(ConstantValue.USERPASSWORDLOGINENABLED, enabledLoginTypes.isUserpasswordLoginEnabled());
-        model.addAttribute(ConstantValue.FACEBOOKLOGIN_ENABLED, enabledLoginTypes.isFacebookLoginEnabled());
-        model.addAttribute(ConstantValue.OPENIDLOGIN_ENABLED, enabledLoginTypes.isOpenIdLoginEnabled());
-        model.addAttribute(ConstantValue.OMNILOGIN_ENABLED, enabledLoginTypes.isOmniLoginEnabled());
-        model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
+        //model.addAttribute(ConstantValue.FACEBOOKLOGIN_ENABLED, enabledLoginTypes.isFacebookLoginEnabled());
+        //model.addAttribute(ConstantValue.OPENIDLOGIN_ENABLED, enabledLoginTypes.isOpenIdLoginEnabled());
+        //model.addAttribute(ConstantValue.OMNILOGIN_ENABLED, enabledLoginTypes.isOmniLoginEnabled());
+        //model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
         model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
-        model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
-        model.addAttribute(ConstantValue.MICROSOFTLOGIN_ENABLED, enabledLoginTypes.isMicrosoftLoginEnabled());
+        //model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
+        //model.addAttribute(ConstantValue.MICROSOFTLOGIN_ENABLED, enabledLoginTypes.isMicrosoftLoginEnabled());
         
         model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
         
         //sign up
-        model.addAttribute(ConstantValue.SIGNUP_MICROSOFT_ON, enabledLoginTypes.isSignuppageMicrosoftOn());
-        model.addAttribute(ConstantValue.SIGNUP_GOOGLE_ON, enabledLoginTypes.isSignuppageGoogleOn());
-        model.addAttribute(ConstantValue.SIGNUP_FACEBOOK_ON, enabledLoginTypes.isSignuppageFacebookOn());
-        model.addAttribute(ConstantValue.SIGNUP_NETIQ_ON, enabledLoginTypes.isSignuppageNetIQOn());
-        model.addAttribute(ConstantValue.SIGNUP_WHYDAH_INTEGRATION_PROVIDERS_ON, enabledLoginTypes.isSignuppageWhydahIntegrationproviderOn());
+        //model.addAttribute(ConstantValue.SIGNUP_MICROSOFT_ON, enabledLoginTypes.isSignuppageMicrosoftOn());
+        //model.addAttribute(ConstantValue.SIGNUP_GOOGLE_ON, enabledLoginTypes.isSignuppageGoogleOn());
+        //model.addAttribute(ConstantValue.SIGNUP_FACEBOOK_ON, enabledLoginTypes.isSignuppageFacebookOn());
+        //model.addAttribute(ConstantValue.SIGNUP_NETIQ_ON, enabledLoginTypes.isSignuppageNetIQOn());
+        //model.addAttribute(ConstantValue.SIGNUP_WHYDAH_INTEGRATION_PROVIDERS_ON, enabledLoginTypes.isSignuppageWhydahIntegrationproviderOn());
         
        
        
@@ -666,7 +668,7 @@ public enum SessionDao {
 		return redirectURI;
 	}
 	
-	public void syncWhydahUserInfoWithThirdPartyUserInfo(String whydahuid, String provider, String accessToken, String appRoles, String thirdpartyUserId, String username, String firstName, String lastName, String email, String cellPhone, String personRef) {
+	public void syncWhydahUserInfoWithThirdPartyUserInfo(String whydahuid, String provider, String accessToken, String appRoles, String userinfoJsonString, String thirdpartyUserId, String username, String firstName, String lastName, String email, String cellPhone, String personRef) {
 		try {
 			String json = new CommandGetUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), whydahuid).execute();
 			log.warn("syncWhydahUserInfoWithThirdPartyUserInfo CommandGetUserAggregate -  json {}", json);
@@ -682,26 +684,35 @@ public enum SessionDao {
 					boolean aad_data_found = false;
 					boolean google_data_found = false;
 					boolean rebel_data_found = false;
+					boolean vipps_data_found = false;
+					
 					for (UserApplicationRoleEntry entry : u.getRoleList()) {
 
-						if (provider.equalsIgnoreCase("aad")) {
+						if (provider.equalsIgnoreCase("azuread")) {
 							if (entry.getOrgName().equalsIgnoreCase("AzureAD") && entry.getRoleName().equalsIgnoreCase("data")) {
 								aad_data_found = true;
-								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("aad", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("aad", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
 								entry.setRoleValue(value);
 							}
 						}
 						if (provider.equalsIgnoreCase("google")) {
 							if (entry.getOrgName().equalsIgnoreCase("Google") && entry.getRoleName().equalsIgnoreCase("data")) {
 								google_data_found = true;
-								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("google", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("google", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
 								entry.setRoleValue(value);
 							}
 						}
 						if (provider.equalsIgnoreCase("rebel")) {
 							if (entry.getOrgName().equalsIgnoreCase("Rebel") && entry.getRoleName().equalsIgnoreCase("data")) {
 								rebel_data_found = true;
-								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("rebel", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("rebel", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+								entry.setRoleValue(value);
+							}
+						}
+						if (provider.equalsIgnoreCase("vipps")) {
+							if (entry.getOrgName().equalsIgnoreCase("Vipps") && entry.getRoleName().equalsIgnoreCase("data")) {
+								vipps_data_found = true;
+								String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("vipps", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
 								entry.setRoleValue(value);
 							}
 						}
@@ -710,14 +721,14 @@ public enum SessionDao {
 						//do for others
 
 					}
-					if (!aad_data_found && provider.equalsIgnoreCase("aad")) {
+					if (!aad_data_found && provider.equalsIgnoreCase("azuread")) {
 						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
 						role.setUserId(whydahuid);
-						role.setApplicationId("2215");
-						role.setApplicationName("Whydah");
+						role.setApplicationId(serviceClient.getWAS().getMyApplicationCredential().getApplicationID());
+						role.setApplicationName(serviceClient.getWAS().getMyApplicationCredential().getApplicationName());
 						role.setOrgName("AzureAD");
 						role.setRoleName("data");
-						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("aad", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("aad", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
 						role.setRoleValue(value);
 						if (u.getRoleList() == null) {
 							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
@@ -729,11 +740,11 @@ public enum SessionDao {
 					if (!google_data_found && provider.equalsIgnoreCase("google")) {
 						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
 						role.setUserId(whydahuid);
-						role.setApplicationId("2215");
-						role.setApplicationName("Whydah");
+						role.setApplicationId(serviceClient.getWAS().getMyApplicationCredential().getApplicationID());
+						role.setApplicationName(serviceClient.getWAS().getMyApplicationCredential().getApplicationName());
 						role.setOrgName("Google");
 						role.setRoleName("data");
-						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("google", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("google", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
 						role.setRoleValue(value);
 						if (u.getRoleList() == null) {
 							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
@@ -745,11 +756,27 @@ public enum SessionDao {
 					if (!rebel_data_found && provider.equalsIgnoreCase("rebel")) {
 						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
 						role.setUserId(whydahuid);
-						role.setApplicationId("2215");
-						role.setApplicationName("Whydah");
+						role.setApplicationId(serviceClient.getWAS().getMyApplicationCredential().getApplicationID());
+						role.setApplicationName(serviceClient.getWAS().getMyApplicationCredential().getApplicationName());
 						role.setOrgName("Rebel");
 						role.setRoleName("data");
-						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("rebel", accessToken, appRoles, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("rebel", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
+						role.setRoleValue(value);
+						if (u.getRoleList() == null) {
+							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
+						}
+						u.getRoleList().add(role);
+
+					}
+					
+					if (!vipps_data_found && provider.equalsIgnoreCase("vipps")) {
+						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
+						role.setUserId(whydahuid);
+						role.setApplicationId(serviceClient.getWAS().getMyApplicationCredential().getApplicationID());
+						role.setApplicationName(serviceClient.getWAS().getMyApplicationCredential().getApplicationName());
+						role.setOrgName("Vipps");
+						role.setRoleName("data");
+						String value = Base64.getEncoder().encodeToString(("<![CDATA[" + serviceClient.getUserXml("vipps", accessToken, appRoles, userinfoJsonString, thirdpartyUserId, firstName, lastName, username, email, cellPhone, personRef) + "]]>").getBytes());
 						role.setRoleValue(value);
 						if (u.getRoleList() == null) {
 							u.setRoleList(new ArrayList<UserApplicationRoleEntry>());
@@ -769,7 +796,7 @@ public enum SessionDao {
 
 	}
 
-	public void saveRoleDatatoWhydah(String whydahuid, String appId, String appName, String orgName, String roleName, String roleValue) {
+	public void saveRoleDatatoWhydah(String whydahuid, String roleName, String roleValue) {
 		log.info("saveRoleDatatoWhydah start ");
 		try {
 			String json = new CommandGetUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), whydahuid).execute();
@@ -789,9 +816,9 @@ public enum SessionDao {
 					log.info("saveRoleDatatoWhydah - create role ");
 					UserApplicationRoleEntry role = new UserApplicationRoleEntry();
 					role.setUserId(whydahuid);
-					role.setApplicationId(appId);
-					role.setApplicationName(appName);
-					role.setOrgName(orgName);
+					role.setApplicationId(serviceClient.getWAS().getMyApplicationCredential().getApplicationID());
+					role.setApplicationName(serviceClient.getWAS().getMyApplicationCredential().getApplicationName());
+					role.setOrgName("Whydah");
 					role.setRoleName(roleName);
 					role.setRoleValue(roleValue);
 					if (u.getRoleList() == null) {

@@ -297,15 +297,15 @@ public class WhydahOAuthSSOLoginController {
 				//save a new user with uid as username, and have personRef pointed to a new registered username 
 				credential = new WhydahOAuthUserCredential(provider_uid, provider_uid, provider_uid);
 				String personRef = userName;
-				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, provider_uid, provider_uid, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
+				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "",provider_uid, provider_uid, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
 				if(userTokenXml!=null) {
 					credential = new WhydahOAuthUserCredential(provider_uid, userName, provider_uid);
 					personRef = UUID.randomUUID().toString();
-					userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+					userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "", provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
 				}
 			} else {
 				String personRef = UUID.randomUUID().toString();
-				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "", provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
 			}
 		}
 
@@ -320,8 +320,8 @@ public class WhydahOAuthSSOLoginController {
 			updateLifeSpanForAuthSession(httpRequest, userTokenXml, provider);
 
 
-			SessionDao.instance.saveRoleDatatoWhydah(uid, APPID, APPNAME, "Whydah", "PersonId", personRef);
-			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), provider, stored_accessToken, resolveAppRoles(null), provider_uid, username, firstName, lastName, email, cellPhone, personRef);
+			SessionDao.instance.saveRoleDatatoWhydah(uid, "PersonId", personRef);
+			SessionDao.instance.syncWhydahUserInfoWithThirdPartyUserInfo(UserTokenXpathHelper.getUserID(userTokenXml), provider, stored_accessToken, resolveAppRoles(null), "", provider_uid, username, firstName, lastName, email, cellPhone, personRef);
 
 
 			return toAction(model, tokenServiceClient.appendTicketToRedirectURI(redirectURI, userticket) + "&referer_channel=" + provider );
