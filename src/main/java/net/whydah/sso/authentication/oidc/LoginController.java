@@ -185,9 +185,9 @@ public class LoginController {
 		String phoneNumber = sessionManagementHelper.getPhoneNumber(httpRequest);
 		String subject = sessionManagementHelper.getSubject(httpRequest);
 	
-		
-		phoneNumber = formatPhoneNumber(phoneNumber);
-		
+		if(phoneNumber!=null) {
+			phoneNumber = formatPhoneNumber(phoneNumber);
+		}
 		String username = String.valueOf(sessionManagementHelper.getClaim(httpRequest, jwtClaimAsUserName));
 		if(jwtClaimAsUserName.equalsIgnoreCase("phone_number")) {
 			if(username!=null) {
