@@ -166,10 +166,10 @@ public class LoginController {
 		
 		phonenumber = phonenumber.replace(" ", "");
 		if(phonenumber.length()>=11 && phonenumber.startsWith("+47")) {
-			phonenumber = phonenumber.replace("+47", "");
+			phonenumber = phonenumber.replaceFirst("+47", "");
 		}
 		if(phonenumber.length()>=10 && phonenumber.startsWith("47")) {
-			phonenumber = phonenumber.replace("47", "");
+			phonenumber = phonenumber.replaceFirst("47", "");
 		}
 		
 		phonenumber = phonenumber.replace("+","");
