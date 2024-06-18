@@ -419,7 +419,22 @@ public class AzureSSOLoginController {
 				//prompt "username exists. Is it you? Yes/No
 				//if Yes, enter username/password. Otherwise, append the 3rd party marker to the username
 				//                return toBasicInfoConfirm(model, redirectURI, adusername, firstName, lastName, email, cellPhone, false);
-				return toCredentialConfirm(model, redirectURI, account.username(), null);
+				//return toCredentialConfirm(model, redirectURI, account.username(), null);
+			
+			
+			
+				
+				//try if a session existing for this trusted client
+				userTokenXml = tokenServiceClient.logOnBySharedSecrect(account.username(), userticket);
+				if(userTokenXml!=null) {
+					return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
+							userTokenXml);
+				} else {
+					
+					return toCredentialConfirm(model, redirectURI, account.username(), null);
+				}
+				
+			
 			}
 
 		} else {
@@ -472,7 +487,7 @@ public class AzureSSOLoginController {
 		if(confirmError!=null && !confirmError.isEmpty()) {
 			model.addAttribute("confirmError", confirmError);
 		}
-		return "confirm_credential";
+		return "confirm_credential_azuread";
 	}
 
 	private String toBasicInfoConfirm(Model model, String redirectURI, String username, String firstName, String
@@ -495,7 +510,7 @@ public class AzureSSOLoginController {
 		if (!userTokenFound) {
 			
 		}
-		return "confirm_basicinfo";
+		return "confirm_basicinfo_azuread";
 	}
 
 	private String extractDomain(String username) {

@@ -60,7 +60,7 @@ public class LoginController {
 				if(tenantId==null || tenantId.isEmpty()) {
 					throw new RuntimeException("azuread.tenantId required in the app config");
 				}
-				issuerUrl +=  tenantId + "/v2.0";
+				issuerUrl += "/common/v2.0";
 			}
 			this.authHelper = new AuthHelper(provider, issuerUrl, clientId, clientSecret,
 					new String[] { "openid", "name", "phoneNumber", "email", "profile" }, this.sessionManagementHelper);
@@ -166,7 +166,7 @@ public class LoginController {
 		
 		phonenumber = phonenumber.replace(" ", "");
 		if(phonenumber.length()>=11 && phonenumber.startsWith("+47")) {
-			phonenumber = phonenumber.replaceFirst("+47", "");
+			phonenumber = phonenumber.replaceFirst("\\+47", "");
 		}
 		if(phonenumber.length()>=10 && phonenumber.startsWith("47")) {
 			phonenumber = phonenumber.replaceFirst("47", "");
