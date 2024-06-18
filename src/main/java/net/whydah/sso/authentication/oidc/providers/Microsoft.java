@@ -25,8 +25,9 @@ public class Microsoft implements Provider {
 
     @Autowired
     public Microsoft() throws IOException, GeneralException, URISyntaxException {
-        Properties properties = AppConfig.readProperties();
-        this.controller = new LoginController(provider);
+    	//TODO: check again
+        //Properties properties = AppConfig.readProperties();
+        this.controller = null; //new LoginController(provider);
     }
 
     @RequestMapping("/" + provider + "/login")

@@ -88,7 +88,7 @@
                     </form>
                 </#if>
                 <#if oidcProviderAzureadEnabled?? && oidcProviderAzureadEnabled == true>
-                    <form action="azuread/login" class="new_user_session" name="azuread/login" method="post">
+                    <form action="aadprelogin" class="new_user_session" name="aadprelogin" method="post">
                         <#if redirectURI??>
                             <input type="hidden" name="redirectURI" value="${redirectURI}"/>
                         </#if>
@@ -100,6 +100,20 @@
 
                     </form>
                 </#if>
+                
+                <#if microsoftLoginEnabled == true>
+                <form action="aadprelogin" class="new_user_session" name="aadprelogin" method="post">
+                    <#if redirectURI??>
+                      <input type="hidden" name="redirectURI" value="${redirectURI}"/>
+                    </#if>
+                   
+                    <button class="customBtn" type="submit">
+				      <span class="icon" style="background: url('/sso/images/microsoft-normal.png') transparent 5px 50% no-repeat;"></span>
+				      <span class="buttonText">Sign in with Microsoft</span>
+				    </button>
+				    
+                 </form>
+                 </#if>
                 
                  <#list whydahLoginIntegrationProviders>
 					    <#items as provider>
