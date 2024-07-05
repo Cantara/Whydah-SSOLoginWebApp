@@ -60,7 +60,8 @@ public class LoginController {
 				if(tenantId==null || tenantId.isEmpty()) {
 					throw new RuntimeException("azuread.tenantId required in the app config");
 				}
-				issuerUrl += "/common/v2.0";
+				issuerUrl = issuerUrl.replaceFirst("/$", "") + "/" ;
+				issuerUrl += "common/v2.0";//.replace("common", tenantId);
 			}
 			this.authHelper = new AuthHelper(provider, issuerUrl, clientId, clientSecret,
 					new String[] { "openid", "name", "phoneNumber", "email", "profile" }, this.sessionManagementHelper);
