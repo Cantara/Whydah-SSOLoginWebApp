@@ -75,7 +75,9 @@ public class AzureSSOLoginController {
 		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
 			return "login";
 		}
-		if (!aadHelper.isAuthenticated(httpRequest)) {
+		
+		
+		if (!aadHelper.isAuthenticated(httpRequest) || aadHelper.isAccessTokenExpired(httpRequest)) {
 			String redirectURI = httpRequest.getParameter("redirectURI");
 			// not authenticated, redirecting to login.microsoft.com so user can authenticate
 			String aad_auth_url = aadHelper.getAuthRedirect(httpRequest, httpRequest.getParameter(ConstantValue.LOGIN_HINT), redirectURI);
@@ -84,9 +86,11 @@ public class AzureSSOLoginController {
 			return "action";
 		}
 
-		if (aadHelper.isAccessTokenExpired(httpRequest)) {
-			aadHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
-		}
+		//TODO: check the silent flow later. It is a bug here from the microsoft client lib 1.15.0 . We may update the dependency
+		//if (aadHelper.isAccessTokenExpired(httpRequest)) {
+			//aadHelper.updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
+		//}
+		
 		//return redirectURi with a ticket
 		return resolve(httpRequest, httpResponse, model, httpRequest.getParameter("redirectURI"));
 	}
