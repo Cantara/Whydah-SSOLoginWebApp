@@ -147,9 +147,23 @@ public class GoogleSSOLoginController {
 			} else {
 				//prompt "username exists. Is it you? Yes/No
 				//if Yes, enter username/password. Otherwise, append the 3rd party marker to the username
-				log.info("return toCredentialConfirm");
+				//log.info("return toCredentialConfirm");
 
-				return toCredentialConfirm(model, redirectURI, email, null );
+				//return toCredentialConfirm(model, redirectURI, email, null );
+				
+				log.info("provider {} - Found username {} exists", "google", email);
+				//try if a session existing for this trusted client
+				userTokenXml = tokenServiceClient.logOnBySharedSecrect(email, userticket);
+				if(userTokenXml!=null) {
+					return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
+							userTokenXml);
+				} else {
+					//should not occur here
+					//TODO: maybe we redirect the user to the landing page
+					return toCredentialConfirm(model, redirectURI, email, null );
+				}
+				
+				
 			}
 
 		} else {

@@ -434,7 +434,7 @@ public class AzureSSOLoginController {
 					return confirmUserInfoCheckAndReturn(httpRequest, httpResponse, model, redirectURI, userticket,
 							userTokenXml);
 				} else {
-					
+					//TODO: should not occur here. We may redirect the user to the landing page
 					return toCredentialConfirm(model, redirectURI, account.username(), null);
 				}
 				
