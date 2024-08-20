@@ -57,12 +57,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public enum SessionDao {
 
 	instance;
 
-	public final String DEFAULT_REDIRECT = "welcome";
+	public String DEFAULT_REDIRECT = "welcome";
 	protected  Logger log = LoggerFactory.getLogger(SessionDao.class);
 	private WhydahServiceClient serviceClient=null;
 	protected String LOGOURL = "/sso/images/site-logo.png";
@@ -96,6 +97,7 @@ public enum SessionDao {
 	
 	private IMap<String, String> csrftokens = HazelcastMapHelper.register("csrftokens_map");
 	private IMap<String, String> username_redirectURI = HazelcastMapHelper.register("username_redirectURI");
+	private IMap<String, Long> username_redirectURI_timeout_map = HazelcastMapHelper.register("username_redirectURI_timeout_map");
 
 	private SessionDao() {
 
@@ -120,6 +122,8 @@ public enum SessionDao {
 			this.personaService = new PersonaServiceHelper(properties);
             this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
             whydahOauthConfig = new WhydahOauthIntegrationConfig(properties);
+            DEFAULT_REDIRECT = AppConfig.readProperties().getProperty("DEFAULT_REDIRECT", "welcome");
+            
         } catch (IOException e) {
 
 			e.printStackTrace();
@@ -656,15 +660,33 @@ public enum SessionDao {
 	}
 
 	public void addRedirectURIForNewUser(String username, String redirectURI) {
+		cleanUpRedirectURIMap();
 		if(redirectURI!=null && !redirectURI.equals(DEFAULT_REDIRECT)) {
 			log.debug("add redirectURI= {} for username {}", redirectURI, username);
 			username_redirectURI.put(username, redirectURI);
+			username_redirectURI_timeout_map.put(username, System.currentTimeMillis());
 		}
 	}
 	
+	void cleanUpRedirectURIMap() {
+		log.debug("clean up redirect map");
+		try {
+		List<String> removed = username_redirectURI_timeout_map.keySet().stream().
+			filter(x -> (System.currentTimeMillis() - username_redirectURI_timeout_map.get(x)) > 5*60*1000).collect(Collectors.toList());
+		for(String i : removed) {
+			username_redirectURI.remove(i);
+			username_redirectURI_timeout_map.remove(i);
+		}} catch(Exception ex) {
+			log.error("unexpected error", ex);
+		}
+	}
+
 	public String getRedirectURIForNewUser(String username) {	
-		String redirectURI = username_redirectURI.remove(username);
+		String redirectURI = username_redirectURI.get(username);
 		log.debug("get redirectURI= {} for username {}", redirectURI, username);
+		if(redirectURI == null) {
+			redirectURI = DEFAULT_REDIRECT;
+		}
 		return redirectURI;
 	}
 	
