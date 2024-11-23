@@ -18,8 +18,8 @@
         <java.version>11</java.version>
         <whydah.admin.sdk.version>2.23.7</whydah.admin.sdk.version>
         <jersey.version>1.19.4</jersey.version>
-        <spring.version>5.3.39</spring.version>
-        <spring.security-version>5.8.15</spring.security-version>
+        <spring.version>6.1.14</spring.version>
+        <spring.security-version>6.2.7</spring.security-version>
         <jetty.version>9.4.56.v20240826</jetty.version>
         <slf4j.version>2.0.16</slf4j.version>
         <metrics.version>4.2.28</metrics.version>
@@ -357,8 +357,8 @@
                                 </excludes>
                             </artifactSet>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
