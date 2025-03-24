@@ -1,9 +1,10 @@
 package net.whydah.sso.authentication.oidc.providers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 
 public interface Provider {
 	

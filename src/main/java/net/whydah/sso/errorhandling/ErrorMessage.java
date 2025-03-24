@@ -1,9 +1,9 @@
 package net.whydah.sso.errorhandling;
 
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
