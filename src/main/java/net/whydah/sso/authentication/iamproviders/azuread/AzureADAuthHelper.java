@@ -142,8 +142,8 @@ public class AzureADAuthHelper {
 		}
 		// validate that state in response equals to state in request
 		log.debug("Validating state: " + params.get("state"));
-		log.debug("Validating state.get(0): " + params.get("state").get(0));
-		StateData stateData = AzureSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").get(0));
+		log.debug("Validating state.get(0): " + params.get("state").getFirst());
+		StateData stateData = AzureSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").getFirst());
 
 		AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
 		if (AzureADAuthHelper.isAuthenticationSuccessful(authResponse)) {
@@ -171,7 +171,7 @@ public class AzureADAuthHelper {
 			return stateData;
 		} else {
 			AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
-			throw new Exception(String.format("Request for auth code failed: %s - %s",
+			throw new Exception("Request for auth code failed: %s - %s".formatted(
 					oidcResponse.getErrorObject().getCode(),
 					oidcResponse.getErrorObject().getDescription()));
 		}
@@ -293,7 +293,7 @@ public class AzureADAuthHelper {
 					AzureSessionManagementHelper.FAILED_TO_VALIDATE_MESSAGE + "could not validate nonce",
 					this.getClass().getSimpleName(),
 					"validateNonce(StateData stateData, String nonce)",
-					String.format("Statedata: %s, nonce: %s", stateData, nonce));
+					"Statedata: %s, nonce: %s".formatted(stateData, nonce));
 
 			throw new Exception(AzureSessionManagementHelper.FAILED_TO_VALIDATE_MESSAGE + "could not validate nonce");
 		}
@@ -371,7 +371,7 @@ public class AzureADAuthHelper {
 					AzureSessionManagementHelper.FAILED_TO_VALIDATE_MESSAGE + "unexpected set of artifacts received",
 					this.getClass().getSimpleName(),
 					"validateAuthRespMatchesAuthCodeFlow(AuthenticationSuccessResponse oidcResponse)",
-					String.format("AuthenticationSuccessResponse: %s", ToStringHelper.toString(oidcResponse)));
+					"AuthenticationSuccessResponse: %s".formatted(ToStringHelper.toString(oidcResponse)));
 
 			throw new Exception(AzureSessionManagementHelper.FAILED_TO_VALIDATE_MESSAGE + "unexpected set of artifacts received");
 		}

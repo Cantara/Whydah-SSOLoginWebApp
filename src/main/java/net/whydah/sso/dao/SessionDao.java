@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public enum SessionDao {
@@ -474,7 +475,7 @@ public enum SessionDao {
 
 	private boolean shouldUpdate() {
 		int max = 100;
-		return (5 >= ((int) (Math.random() * max)));  // update on 5 percent of requests
+		return (5 >= ((int) (ThreadLocalRandom.current().nextDouble() * max)));  // update on 5 percent of requests
 	}
 
 	public void updateApplinks() {

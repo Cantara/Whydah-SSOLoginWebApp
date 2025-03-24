@@ -195,13 +195,19 @@ public class NewUserController {
 		UserCredential userCredential = new UserCredential() {
 			@Override
 			public String toXML() {
-				return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
-						"<usercredential>\n" +
-						"    <params>\n" +
-						"        <fbId>" + "" + "</fbId>\n" +
-						"        <username>" + "user" + "</username>\n" +
-						"    </params> \n" +
-						"</usercredential>\n";
+				return """
+						<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\s
+						 \
+						<usercredential>
+						    <params>
+						        <fbId>\
+						</fbId>
+						        <username>\
+						user\
+						</username>
+						    </params>\s
+						</usercredential>
+						""";
 			}
 		};
 

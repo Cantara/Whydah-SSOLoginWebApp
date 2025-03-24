@@ -3,13 +3,16 @@ package net.whydah.sso.authentication.iamproviders;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 public class StateData implements Serializable{
 	/**
 	 * 
 	 */
+	@Serial
 	private static final long serialVersionUID = 1L;
 	private String state;
     private String nonce;
@@ -71,19 +74,10 @@ public class StateData implements Serializable{
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-	    if (obj instanceof StateData) {
-	        final StateData state = (StateData) obj;
-
-			return new EqualsBuilder()
-					.append(state, state.state)
-					.append(nonce, state.nonce)
-					.append(redirectURI, state.redirectURI)
-					.append(domain, state.domain)
-					.isEquals();
-		} else {
-			return false;
-		}
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		StateData stateData = (StateData) o;
+		return Objects.equals(state, stateData.state) && Objects.equals(nonce, stateData.nonce) && Objects.equals(redirectURI, stateData.redirectURI) && Objects.equals(domain, stateData.domain) && Objects.equals(expirationDate, stateData.expirationDate);
 	}
 
 	@Override

@@ -164,7 +164,7 @@ public class CRMHelper {
 							return innCrmCustomerJson;
 						} else {
 							log.error("Trouble fetching crm data for user {}, with usertokenxml={} from the backend service. It maybe offline or too busy", userToken.getPersonRef(), userTokenXml);
-							throw AppExceptionCode.USER_CRMSERVICE_FAILURE_4006.setDeveloperMessage(String.format("Failed to fetch crm data for user %s, with usertokenxml=%s from the backend service. It maybe offline or too busy", userToken.getPersonRef(), userTokenXml));
+							throw AppExceptionCode.USER_CRMSERVICE_FAILURE_4006.setDeveloperMessage("Failed to fetch crm data for user %s, with usertokenxml=%s from the backend service. It maybe offline or too busy".formatted(userToken.getPersonRef(), userTokenXml));
 						}
 
 					} catch (Exception e) {

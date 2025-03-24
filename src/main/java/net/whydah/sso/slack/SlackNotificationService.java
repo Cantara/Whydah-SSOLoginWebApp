@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
@@ -218,7 +218,7 @@ public class SlackNotificationService {
             file.getParentFile().mkdirs();
             file.createNewFile();
 
-            String content = new String(Files.readAllBytes(Paths.get(warningMapFileName)), StandardCharsets.UTF_8);
+            String content = new String(Files.readAllBytes(Path.of(warningMapFileName)), StandardCharsets.UTF_8);
             if (content != null && content.length() > 4) {
                 warningMap = mapper.readValue(content, Map.class);
             }
@@ -231,7 +231,7 @@ public class SlackNotificationService {
             File file = new File(alarmMapFileName);
             file.getParentFile().mkdirs();
             file.createNewFile();
-            String content = new String(Files.readAllBytes(Paths.get(alarmMapFileName)), StandardCharsets.UTF_8);
+            String content = new String(Files.readAllBytes(Path.of(alarmMapFileName)), StandardCharsets.UTF_8);
             if (content != null && content.length() > 4) {
                 alarmMap = mapper.readValue(content, Map.class);
             }

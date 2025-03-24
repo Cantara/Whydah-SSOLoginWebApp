@@ -1,5 +1,6 @@
 package net.whydah.sso.authentication.oidc;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -13,6 +14,7 @@ public class BaseSessionData implements Serializable {
 	/**
 	 * 
 	 */
+	@Serial
 	private static final long serialVersionUID = 1L;
 	
 	private String domain="common";

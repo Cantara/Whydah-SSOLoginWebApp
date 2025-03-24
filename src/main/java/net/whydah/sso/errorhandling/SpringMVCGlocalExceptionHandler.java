@@ -47,8 +47,8 @@ public class SpringMVCGlocalExceptionHandler {
 	}
 
 	private void setHttpStatus(Throwable ex, ErrorMessage errorMessage) {
-		if(ex instanceof WebApplicationException ) { 
-			errorMessage.setStatus(((WebApplicationException)ex).getResponse().getStatus());
+		if(ex instanceof WebApplicationException exception ) { 
+			errorMessage.setStatus(exception.getResponse().getStatus());
 		} else {
 			errorMessage.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value()); //defaults to internal server error 500
 		}

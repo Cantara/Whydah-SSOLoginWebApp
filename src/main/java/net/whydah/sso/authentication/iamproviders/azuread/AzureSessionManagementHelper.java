@@ -88,7 +88,7 @@ public class AzureSessionManagementHelper {
 				AzureSessionManagementHelper.FAILED_TO_VALIDATE_MESSAGE + "could not validate state",
 				AzureSessionManagementHelper.class.getSimpleName(),
 				"validateState(HttpSession session, String state)",
-				String.format("state: %s", state));
+				"state: %s".formatted(state));
 
     	throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "could not validate state");
     }

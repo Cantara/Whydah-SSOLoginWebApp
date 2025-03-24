@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.io.Serial;
 
 
 public class AppException extends Exception {
 
+	@Serial
 	private static final long serialVersionUID = -8999932578270387947L;
 	
 	

@@ -115,7 +115,7 @@ public class AuthHelper implements Provider {
 
 		JWSAlgorithm alg = JWSAlgorithm.RS256;
 		if (!this.providerMetadata.getIDTokenJWSAlgs().contains(alg)) {
-			alg = this.providerMetadata.getAuthorizationJWSAlgs().get(0);
+			alg = this.providerMetadata.getAuthorizationJWSAlgs().getFirst();
 		}
 
 
@@ -283,7 +283,7 @@ public class AuthHelper implements Provider {
 
 		if (!userInfoResponse.indicatesSuccess()) {
 			ErrorObject error = userInfoResponse.toErrorResponse().getErrorObject();
-			throw new Exception(String.format("Request for userinfo failed: %s - %s",
+			throw new Exception("Request for userinfo failed: %s - %s".formatted(
 					error.getCode(),
 					error.getDescription()));
 		}

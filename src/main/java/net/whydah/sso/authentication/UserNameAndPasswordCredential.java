@@ -38,13 +38,18 @@ public class UserNameAndPasswordCredential extends UserCredential {
     @Override
     public String toXML(){
         if (userName== null){
-            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
-                    "    <usercredential>\n" +
-                    "        <params>\n" +
-                    "            <username>" + "" + "</username>\n" +
-                    "            <password>" + "" + "</password>\n" +
-                    "        </params> \n" +
-                    "    </usercredential>\n";
+            return """
+                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>\s
+                     \
+                        <usercredential>
+                            <params>
+                                <username>\
+                    </username>
+                                <password>\
+                    </password>
+                            </params>\s
+                        </usercredential>
+                    """;
         } else {
             return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
             "<usercredential>\n" +

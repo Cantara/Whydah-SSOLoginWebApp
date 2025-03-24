@@ -186,7 +186,7 @@ public class WhydahOAuthHelper {
 		}
 		
 		// validate that state in response equals to state in request
-		StateData stateData = WhydahOAuthSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").get(0));
+		StateData stateData = WhydahOAuthSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").getFirst());
 		
 		AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
 		if (isAuthenticationSuccessful(authResponse)) {
@@ -200,7 +200,7 @@ public class WhydahOAuthHelper {
 			
 		} else {
 			AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
-			throw new Exception(String.format("Request for auth code failed: %s - %s",
+			throw new Exception("Request for auth code failed: %s - %s".formatted(
 					oidcResponse.getErrorObject().getCode(),
 					oidcResponse.getErrorObject().getDescription()));
 		}
@@ -234,7 +234,7 @@ public class WhydahOAuthHelper {
 		    // We got an error response...
 		    TokenErrorResponse errorResponse = response.toErrorResponse();
 		   
-			throw new Exception(String.format("Request for auth code failed: %s - %s",
+			throw new Exception("Request for auth code failed: %s - %s".formatted(
 					errorResponse.getErrorObject().getCode(),
 					errorResponse.getErrorObject().getDescription()));
 		}
@@ -274,9 +274,9 @@ public class WhydahOAuthHelper {
 			throw new Exception(e.getMessage());
 		}
 
-		if (userInfoResponse instanceof UserInfoErrorResponse) {
-			ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
-			throw new Exception(String.format("Request for userinfo failed: %s - %s",
+		if (userInfoResponse instanceof UserInfoErrorResponse response) {
+			ErrorObject error = response.getErrorObject();
+			throw new Exception("Request for userinfo failed: %s - %s".formatted(
 					error.getCode(),
 					error.getDescription()));
 		}

@@ -131,7 +131,7 @@ public class GoogleAuthHelper {
 			params.put(key, Collections.singletonList(httpRequest.getParameterMap().get(key)[0]));
 		}
 		// validate that state in response equals to state in request
-		StateData stateData = GoogleSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").get(0));
+		StateData stateData = GoogleSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").getFirst());
 
 		AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
 		if (isAuthenticationSuccessful(authResponse)) {
@@ -159,7 +159,7 @@ public class GoogleAuthHelper {
 			return stateData.getRedirectURI();
 		} else {
 			AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
-			throw new Exception(String.format("Request for auth code failed: %s - %s",
+			throw new Exception("Request for auth code failed: %s - %s".formatted(
 					oidcResponse.getErrorObject().getCode(),
 					oidcResponse.getErrorObject().getDescription()));
 		}

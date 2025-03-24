@@ -29,7 +29,7 @@ public class AppConfig {
 
     private static Properties loadFromClasspath(String appMode) throws IOException {
         Properties properties = new Properties();
-        String propertyfile = String.format("ssologinwebapp.%s.properties", appMode);
+        String propertyfile = "ssologinwebapp.%s.properties".formatted(appMode);
         //log.info("Loading properties from classpath: {}", propertyfile);
         InputStream is = AppConfig.class.getClassLoader().getResourceAsStream(propertyfile);
         if(is == null) {
