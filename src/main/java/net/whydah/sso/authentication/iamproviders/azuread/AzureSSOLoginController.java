@@ -4,10 +4,14 @@ import com.jayway.jsonpath.JsonPath;
 import com.microsoft.aad.msal4j.IAccount;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.UUID;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
 import net.whydah.sso.authentication.iamproviders.StateData;
-import net.whydah.sso.authentication.iamproviders.google.GoogleSessionManagementHelper;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
@@ -21,13 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
 
 @Controller
 public class AzureSSOLoginController {

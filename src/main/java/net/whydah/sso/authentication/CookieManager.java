@@ -1,13 +1,14 @@
 package net.whydah.sso.authentication;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.ddd.model.user.UserTokenId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;

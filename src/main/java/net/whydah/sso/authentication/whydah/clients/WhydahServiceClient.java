@@ -1,15 +1,11 @@
 package net.whydah.sso.authentication.whydah.clients;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
-import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
-import static com.sun.jersey.api.client.ClientResponse.Status.OK;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

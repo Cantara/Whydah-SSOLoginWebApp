@@ -3,6 +3,9 @@
 
 package net.whydah.sso.authentication.iamproviders.azuread;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -10,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public class AzureSessionManagementHelper {
 		return states.size();
 	}
 	
-    public static AzureSessionData getSessionData(HttpServletRequest httpRequest) {	
+    public static AzureSessionData getSessionData(HttpServletRequest httpRequest) {
     	List<String> removedSessionIds = removeExpiredSessions();
     	
 		String sessionid = httpRequest.getSession().getId();

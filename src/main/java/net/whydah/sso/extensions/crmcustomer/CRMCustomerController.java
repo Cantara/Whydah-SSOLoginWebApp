@@ -2,6 +2,8 @@ package net.whydah.sso.extensions.crmcustomer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.basehelpers.JsonPathHelper;
 import net.whydah.sso.config.AppConfig;
@@ -26,9 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;

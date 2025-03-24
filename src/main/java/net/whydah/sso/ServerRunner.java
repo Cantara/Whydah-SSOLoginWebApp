@@ -3,6 +3,7 @@ package net.whydah.sso;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.servlet.Servlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -123,7 +124,7 @@ public class ServerRunner {
 
 		DispatcherServlet dispatcherServlet = new DispatcherServlet();
 		dispatcherServlet.setContextConfigLocation("classpath:webapp/sso/mvc-config.xml");
-		ServletHolder servletHolder = new ServletHolder(dispatcherServlet);
+		ServletHolder servletHolder = new ServletHolder((Servlet) dispatcherServlet);
 		context.addServlet(servletHolder, "/*");
 	}
 
