@@ -84,15 +84,15 @@ public class ServerRunner {
 	private Connector getSSLConnector() {
 		HttpConfiguration https = new HttpConfiguration();
 		https.addCustomizer(new SecureRequestCustomizer());
-		SslContextFactory sslContextFactory = new SslContextFactory.Server();
+		SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();  // Updated this line
 		sslContextFactory.setKeyStorePath(ServerRunner.class.getResource("/keystore.jks").toExternalForm());
 		sslContextFactory.setKeyStorePassword("123456");
 		sslContextFactory.setKeyManagerPassword("123456");
 
-		ServerConnector sslConnector = new ServerConnector(server, 
+		ServerConnector sslConnector = new ServerConnector(server,
 				new SslConnectionFactory(sslContextFactory, "http/1.1"),
 				new HttpConnectionFactory(https)
-				);
+		);
 		sslConnector.setPort(SSL_PORT_NO);
 		return sslConnector;
 	}

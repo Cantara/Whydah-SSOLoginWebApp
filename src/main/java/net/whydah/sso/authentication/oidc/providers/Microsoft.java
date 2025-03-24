@@ -2,10 +2,9 @@ package net.whydah.sso.authentication.oidc.providers;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.nimbusds.oauth2.sdk.GeneralException;
 
 import net.whydah.sso.authentication.oidc.LoginController;
-import net.whydah.sso.config.AppConfig;
 
 @Controller
 public class Microsoft implements Provider {

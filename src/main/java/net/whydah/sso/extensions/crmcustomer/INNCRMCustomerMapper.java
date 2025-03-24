@@ -2,22 +2,17 @@ package net.whydah.sso.extensions.crmcustomer;
 
 import net.whydah.sso.basehelpers.JsonPathHelper;
 import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.extensions.crmcustomer.mappers.CustomerMapper;
 import net.whydah.sso.extensions.crmcustomer.types.Customer;
 import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
 import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
 import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import net.whydah.sso.user.mappers.UserTokenMapper;
-import net.whydah.sso.user.types.UserToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

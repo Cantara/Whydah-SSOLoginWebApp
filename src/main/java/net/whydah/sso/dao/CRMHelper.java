@@ -11,7 +11,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;

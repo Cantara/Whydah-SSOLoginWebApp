@@ -7,7 +7,7 @@ import static com.sun.jersey.api.client.ClientResponse.Status.OK;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
