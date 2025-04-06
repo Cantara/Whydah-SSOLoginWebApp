@@ -9,7 +9,6 @@ import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.user.UserTokenId;
-import net.whydah.sso.model.WhydahProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

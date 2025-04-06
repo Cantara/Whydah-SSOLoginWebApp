@@ -4,19 +4,9 @@ import net.whydah.sso.authentication.oidc.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
-import net.whydah.sso.model.PersonaCredential;
-import net.whydah.sso.user.types.UserCredential;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 public class LoginTypes {
 	private final static Logger log = LoggerFactory.getLogger(LoginTypes.class);

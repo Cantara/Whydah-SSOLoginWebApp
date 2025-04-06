@@ -1,6 +1,5 @@
 package net.whydah.sso.utils;
 
-import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.config.AwsConfig;
 import com.hazelcast.config.Config;
-import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;

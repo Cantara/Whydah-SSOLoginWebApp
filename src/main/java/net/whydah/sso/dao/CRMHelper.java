@@ -43,7 +43,6 @@ import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.mappers.UserTokenMapper;
 import net.whydah.sso.user.types.UserToken;
 import net.whydah.sso.util.SSLTool;
-import net.whydah.sso.utils.ServerUtil;
 
 
 public class CRMHelper {

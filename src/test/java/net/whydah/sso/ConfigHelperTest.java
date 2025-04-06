@@ -1,10 +1,6 @@
 package net.whydah.sso;
 
-import net.whydah.sso.authentication.CookieManager;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 
 public class ConfigHelperTest {

@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
@@ -58,10 +53,8 @@ import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
 
 import net.minidev.json.JSONObject;
 import net.whydah.sso.authentication.iamproviders.StateData;
-import net.whydah.sso.authentication.iamproviders.google.GoogleSessionManagementHelper;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.model.PersonaCredential;
 import net.whydah.sso.model.WhydahProvider;
 import net.whydah.sso.utils.HttpConnectionHelper;
 

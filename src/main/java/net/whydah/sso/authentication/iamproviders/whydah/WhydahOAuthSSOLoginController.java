@@ -24,7 +24,6 @@ import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserCredential;
-import net.whydah.sso.utils.AES;
 
 @Controller
 public class WhydahOAuthSSOLoginController {

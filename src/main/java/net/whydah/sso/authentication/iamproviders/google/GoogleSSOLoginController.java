@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
-import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthSessionManagementHelper;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;

@@ -40,10 +40,6 @@ import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
-import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
-
-import net.whydah.sso.authentication.iamproviders.ExternalIAMSSOSuppliers;
 import net.whydah.sso.authentication.iamproviders.StateData;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.ddd.model.application.RedirectURI;

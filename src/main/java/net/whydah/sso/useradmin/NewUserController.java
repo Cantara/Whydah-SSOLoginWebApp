@@ -1,7 +1,6 @@
 package net.whydah.sso.useradmin;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
@@ -12,7 +11,6 @@ import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.user.Email;
 import net.whydah.sso.errorhandling.AppException;
-import net.whydah.sso.errorhandling.AppExceptionCode;
 import net.whydah.sso.user.mappers.UserIdentityMapper;
 import net.whydah.sso.user.types.UserIdentity;
 import org.slf4j.Logger;

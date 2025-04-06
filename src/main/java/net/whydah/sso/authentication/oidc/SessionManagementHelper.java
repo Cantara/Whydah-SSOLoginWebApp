@@ -5,7 +5,6 @@ package net.whydah.sso.authentication.oidc;
 
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
 import net.whydah.sso.authentication.iamproviders.StateData;
-import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.utils.HazelcastMapHelper;
 
 import org.apache.commons.lang3.StringUtils;
