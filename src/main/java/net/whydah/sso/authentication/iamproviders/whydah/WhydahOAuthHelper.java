@@ -179,7 +179,7 @@ public class WhydahOAuthHelper {
 		}
 		
 		// validate that state in response equals to state in request
-		StateData stateData = WhydahOAuthSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").getFirst());
+		StateData stateData = WhydahOAuthSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").get(0));
 		
 		AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
 		if (isAuthenticationSuccessful(authResponse)) {

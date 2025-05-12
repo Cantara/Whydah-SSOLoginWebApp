@@ -144,8 +144,8 @@ public class AzureADAuthHelper {
 		}
 		// validate that state in response equals to state in request
 		log.debug("Validating state: " + params.get("state"));
-		log.debug("Validating state.get(0): " + params.get("state").getFirst());
-		StateData stateData = AzureSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").getFirst());
+		log.debug("Validating state.get(0): " + params.get("state").get(0));
+		StateData stateData = AzureSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").get(0));
 
 		AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
 		if (AzureADAuthHelper.isAuthenticationSuccessful(authResponse)) {

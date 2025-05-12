@@ -9,6 +9,7 @@ import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.config.AppConfig;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.Password;
 import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserCredential;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -140,19 +142,35 @@ public class PasswordChangeController {
 		
 		SessionDao.instance.addModel_CSRFtoken(model);
 		
+		
 		PasswordChangeToken passwordChangeToken = getTokenFromPath(request);
+		model.addAttribute("username", passwordChangeToken.getUser());
+		
 		String newpassword = request.getParameter("newpassword");
+		if(!Password.isValid(newpassword)) {
+			List<String> invalidChars = Password.getInValidCharacters(newpassword);
+			if(invalidChars.size()>0) {
+				model.addAttribute("error", "Password contains invaid characters:" + String.join(" ", invalidChars) + ". Please try another password.");
+			} else {
+				model.addAttribute("error", "Password must be 4-128 characters. Please try another password.");
+			}
+			
+			model.addAttribute("token", passwordChangeToken.getToken());
+			return "changepassword";
+		}
+		
+		
 		//        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
 		WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
 		log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
 
 		ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
-		model.addAttribute("username", passwordChangeToken.getUser());
+		
 		if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
 			String error = uasResponse.getEntity(String.class);
 			log.error(error);
 			if (uasResponse.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
-				model.addAttribute("error", "The password you entered was found to be too weak, please try another password.");
+				model.addAttribute("error", "The password you entered was found to be too weak. Please try another password.");
 			} else {
 				model.addAttribute("error", error + "\nusername:" + passwordChangeToken.getUser());
 			}

@@ -127,7 +127,7 @@ public class GoogleAuthHelper {
 			params.put(key, Collections.singletonList(httpRequest.getParameterMap().get(key)[0]));
 		}
 		// validate that state in response equals to state in request
-		StateData stateData = GoogleSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").getFirst());
+		StateData stateData = GoogleSessionManagementHelper.validateState(httpRequest.getSession(), params.get("state").get(0));
 
 		AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
 		if (isAuthenticationSuccessful(authResponse)) {

@@ -25,7 +25,7 @@ import java.util.Properties;
 
 @Controller
 public class HealthResource {
-    private static WhydahServiceClient serviceClient;// = SessionDao.instance.getServiceClient();
+    private static WhydahServiceClient serviceClient;
 
     private static final Logger log = LoggerFactory.getLogger(HealthResource.class);
     protected static Properties properties;

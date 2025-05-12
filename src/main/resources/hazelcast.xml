@@ -12,18 +12,13 @@
             <tcp-ip enabled="false">
                 <interface>192.168.1.2</interface>
             </tcp-ip>
+            
             <aws enabled="false">
-                <access-key>my-access-key</access-key>
-                <secret-key>my-secret-key</secret-key>
-                <region>us-east-1</region>
-
-                <!-- AWS security group -->
-                <security-group-name>peter</security-group-name>
-
-                <!--  EC2 AMI/server tags to match against -->
-                <tag-key>type</tag-key>
-                <tag-value>hz-nodes</tag-value>
-            </aws>
+		        <region>eu-north-1</region>
+		        <iam-role>Hazelcast</iam-role>
+		        <tag-key>hazelcast-bacao</tag-key>
+		        <tag-value>prod</tag-value>
+		    </aws>
         </join>
     </network>
 </hazelcast>

@@ -115,7 +115,7 @@ public class AuthHelper implements Provider {
 
 		JWSAlgorithm alg = JWSAlgorithm.RS256;
 		if (!this.providerMetadata.getIDTokenJWSAlgs().contains(alg)) {
-			alg = this.providerMetadata.getAuthorizationJWSAlgs().getFirst();
+			alg = this.providerMetadata.getAuthorizationJWSAlgs().get(0);
 		}
 
 
