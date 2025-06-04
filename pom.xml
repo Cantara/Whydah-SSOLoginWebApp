@@ -241,11 +241,19 @@
             <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
-            <version>5.3.7</version>
-        </dependency>
+       <!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast-all -->
+		<dependency>
+		    <groupId>com.hazelcast</groupId>
+		    <artifactId>hazelcast</artifactId>
+		    <version>4.2.8</version>
+		</dependency>
+
+				<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast-aws -->
+		<dependency>
+		    <groupId>com.hazelcast</groupId>
+		    <artifactId>hazelcast-aws</artifactId>
+		    <version>3.4</version>
+		</dependency>
 
         <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
         <dependency>
