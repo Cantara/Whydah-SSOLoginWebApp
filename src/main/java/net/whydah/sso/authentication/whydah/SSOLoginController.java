@@ -3,15 +3,14 @@ package net.whydah.sso.authentication.whydah;
 import java.io.IOException;
 import java.util.UUID;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
@@ -105,6 +104,7 @@ public class SSOLoginController {
 							 redirectURI = prependRefererToRedirectURI(redirectURI, referer_channel);
 						 }
 						 redirectURI = prependRefererToRedirectURI(redirectURI, userTicket);
+						 redirectURI = appendHttpSchemeIfNotFound(redirectURI);
 						 model.addAttribute(ConstantValue.REDIRECT, redirectURI);
 						 log.info("login - Redirecting to {}", redirectURI);
 						 SessionDao.instance.addModel_CSRFtoken(model);
@@ -120,6 +120,7 @@ public class SSOLoginController {
 			// Added return is sessioncheck only and no cookie found
 			if (sessionCheckOnly) {
 				// Action use redirect - not redirectURI
+				redirectURI = appendHttpSchemeIfNotFound(redirectURI);
 				model.addAttribute(ConstantValue.REDIRECT, redirectURI);
 				log.info("login - isSessionCheckOnly - Redirecting to {}", redirectURI);
 				//return Response.ok(FreeMarkerHelper.createBody("/action.ftl", model.asMap())).build();
@@ -139,8 +140,16 @@ public class SSOLoginController {
 		return "login";
 	}
 	
-	
-	
+	private String appendHttpSchemeIfNotFound(String redirectURI) {
+		if(!isDefaultRedirect(redirectURI) && !redirectURI.toLowerCase().startsWith("http")) {
+			redirectURI = "https://" + redirectURI;
+		}
+		return redirectURI;
+	}
+	private boolean isDefaultRedirect(String redirectURI) {
+		return SessionDao.instance.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI);
+	}
+
 	private UserToken storeUserTokenInCookie(HttpServletRequest request,
 			HttpServletResponse response, String userTokenXml) {
 		UserToken loginUserToken = UserTokenMapper.fromUserTokenXml(userTokenXml);
@@ -308,6 +317,7 @@ public class SSOLoginController {
 			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml).replace(" ","+"));
 		}
 		// Action use redirect...
+		redirectURI = appendHttpSchemeIfNotFound(redirectURI);
 		model.addAttribute(ConstantValue.REDIRECT, redirectURI);
 		model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
 		log.info("action - Redirecting to {}", redirectURI);
