@@ -21,7 +21,10 @@ public class WhydahOauthIntegrationConfig {
 	
 	public WhydahOauthIntegrationConfig(Properties properties) throws JsonMappingException, JsonProcessingException {
 		String integrationConfig = properties.getProperty("whydah.integration.providers");
-		PROVIDERS = mapper.readValue(integrationConfig, new TypeReference<List<WhydahProvider>>() {}).stream().distinct().collect(Collectors.toMap(WhydahProvider::getProvider, Function.identity()));
+		if (integrationConfig!=null) {
+			PROVIDERS = mapper.readValue(integrationConfig, new TypeReference<List<WhydahProvider>>() {
+			}).stream().distinct().collect(Collectors.toMap(WhydahProvider::getProvider, Function.identity()));
+		}
 	}
 
 	public Map<String, WhydahProvider> getProviderMap() {
