@@ -524,6 +524,12 @@
             <name>Cantara Snapshot Repository</name>
             <url>https://mvnrepo.cantara.no/content/repositories/snapshots/</url>
         </repository>
+        <!-- Add Maven Central -->
+        <repository>
+            <id>central</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
     </repositories>
 
 </project>
