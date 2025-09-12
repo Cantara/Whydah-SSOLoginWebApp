@@ -45,9 +45,29 @@ public class IntegrationController {
 		uasServiceUri = UriBuilder.fromUri(AppConfig.readProperties().getProperty("useradminservice")).build();
 	}
 
+	@Deprecated
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@RequestMapping(value = "/integration/user/{uid}/", method = RequestMethod.PUT)
+	public String updateUserIdentity2(
+			@PathVariable("uid") String uid,
+			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+		log.trace("updateUserIdentity with uid={}", uid);
+
+		accessCheck(request);
+		
+		String json = readInput(request.getInputStream());
+		CommandUpdateUser cmd = new CommandUpdateUser(uasServiceUri, 
+				SessionDao.instance.getServiceClient().getMyAppTokenID(), 
+				SessionDao.instance.getUserAdminToken().getUserTokenId(), 
+				uid, json);
+		return handleResponse(response, model, cmd.execute(), cmd.getResponseBodyAsByteArray(), cmd.getStatusCode());
+
+	}
+	
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@RequestMapping(value = "/integration/user/{uid}", method = RequestMethod.PUT)
 	public String updateUserIdentity(
 			@PathVariable("uid") String uid,
 			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
@@ -66,8 +86,29 @@ public class IntegrationController {
 	
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	@RequestMapping(value = "/integration/user/{uid}/", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/integration/user/{uid}", method = RequestMethod.DELETE)
 	public String deleteUserIdentity(
+			@PathVariable("uid") String uid,
+			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+		log.trace("updateUserIdentity with uid={}", uid);
+
+		accessCheck(request);
+		
+		CommandDeleteUser cmd = new CommandDeleteUser(uasServiceUri, 
+				SessionDao.instance.getServiceClient().getMyAppTokenID(), 
+				SessionDao.instance.getUserAdminToken().getUserTokenId(), 
+				uid);
+		boolean result = cmd.execute();
+		model.addAttribute(ConstantValue.JSON_DATA, "{ok:" + (result?"true}":"false}"));
+	    return "json";
+
+	}
+	
+	@Deprecated
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@RequestMapping(value = "/integration/user/{uid}/", method = RequestMethod.DELETE)
+	public String deleteUserIdentity2(
 			@PathVariable("uid") String uid,
 			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
 		log.trace("updateUserIdentity with uid={}", uid);
