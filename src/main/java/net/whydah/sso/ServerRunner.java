@@ -3,6 +3,9 @@ package net.whydah.sso;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -10,9 +13,9 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+//import org.eclipse.jetty.server.session.SessionHandler;
+//import org.eclipse.jetty.servlet.ServletContextHandler;
+//import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +117,10 @@ public class ServerRunner {
 		ROOT_URL = "http://localhost:" + PORT_NO + CONTEXT;
 		TESTURL = ROOT_URL + "/action";
 
-		context = new ServletContextHandler(server, CONTEXT, ServletContextHandler.SESSIONS);
+		//context = new ServletContextHandler(server, CONTEXT, ServletContextHandler.SESSIONS);
+        context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath(CONTEXT);
+        server.setHandler(context);
 		context.setSessionHandler(new SessionHandler());
 		version = this.getClass().getPackage().getImplementationVersion();
 

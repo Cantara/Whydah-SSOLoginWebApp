@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.whydah.sso</groupId>
     <artifactId>SSOLoginWebApp</artifactId>
-    <version>2.30.14-SNAPSHOT</version>
+    <version>2.31.3-SNAPSHOT</version>
     <name>SSOLoginWebApp</name>
     <url>https://wiki.cantara.no/display/iam/SSOLoginWebApp</url>
     <parent>
@@ -19,11 +19,11 @@
         <java.version>21</java.version>
         <whydah.admin.sdk.version>2.30.0</whydah.admin.sdk.version>
         <jersey.version>1.19.4</jersey.version>
-        <spring.version>6.2.6</spring.version>
-        <spring.security-version>6.4.6</spring.security-version>
-        <jetty.version>11.0.25</jetty.version>
+        <spring.version>6.2.9</spring.version>
+        <spring.security-version>6.5.2</spring.security-version>
+        <jetty.version>12.1.0</jetty.version>
         <slf4j.version>2.0.17</slf4j.version>
-        <metrics.version>4.2.30</metrics.version>
+        <metrics.version>4.2.33</metrics.version>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
     </properties>
     <scm>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>2.46</version>
+            <version>2.47</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -130,7 +130,6 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.1.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -142,17 +141,17 @@
             <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.jetty.ee10/jetty-ee10-servlet -->
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-servlet</artifactId>
             <version>${jetty.version}</version>
         </dependency>
-
         <!-- OpenID Connect -->
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
-            <version>11.23.1</version>
+            <version>11.27.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -216,12 +215,12 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20250107</version>
+            <version>20250517</version>
         </dependency>
         <dependency>
             <groupId>com.restfb</groupId>
             <artifactId>restfb</artifactId>
-            <version>2025.8.0</version>
+            <version>2025.13.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -264,7 +263,7 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>2.7.2</version>
+            <version>2.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -275,29 +274,29 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.18.3</version>
+            <version>2.19.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.18.3</version>
+            <version>2.19.2</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.46.3</version>
+            <version>1.47.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.17.0</version>
+            <version>3.18.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.microsoft.azure/msal4j -->
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>msal4j</artifactId>
-            <version>1.20.1</version>
+            <version>1.22.0</version>
         </dependency>
 
         <dependency>
@@ -377,8 +376,8 @@
                                 </excludes>
                             </artifactSet>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
@@ -523,6 +522,12 @@
             <id>cantara-snapshots</id>
             <name>Cantara Snapshot Repository</name>
             <url>https://mvnrepo.cantara.no/content/repositories/snapshots/</url>
+        </repository>
+        <!-- Add Maven Central -->
+        <repository>
+            <id>central</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
     </repositories>
 
