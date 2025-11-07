@@ -36,7 +36,13 @@ public class Whydah {
         Properties properties = AppConfig.readProperties();
         PROVIDERS = new WhydahOauthIntegrationConfig(properties).getProviderMap();
         for(WhydahProvider p : PROVIDERS.values()) {
-        	controller_map.put(p.getProvider(), new LoginController(p));
+        		if(p.isEnabled()) {
+        			try {
+        				controller_map.put(p.getProvider(), new LoginController(p));
+        			} catch(Exception ex) {
+        				ex.printStackTrace(); //do not block the app
+        			}
+        		}
         }
     }
     
