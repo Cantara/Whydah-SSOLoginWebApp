@@ -58,63 +58,63 @@ public class SSOLoginController {
 			log.trace("login: redirectURI={}, SessionCheck={}, userTokenIdFromCookie={}", redirectURI, sessionCheckOnly, userTokenId);
 
 
-			 String userTokenXml = null;
-			 if (userTicket != null) {
-				 userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTicket(userTicket);
-				 if (userTokenXml != null) {
-					 userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-					 log.debug("User ticket found, override with new user token id");
-				 } else {
-					 log.debug("User ticket not found");
-				 }
-			 }
-			 
-			 if (shouldClearUserToken(userTokenId)) {
-				 userTokenId = clearUserToken(request, response, userTokenId); // Will set userTokenId to null
-			 }
+			String userTokenXml = null;
+			if (userTicket != null) {
+				userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTicket(userTicket);
+				if (userTokenXml != null) {
+					userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
+					log.debug("User ticket found, override with new user token id");
+				} else {
+					log.debug("User ticket not found");
+				}
+			}
 
-			 if (userTokenId != null) {
-				 if (userTokenXml == null) {
-					 userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
-				 }
-				 
-				 if(userTokenXml!=null) {
-					 storeUserTokenInCookie(request, response, userTokenXml);
-					 
-					 log.debug("login - redirecting request");
-						
-					 if (ConstantValue.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)) {
-						 log.trace("login - Did not find any sensible redirectURI, using /welcome");
-						 model.addAttribute(ConstantValue.REDIRECT, redirectURI);
-						 SessionDao.instance.addModel_CSRFtoken(model);
-						 log.info("login - Redirecting to {}", redirectURI);
-						 return "action";
-					 } else {
-						 log.info("login - created new userticket={} for usertokenid={}", userTicket, userTokenId);
+			if (shouldClearUserToken(userTokenId)) {
+				userTokenId = clearUserToken(request, response, userTokenId); // Will set userTokenId to null
+			}
 
-						 if (SessionDao.instance.getServiceClient().createTicketForUserTokenID(userTicket, userTokenId)) {
-							 redirectURI = prependTicketToRedirectURI(redirectURI, userTicket);
-							 log.debug("Created a new user ticket [userTicket={}, userTokenId={}]", userTicket, userTokenId);
-						 } else {
-							 log.warn("Can not create ticket [userTokenId={}]", userTokenId);
-						 }
-					        
-						 String referer_channel = request.getParameter("referer_channel");
-						 if(referer_channel!=null) {
-							 redirectURI = prependRefererToRedirectURI(redirectURI, referer_channel);
-						 }
-						 redirectURI = prependRefererToRedirectURI(redirectURI, userTicket);
-						 redirectURI = appendHttpSchemeIfNotFound(redirectURI);
-						 model.addAttribute(ConstantValue.REDIRECT, redirectURI);
-						 log.info("login - Redirecting to {}", redirectURI);
-						 SessionDao.instance.addModel_CSRFtoken(model);
-						 return "action";
-					 }   
-					 
-				 }
-				 
-				    
-			 }
+			if (userTokenId != null) {
+				if (userTokenXml == null) {
+					userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
+				}
+
+				if(userTokenXml!=null) {
+					storeUserTokenInCookie(request, response, userTokenXml);
+
+					log.debug("login - redirecting request");
+
+					if (ConstantValue.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI)) {
+						log.trace("login - Did not find any sensible redirectURI, using /welcome");
+						model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+						SessionDao.instance.addModel_CSRFtoken(model);
+						log.info("login - Redirecting to {}", redirectURI);
+						return "action";
+					} else {
+						log.info("login - created new userticket={} for usertokenid={}", userTicket, userTokenId);
+
+						if (SessionDao.instance.getServiceClient().createTicketForUserTokenID(userTicket, userTokenId)) {
+							redirectURI = prependTicketToRedirectURI(redirectURI, userTicket);
+							log.debug("Created a new user ticket [userTicket={}, userTokenId={}]", userTicket, userTokenId);
+						} else {
+							log.warn("Can not create ticket [userTokenId={}]", userTokenId);
+						}
+
+						String referer_channel = request.getParameter("referer_channel");
+						if(referer_channel!=null) {
+							redirectURI = prependRefererToRedirectURI(redirectURI, referer_channel);
+						}
+						redirectURI = prependRefererToRedirectURI(redirectURI, userTicket);
+						redirectURI = appendHttpSchemeIfNotFound(redirectURI);
+						model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+						log.info("login - Redirecting to {}", redirectURI);
+						SessionDao.instance.addModel_CSRFtoken(model);
+						return "action";
+					}   
+
+				}
+
+
+			}
 
 
 			// Added return is sessioncheck only and no cookie found
@@ -139,7 +139,7 @@ public class SSOLoginController {
 		//return Response.ok(FreeMarkerHelper.createBody("/login.ftl", model.asMap())).build();
 		return "login";
 	}
-	
+
 	private String appendHttpSchemeIfNotFound(String redirectURI) {
 		if(!isDefaultRedirect(redirectURI) && !redirectURI.toLowerCase().startsWith("http")) {
 			redirectURI = "https://" + redirectURI;
@@ -147,7 +147,7 @@ public class SSOLoginController {
 		return redirectURI;
 	}
 	private boolean isDefaultRedirect(String redirectURI) {
-		return SessionDao.instance.DEFAULT_REDIRECT.equalsIgnoreCase(redirectURI);
+		return redirectURI.startsWith(SessionDao.instance.DEFAULT_REDIRECT);
 	}
 
 	private UserToken storeUserTokenInCookie(HttpServletRequest request,
@@ -157,24 +157,24 @@ public class SSOLoginController {
 		CookieManager.createAndSetUserTokenCookie(loginUserToken.getUserTokenId(), tokenRemainingLifetimeSeconds * 1000, request, response);
 		return loginUserToken;
 	}
-	
-	 private String clearUserToken(HttpServletRequest request, HttpServletResponse response, String userTokenId) {
-	        log.info("Clearing user token [userTokenId={}]", userTokenId);
-	        CookieManager.clearUserTokenCookies(request, response);
-	        return null;
-	    }
-	
+
+	private String clearUserToken(HttpServletRequest request, HttpServletResponse response, String userTokenId) {
+		log.info("Clearing user token [userTokenId={}]", userTokenId);
+		CookieManager.clearUserTokenCookies(request, response);
+		return null;
+	}
+
 	private boolean shouldClearUserToken(String userTokenId) {
 		return isLogoutUserTokenId(userTokenId) || isInvalidUserTokenId(userTokenId);
 	}
-	
+
 	private boolean isLogoutUserTokenId(String userTokenId) {
-        return "logout".equalsIgnoreCase(userTokenId);
-    }
-	
+		return "logout".equalsIgnoreCase(userTokenId);
+	}
+
 	private boolean isInvalidUserTokenId(String userTokenId) {
-        return userTokenId != null && !SessionDao.instance.getServiceClient().verifyUserTokenId(userTokenId);
-    }
+		return userTokenId != null && !SessionDao.instance.getServiceClient().verifyUserTokenId(userTokenId);
+	}
 
 	String prependTicketToRedirectURI(String redirectURI, String userticket) {
 		String[] parts = redirectURI.split("\\?", 2);
@@ -186,7 +186,7 @@ public class SSOLoginController {
 		}
 		return r;
 	}
-	
+
 	String prependRefererToRedirectURI(String redirectURI, String referer_channel) {
 		String[] parts = redirectURI.split("\\?", 2);
 		String r ="";
@@ -197,8 +197,8 @@ public class SSOLoginController {
 		}
 		return r;
 	}
-	
-	
+
+
 
 	@RequestMapping("/welcome")
 	public String welcome(HttpServletRequest request, HttpServletResponse response,Model model) {
