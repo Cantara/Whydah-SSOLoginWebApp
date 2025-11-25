@@ -249,24 +249,67 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 		return "";
 	}
 	
+//	public String getUserXml(String provider, String accessToken, String appRoles, String userinfoJson, String userId, String firstName, String lastName, String username, String email, String cellPhone, String personRef) {
+//		StringBuilder strb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n ");
+//		strb.append("<user>\n");
+//		strb.append("    <params>\n");
+//		strb.append(getProviderAccessTokenTag(provider, accessToken) + "\n");
+//		strb.append("		 <appRoles>").append(appRoles).append("</appRoles>\n");
+//		strb.append("        <userId>").append(userId).append( "</userId>\n");
+//		strb.append("        <firstName>").append(firstName).append("</firstName>\n");
+//		strb.append("        <lastName>").append(lastName).append("</lastName>\n");
+//		strb.append("        <username>").append(username).append("</username>\n");  // +UUID.randomUUID().toString()
+//		strb.append("        <email>").append(email).append( "</email>\n");
+//		strb.append("        <cellPhone>").append(cellPhone).append( "</cellPhone>\n");
+//		strb.append("        <personRef>").append(personRef).append( "</personRef>\n");
+//		strb.append("        <userinfoJson>").append(userinfoJson).append( "</userinfoJson>\n");
+//		strb.append("    </params> \n");
+//		strb.append("</user>\n");
+//		log.info(strb.toString());
+//		return strb.toString();
+//	}
+	
 	public String getUserXml(String provider, String accessToken, String appRoles, String userinfoJson, String userId, String firstName, String lastName, String username, String email, String cellPhone, String personRef) {
-		StringBuilder strb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n ");
-		strb.append("<user>\n");
-		strb.append("    <params>\n");
-		strb.append(getProviderAccessTokenTag(provider, accessToken) + "\n");
-		strb.append("		 <appRoles>").append(appRoles).append("</appRoles>\n");
-		strb.append("        <userId>").append(userId).append( "</userId>\n");
-		strb.append("        <firstName>").append(firstName).append("</firstName>\n");
-		strb.append("        <lastName>").append(lastName).append("</lastName>\n");
-		strb.append("        <username>").append(username).append("</username>\n");  // +UUID.randomUUID().toString()
-		strb.append("        <email>").append(email).append( "</email>\n");
-		strb.append("        <cellPhone>").append(cellPhone).append( "</cellPhone>\n");
-		strb.append("        <personRef>").append(personRef).append( "</personRef>\n");
-		strb.append("        <userinfoJson>").append(userinfoJson).append( "</userinfoJson>\n");
-		strb.append("    </params> \n");
-		strb.append("</user>\n");
-		log.info(strb.toString());
-		return strb.toString();
+	    StringBuilder strb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n ");
+	    strb.append("<user>\n");
+	    strb.append("    <params>\n");
+	    strb.append(getProviderAccessTokenTag(provider, accessToken)).append("\n");
+	    strb.append("        <appRoles>").append(escapeXml(appRoles)).append("</appRoles>\n");
+	    strb.append("        <userId>").append(escapeXml(userId)).append("</userId>\n");
+	    strb.append("        <firstName>").append(escapeXml(firstName)).append("</firstName>\n");
+	    strb.append("        <lastName>").append(escapeXml(lastName)).append("</lastName>\n");
+	    strb.append("        <username>").append(escapeXml(username)).append("</username>\n");
+	    strb.append("        <email>").append(escapeXml(email)).append("</email>\n");
+	    strb.append("        <cellPhone>").append(escapeXml(cellPhone)).append("</cellPhone>\n");
+	    strb.append("        <personRef>").append(escapeXml(personRef)).append("</personRef>\n");
+	    
+	    // Wrap JSON in CDATA to prevent XML parsing issues
+	    if (userinfoJson != null && !userinfoJson.trim().isEmpty()) {
+	        strb.append("        <userinfoJson><![CDATA[").append(userinfoJson).append("]]></userinfoJson>\n");
+	    } else {
+	        strb.append("        <userinfoJson></userinfoJson>\n");
+	    }
+	    
+	    strb.append("    </params> \n");
+	    strb.append("</user>\n");
+	    log.info(strb.toString());
+	    return strb.toString();
+	}
+
+	/**
+	 * Escape special XML characters and handle null values
+	 */
+	private String escapeXml(String value) {
+	    if (value == null || value.equals("null")) {
+	        return "";
+	    }
+	    
+	    return value
+	        .replace("&", "&amp;")
+	        .replace("<", "&lt;")
+	        .replace(">", "&gt;")
+	        .replace("\"", "&quot;")
+	        .replace("'", "&apos;");
 	}
 
 	public String logOnBySharedSecrect(String username, String userticket) {
