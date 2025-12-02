@@ -16,7 +16,6 @@ import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.dao.View;
 import net.whydah.sso.ddd.model.user.Password;
 import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.errorhandling.AppException;
