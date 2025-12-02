@@ -323,6 +323,40 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 				userticket
 				).execute();
 	}
+	
+
+	public void ensureActiveAppToken() throws Exception {
+
+
+		if(!getWAS().hasActiveSession()) {
+			log.debug("No active app token found. Try fetching from STS now");
+			getWAS().resetApplicationSession();
+		}
+
+		//just wait for an available appTokenId to further the progress
+		int seconds_esclapsed = 30000;
+		while(getWAS().getActiveApplicationTokenId().isEmpty()) {
+			try {
+
+				if(seconds_esclapsed - 500 <=0) {
+					break;
+				}
+
+				Thread.sleep(500);
+
+				seconds_esclapsed -= 500;
+
+			} catch (InterruptedException e) {	
+				break;
+			}
+		}
+
+		if(getWAS().getActiveApplicationTokenId().isEmpty()) {
+			log.debug("Failed to get an app token from STS");
+			throw new RuntimeException("Failed to get an active app token from STS");
+		}
+
+	}
 }
 
 

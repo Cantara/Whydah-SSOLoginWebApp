@@ -108,12 +108,20 @@ public class SSOLogoutController {
 			//model.addAttribute("TokenID", userTokenId);
 			//ED: I think this is never called. Unkown what/when it should be used.
 			//log.info("logout was called. userTokenIdFromRequest={}, redirectUri={}. TALK TO Erik if you see this log statement!", userTokenId, redirectUriFromClient);
-			SessionDao.instance.getServiceClient().releaseUserToken(userTokenId);
+			try {
+				SessionDao.instance.getServiceClient().ensureActiveAppToken();
+				SessionDao.instance.getServiceClient().releaseUserToken(userTokenId);
+				
+			} catch (Exception e) {
+				log.error("unexpected error", e);
+			}
+			
 			CookieManager.clearUserTokenCookies(request, response);
 			String loginRedirectUri =  SessionDao.instance.LOGIN_URI + "?" + ConstantValue.REDIRECT_URI + "=" + redirectUriFromClient;
 			model.addAttribute(ConstantValue.REDIRECT, loginRedirectUri);
 			log.info("logout - Redirecting to loginRedirectUri={}", loginRedirectUri);
 			return "action";
+			
 		} else {
 			//No userTokenId, so not possible to perform logout.  Redirect to logoutaction to ensure browser sets the expected cookie on the request to obtian the userTokenId.
 			String logout_action_redirect_uri = SessionDao.instance.LOGOUT_ACTION_URI + "?" + ConstantValue.REDIRECT_URI + "=" + redirectUriFromClient;
@@ -134,7 +142,14 @@ public class SSOLogoutController {
 		log.trace("logoutaction was called. userTokenId={}, redirectUri={}", userTokenId, redirectUri);
 
 		if (UserTokenId.isValid(userTokenId)) {
-			SessionDao.instance.getServiceClient().releaseUserToken(userTokenId);
+			try {
+				SessionDao.instance.getServiceClient().ensureActiveAppToken();
+				SessionDao.instance.getServiceClient().releaseUserToken(userTokenId);
+				
+			} catch (Exception e) {
+				log.error("unexpected error", e);
+			}
+			
 		} else {
 			log.warn("logoutAction - tokenServiceClient.releaseUserToken was not called because no userTokenId was found in request or cookie.");
 		}

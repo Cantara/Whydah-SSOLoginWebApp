@@ -16,6 +16,7 @@ import net.whydah.sso.authentication.UserNameAndPasswordCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.dao.ConstantValue;
 import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.dao.View;
 import net.whydah.sso.ddd.model.user.Password;
 import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.errorhandling.AppException;
@@ -38,6 +39,8 @@ public class SSOLoginController {
 	public String login(HttpServletRequest request, HttpServletResponse response,Model model) {
 
 		try {
+
+			SessionDao.instance.getServiceClient().ensureActiveAppToken();
 
 			String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
 			boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
@@ -135,9 +138,39 @@ public class SSOLoginController {
 		} catch(Exception ex) {
 			ex.printStackTrace();
 			log.error("unexpected error", ex);
+			return returnError(model, ex);
+
 		}
 		//return Response.ok(FreeMarkerHelper.createBody("/login.ftl", model.asMap())).build();
 		return "login";
+	}
+
+	private String returnError(Model model, Exception ex) {
+		String userFriendlyMessage = resolveUserFriendlyMessage(ex);
+		model.addAttribute("errorMessage", userFriendlyMessage);
+
+		// Logg full stack trace server-side (ingen errorId i viewet)
+		log.error("Error page rendered", ex);
+
+		return "error";
+	}
+
+	private String resolveUserFriendlyMessage(Exception ex) {
+		if (ex == null || ex.getMessage() == null) {
+			return null;
+		}
+
+		String msg = ex.getMessage().toLowerCase();
+
+		// Kun én spesifikk oversettelse: STS token-feil
+		//if (msg.contains("failed to get an active app token from sts")) {
+		//return "Vi klarer ikke å hente et aktivt app-token fra STS akkurat nå. Vi jobber med å fikse dette.";
+		//}
+
+		// Alt annet: vis original melding (engelsk eller norsk)
+		return ex.getMessage().length() > 200 
+				? "We are experiencing technical difficulties right now." 
+						: ex.getMessage();
 	}
 
 	private String appendHttpSchemeIfNotFound(String redirectURI) {
@@ -203,125 +236,135 @@ public class SSOLoginController {
 	@RequestMapping("/welcome")
 	public String welcome(HttpServletRequest request, HttpServletResponse response,Model model) {
 
-		String userTokenXml = SessionDao.instance.findUserTokenXMLFromSession(request, response, model);
-		SessionDao.instance.addModel_LOGO_URL(model);
-		SessionDao.instance.addModel_MYURI(model);
-		SessionDao.instance.addModel_WHYDAH_VERSION(model);
-		SessionDao.instance.addModel_LoginTypes(model);
-		SessionDao.instance.addModel_CSRFtoken(model);
-		SessionDao.instance.setCSP(response);
+		try {
+
+			String userTokenXml = SessionDao.instance.findUserTokenXMLFromSession(request, response, model);
+			SessionDao.instance.addModel_LOGO_URL(model);
+			SessionDao.instance.addModel_MYURI(model);
+			SessionDao.instance.addModel_WHYDAH_VERSION(model);
+			SessionDao.instance.addModel_LoginTypes(model);
+			SessionDao.instance.addModel_CSRFtoken(model);
+			SessionDao.instance.setCSP(response);
 
 
-		if (userTokenXml == null) {
-			return "login";
-		} else {
+			if (userTokenXml == null) {
+				return "login";
+			} else {
 
-			boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
-			model.addAttribute(ConstantValue.SESSIONCHECK, sessionCheckOnly);
-			model.addAttribute(ConstantValue.USERTOKEN, SignupHelper.trim(userTokenXml));
-			model.addAttribute(ConstantValue.APP_LINKS, SessionDao.instance.getAppLinks());
-			model.addAttribute(ConstantValue.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
-			model.addAttribute(ConstantValue.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
-			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
-			model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
-			model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
-			//SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
-			return ConstantValue.DEFAULT_REDIRECT;
-		}
+				boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
+				model.addAttribute(ConstantValue.SESSIONCHECK, sessionCheckOnly);
+				model.addAttribute(ConstantValue.USERTOKEN, SignupHelper.trim(userTokenXml));
+				model.addAttribute(ConstantValue.APP_LINKS, SessionDao.instance.getAppLinks());
+				model.addAttribute(ConstantValue.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
+				model.addAttribute(ConstantValue.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
+				model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
+				model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
+				model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
+				//SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
+				return ConstantValue.DEFAULT_REDIRECT;
+			} }catch (Exception ex) {
+				log.error("unexpected error", ex);
+				return returnError(model, ex);
+			}
 	}
 
 	@RequestMapping("/action")
 	public String action(HttpServletRequest request, HttpServletResponse response, Model model) throws AppException {
 
-		String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
-		log.trace("action: redirectURI: {}", redirectURI);
-
-		SessionDao.instance.addModel_LOGO_URL(model);
-		SessionDao.instance.addModel_MYURI(model);
-		SessionDao.instance.addModel_WHYDAH_VERSION(model);
-		SessionDao.instance.addModel_IAM_MODE(model);
-		SessionDao.instance.addModel_CSRFtoken(model);
-		SessionDao.instance.setCSP(response);
-		SessionDao.instance.addModel_LoginTypes(model);
-
-		model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
-
-		SessionDao.instance.addModel_LoginTypes(model);
-		//if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
-		if(!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
-			log.warn("action - CSRFtoken verification failed. Redirecting to login.");
-			model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in - CSRFtoken missing or incorrect");
-			//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-			SessionDao.instance.addModel_CSRFtoken(model);
-			//ModelHelper.setEnabledLoginTypes(model);
-			SessionDao.instance.addModel_LoginTypes(model);
-			CookieManager.clearUserTokenCookies(request, response);
-			model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
-			return "login";
-
-		}
-
-		if (!UserName.isValid(SessionDao.instance.getFromRequest_User(request)) || !Password.isValid(SessionDao.instance.getFromRequest_Password(request))) {
-			log.warn("action - illegal username or password. Redirecting to login.");
-			model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in.");
-			CookieManager.clearUserTokenCookies(request, response);
-			return "login";
-		}
-
-
-		UserCredential user = new UserNameAndPasswordCredential(SessionDao.instance.getFromRequest_User(request), SessionDao.instance.getFromRequest_Password(request));
-		String userTicket = UUID.randomUUID().toString();
-		String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
-
-		if (userTokenXml == null) {
-			log.warn("action - getUserToken failed. Redirecting to login.");
-			model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in.");
-			CookieManager.clearUserTokenCookies(request, response);
-			return "login";
-		}
-
-		SessionDao.instance.getServiceClient().getWAS().updateDefcon(userTokenXml);
-		if (redirectURI.contains(ConstantValue.USERTICKET) && !redirectURI.toLowerCase().contains("http")) {
-			log.warn("action - redirectURI contain ticket and no URL. Redirecting to welcome.");
-			model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
-			//ModelHelper.setEnabledLoginTypes(model);
-			SessionDao.instance.addModel_LoginTypes(model);
-			model.addAttribute(ConstantValue.REDIRECT_URI, "");
-			model.addAttribute(ConstantValue.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
-			model.addAttribute(ConstantValue.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
-			model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
-			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
-			model.addAttribute(ConstantValue.DEFCON, SessionDao.instance.getServiceClient().getWAS().getDefcon());
-			model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
-			SessionDao.instance.getCRMHelper().getCrmdata_AddToModel(model, userTokenXml);
-			//SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
-			return "welcome";
-		}
-
-		String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
-		Integer tokenRemainingLifetimeSeconds = WhydahServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
-		CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
-
-		// ticket on redirect
-		if (redirectURI.toLowerCase().contains(ConstantValue.USERTICKET)) {
-			// Do not overwrite ticket
-		} else {
-			redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);
-		}
-
-		// Attempt for a workaround for space instead of + in email seen from invite flows
 		try {
-			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
-		} catch (Exception e){
-			log.error("Exception in email from usertoken xml.getEmail");
-			model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml).replace(" ","+"));
+			String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
+			log.trace("action: redirectURI: {}", redirectURI);
+
+			SessionDao.instance.addModel_LOGO_URL(model);
+			SessionDao.instance.addModel_MYURI(model);
+			SessionDao.instance.addModel_WHYDAH_VERSION(model);
+			SessionDao.instance.addModel_IAM_MODE(model);
+			SessionDao.instance.addModel_CSRFtoken(model);
+			SessionDao.instance.setCSP(response);
+			SessionDao.instance.addModel_LoginTypes(model);
+
+			model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+
+			SessionDao.instance.addModel_LoginTypes(model);
+			//if (!SessionHelper.validCSRFToken(request.getParameter(SessionHelper.CSRFtoken))) {
+			if(!SessionDao.instance.validCSRFToken(SessionDao.instance.getfromRequest_CSRFtoken(request))) {
+				log.warn("action - CSRFtoken verification failed. Redirecting to login.");
+				model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in - CSRFtoken missing or incorrect");
+				//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+				SessionDao.instance.addModel_CSRFtoken(model);
+				//ModelHelper.setEnabledLoginTypes(model);
+				SessionDao.instance.addModel_LoginTypes(model);
+				CookieManager.clearUserTokenCookies(request, response);
+				model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+				return "login";
+
+			}
+
+			if (!UserName.isValid(SessionDao.instance.getFromRequest_User(request)) || !Password.isValid(SessionDao.instance.getFromRequest_Password(request))) {
+				log.warn("action - illegal username or password. Redirecting to login.");
+				model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in.");
+				CookieManager.clearUserTokenCookies(request, response);
+				return "login";
+			}
+
+
+			UserCredential user = new UserNameAndPasswordCredential(SessionDao.instance.getFromRequest_User(request), SessionDao.instance.getFromRequest_Password(request));
+			String userTicket = UUID.randomUUID().toString();
+			String userTokenXml = SessionDao.instance.getServiceClient().getUserToken(user, userTicket);
+
+			if (userTokenXml == null) {
+				log.warn("action - getUserToken failed. Redirecting to login.");
+				model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not log in.");
+				CookieManager.clearUserTokenCookies(request, response);
+				return "login";
+			}
+
+			SessionDao.instance.getServiceClient().getWAS().updateDefcon(userTokenXml);
+			if (redirectURI.contains(ConstantValue.USERTICKET) && !redirectURI.toLowerCase().contains("http")) {
+				log.warn("action - redirectURI contain ticket and no URL. Redirecting to welcome.");
+				model.addAttribute(ConstantValue.LOGIN_ERROR, "Could not redirect back, redirect loop detected.");
+				//ModelHelper.setEnabledLoginTypes(model);
+				SessionDao.instance.addModel_LoginTypes(model);
+				model.addAttribute(ConstantValue.REDIRECT_URI, "");
+				model.addAttribute(ConstantValue.REALNAME, UserTokenXpathHelper.getRealName(userTokenXml));
+				model.addAttribute(ConstantValue.PHONE_NUMBER, UserTokenXpathHelper.getPhoneNumber(userTokenXml));
+				model.addAttribute(ConstantValue.SECURITY_LEVEL, UserTokenXpathHelper.getSecurityLevel(userTokenXml));
+				model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
+				model.addAttribute(ConstantValue.DEFCON, SessionDao.instance.getServiceClient().getWAS().getDefcon());
+				model.addAttribute(ConstantValue.PERSON_REF, UserTokenXpathHelper.getPersonref(userTokenXml));
+				SessionDao.instance.getCRMHelper().getCrmdata_AddToModel(model, userTokenXml);
+				//SessionDao.instance.getReportServiceHelper().addUserActivities(model, userTokenXml);
+				return "welcome";
+			}
+
+			String userTokenId = UserTokenXpathHelper.getUserTokenId(userTokenXml);
+			Integer tokenRemainingLifetimeSeconds = WhydahServiceClient.calculateTokenRemainingLifetimeInSeconds(userTokenXml);
+			CookieManager.createAndSetUserTokenCookie(userTokenId, tokenRemainingLifetimeSeconds, request, response);
+
+			// ticket on redirect
+			if (redirectURI.toLowerCase().contains(ConstantValue.USERTICKET)) {
+				// Do not overwrite ticket
+			} else {
+				redirectURI = SessionDao.instance.getServiceClient().appendTicketToRedirectURI(redirectURI, userTicket);
+			}
+
+			// Attempt for a workaround for space instead of + in email seen from invite flows
+			try {
+				model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml));
+			} catch (Exception e){
+				log.error("Exception in email from usertoken xml.getEmail");
+				model.addAttribute(ConstantValue.EMAIL, UserTokenXpathHelper.getEmail(userTokenXml).replace(" ","+"));
+			}
+			// Action use redirect...
+			redirectURI = appendHttpSchemeIfNotFound(redirectURI);
+			model.addAttribute(ConstantValue.REDIRECT, redirectURI);
+			model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
+			log.info("action - Redirecting to {}", redirectURI);
+			return "action";
+		} catch(Exception ex) {
+			log.error("unexpected error", ex);
+			return returnError(model, ex);
 		}
-		// Action use redirect...
-		redirectURI = appendHttpSchemeIfNotFound(redirectURI);
-		model.addAttribute(ConstantValue.REDIRECT, redirectURI);
-		model.addAttribute(ConstantValue.REDIRECT_URI, redirectURI);
-		log.info("action - Redirecting to {}", redirectURI);
-		return "action";
 	}
 
 }
