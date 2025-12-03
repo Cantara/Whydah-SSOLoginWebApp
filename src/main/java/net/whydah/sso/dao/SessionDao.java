@@ -75,16 +75,16 @@ public enum SessionDao {
 	public String MY_APP_URI;
 	public String LOGOUT_ACTION_URI;
 	public String LOGIN_URI;
-    private boolean matchRedirectURLtoModel = false;
+	private boolean matchRedirectURLtoModel = false;
 
-    CRMHelper crmHelper;
+	CRMHelper crmHelper;
 	ReportServiceHelper reportServiceHelper;
 	LoginTypes enabledLoginTypes;
 	PersonaServiceHelper personaService;
-	
+
 	WhydahOauthIntegrationConfig whydahOauthConfig;
 	public String SSOLWA_STS_SHARED_SECRECT;
-	
+
 	public CRMHelper getCRMHelper(){
 		return crmHelper;
 	}
@@ -92,10 +92,13 @@ public enum SessionDao {
 	public ReportServiceHelper getReportServiceHelper(){
 		return reportServiceHelper;
 	}
-	
+
 	private IMap<String, String> csrftokens = HazelcastMapHelper.register("csrftokens_map");
 	private IMap<String, String> username_redirectURI = HazelcastMapHelper.register("username_redirectURI");
 	private IMap<String, Long> username_redirectURI_timeout_map = HazelcastMapHelper.register("username_redirectURI_timeout_map");
+
+	private UserToken adminUserToken = null;
+	private String adminUserTokenXML=null;
 
 	private SessionDao() {
 
@@ -105,10 +108,10 @@ public enum SessionDao {
 			this.SSOLWA_STS_SHARED_SECRECT = properties.getProperty("ssolwa_sts_shared_secrect");
 			this.LOGOURL = properties.getProperty("logourl", LOGOURL);
 			MY_APP_URI = AppConfig.readProperties().getProperty("myuri");
-            LOGOUT_ACTION_URI = MY_APP_URI + "logoutaction";
-            LOGIN_URI = MY_APP_URI + "login";
-            enabledLoginTypes = new LoginTypes(properties);
-            
+			LOGOUT_ACTION_URI = MY_APP_URI + "logoutaction";
+			LOGIN_URI = MY_APP_URI + "login";
+			enabledLoginTypes = new LoginTypes(properties);
+
 			this.serviceClient = new WhydahServiceClient(properties);
 			this.tokenServiceUri = UriBuilder.fromUri(properties.getProperty("securitytokenservice")).build();
 			this.uasServiceUri = UriBuilder.fromUri(properties.getProperty("useradminservice")).build();
@@ -118,11 +121,11 @@ public enum SessionDao {
 			this.crmHelper = new CRMHelper(serviceClient, crmServiceUri, properties.getProperty("email.verification.link"));
 			this.reportServiceHelper = new ReportServiceHelper(serviceClient, reportservice);
 			this.personaService = new PersonaServiceHelper(properties);
-            this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
-            whydahOauthConfig = new WhydahOauthIntegrationConfig(properties);
-            DEFAULT_REDIRECT = AppConfig.readProperties().getProperty("DEFAULT_REDIRECT", "welcome");
-            
-        } catch (IOException e) {
+			this.matchRedirectURLtoModel = Boolean.getBoolean(properties.getProperty("matchRedirects"));
+			whydahOauthConfig = new WhydahOauthIntegrationConfig(properties);
+			DEFAULT_REDIRECT = AppConfig.readProperties().getProperty("DEFAULT_REDIRECT", "welcome");
+
+		} catch (IOException e) {
 
 			e.printStackTrace();
 			log.error("Exception in Sessiondao setup",e);
@@ -142,44 +145,44 @@ public enum SessionDao {
 	//////ADD BASIC VALUE TO THE MODEL
 
 	public Model addModel_LoginTypes(Model model){
-		
+
 		model.addAttribute(ConstantValue.SIGNUPENABLED, enabledLoginTypes.isSignupEnabled());
 		model.addAttribute(ConstantValue.USERPASSWORDLOGINENABLED, enabledLoginTypes.isUserpasswordLoginEnabled());
-        //model.addAttribute(ConstantValue.FACEBOOKLOGIN_ENABLED, enabledLoginTypes.isFacebookLoginEnabled());
-        //model.addAttribute(ConstantValue.OPENIDLOGIN_ENABLED, enabledLoginTypes.isOpenIdLoginEnabled());
-        //model.addAttribute(ConstantValue.OMNILOGIN_ENABLED, enabledLoginTypes.isOmniLoginEnabled());
-        //model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
-        model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
-        //model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
-        model.addAttribute(ConstantValue.MICROSOFTLOGIN_ENABLED, enabledLoginTypes.isMicrosoftLoginEnabled());
-        
-        model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
-        
-        //sign up
-        model.addAttribute(ConstantValue.SIGNUP_MICROSOFT_ON, enabledLoginTypes.isSignuppageMicrosoftOn());
-        //model.addAttribute(ConstantValue.SIGNUP_GOOGLE_ON, enabledLoginTypes.isSignuppageGoogleOn());
-        //model.addAttribute(ConstantValue.SIGNUP_FACEBOOK_ON, enabledLoginTypes.isSignuppageFacebookOn());
-        //model.addAttribute(ConstantValue.SIGNUP_NETIQ_ON, enabledLoginTypes.isSignuppageNetIQOn());
-        //model.addAttribute(ConstantValue.SIGNUP_WHYDAH_INTEGRATION_PROVIDERS_ON, enabledLoginTypes.isSignuppageWhydahIntegrationproviderOn());
-        
-       
-       
-        if (enabledLoginTypes.isNetIQLoginEnabled()) {
-            setNetIQOverrides(model);
-        }
-        
-        if(enabledLoginTypes.isPersonasShortcutEnabled()) {
-        	model.addAttribute("personas", personaService.getPersonasCredentials());
-        }
+		//model.addAttribute(ConstantValue.FACEBOOKLOGIN_ENABLED, enabledLoginTypes.isFacebookLoginEnabled());
+		//model.addAttribute(ConstantValue.OPENIDLOGIN_ENABLED, enabledLoginTypes.isOpenIdLoginEnabled());
+		//model.addAttribute(ConstantValue.OMNILOGIN_ENABLED, enabledLoginTypes.isOmniLoginEnabled());
+		//model.addAttribute(ConstantValue.NETIQLOGIN_ENABLED, enabledLoginTypes.isNetIQLoginEnabled());
+		model.addAttribute(ConstantValue.PERSONASSHOTCUT_ENABLED, enabledLoginTypes.isPersonasShortcutEnabled());
+		//model.addAttribute(ConstantValue.GOOGLELOGIN_ENABLED, enabledLoginTypes.isGoogleLoginEnabled());
+		model.addAttribute(ConstantValue.MICROSOFTLOGIN_ENABLED, enabledLoginTypes.isMicrosoftLoginEnabled());
+
+		model.addAttribute(ConstantValue.WHYDAH_LOGININTEGRATION_PROVIDERS, whydahOauthConfig.getProviderMap().values());
+
+		//sign up
+		model.addAttribute(ConstantValue.SIGNUP_MICROSOFT_ON, enabledLoginTypes.isSignuppageMicrosoftOn());
+		//model.addAttribute(ConstantValue.SIGNUP_GOOGLE_ON, enabledLoginTypes.isSignuppageGoogleOn());
+		//model.addAttribute(ConstantValue.SIGNUP_FACEBOOK_ON, enabledLoginTypes.isSignuppageFacebookOn());
+		//model.addAttribute(ConstantValue.SIGNUP_NETIQ_ON, enabledLoginTypes.isSignuppageNetIQOn());
+		//model.addAttribute(ConstantValue.SIGNUP_WHYDAH_INTEGRATION_PROVIDERS_ON, enabledLoginTypes.isSignuppageWhydahIntegrationproviderOn());
+
+
+
+		if (enabledLoginTypes.isNetIQLoginEnabled()) {
+			setNetIQOverrides(model);
+		}
+
+		if(enabledLoginTypes.isPersonasShortcutEnabled()) {
+			model.addAttribute("personas", personaService.getPersonasCredentials());
+		}
 
 		for (Provider oidcProvider : enabledLoginTypes.getOIDCProvidersEnabled()) {
 			model.addAttribute("oidcProvider"+oidcProvider.provider().substring(0, 1).toUpperCase() + oidcProvider.provider().substring(1)+"Enabled", true);
 		}
-        
-        
+
+
 		return model;
 	}
-	
+
 	private void setNetIQOverrides(Model model) {
 		try {
 			model.addAttribute("netIQtext", AppConfig.readProperties().getProperty("logintype.netiq.text"));
@@ -189,33 +192,33 @@ public enum SessionDao {
 			model.addAttribute("netIQimage", "images/netiqlogo.png");
 		}
 	}
-	
+
 	public  boolean isLoginTypeEnabled(String loginType) {
 		LoginTypes enabledLoginTypes = new LoginTypes(properties);
-        if (loginType.equalsIgnoreCase(ConstantValue.FACEBOOKLOGIN_ENABLED)) {
-            return enabledLoginTypes.isFacebookLoginEnabled();
-        }
-        if (loginType.equalsIgnoreCase(ConstantValue.OPENIDLOGIN_ENABLED)) {
-            return enabledLoginTypes.isOpenIdLoginEnabled();
-        }
-        if (loginType.equalsIgnoreCase(ConstantValue.OMNILOGIN_ENABLED)) {
-            return enabledLoginTypes.isOmniLoginEnabled();
-        }
-        if (loginType.equalsIgnoreCase(ConstantValue.NETIQLOGIN_ENABLED)) {
-            return enabledLoginTypes.isNetIQLoginEnabled();
-        }
-        if (loginType.equalsIgnoreCase(ConstantValue.SIGNUPENABLED)) {
-            return enabledLoginTypes.isSignupEnabled();
-        }
-        if (loginType.equalsIgnoreCase(ConstantValue.GOOGLELOGIN_ENABLED)) {
-            return enabledLoginTypes.isGoogleLoginEnabled();
-        }
-        if (loginType.equalsIgnoreCase(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
-            return enabledLoginTypes.isMicrosoftLoginEnabled();
-        }
-        
-        return false;
-    }
+		if (loginType.equalsIgnoreCase(ConstantValue.FACEBOOKLOGIN_ENABLED)) {
+			return enabledLoginTypes.isFacebookLoginEnabled();
+		}
+		if (loginType.equalsIgnoreCase(ConstantValue.OPENIDLOGIN_ENABLED)) {
+			return enabledLoginTypes.isOpenIdLoginEnabled();
+		}
+		if (loginType.equalsIgnoreCase(ConstantValue.OMNILOGIN_ENABLED)) {
+			return enabledLoginTypes.isOmniLoginEnabled();
+		}
+		if (loginType.equalsIgnoreCase(ConstantValue.NETIQLOGIN_ENABLED)) {
+			return enabledLoginTypes.isNetIQLoginEnabled();
+		}
+		if (loginType.equalsIgnoreCase(ConstantValue.SIGNUPENABLED)) {
+			return enabledLoginTypes.isSignupEnabled();
+		}
+		if (loginType.equalsIgnoreCase(ConstantValue.GOOGLELOGIN_ENABLED)) {
+			return enabledLoginTypes.isGoogleLoginEnabled();
+		}
+		if (loginType.equalsIgnoreCase(ConstantValue.MICROSOFTLOGIN_ENABLED)) {
+			return enabledLoginTypes.isMicrosoftLoginEnabled();
+		}
+
+		return false;
+	}
 
 	public Model addModel_LOGO_URL(Model model){
 		model.addAttribute(ConstantValue.LOGO_URL, LOGOURL);
@@ -241,30 +244,30 @@ public enum SessionDao {
 		model.addAttribute(ConstantValue.MYURI, properties.getProperty("myuri"));
 		return model;
 	}
-	
+
 	//////END ADD BASIC VALUE TO THE MODEL
 
 
-	
-	
+
+
 	//////HANDLE PARAMTERS FROM THE REQUEST
 
 	public String getFromRequest_User(HttpServletRequest request){
 		return request.getParameter(ConstantValue.USER);
 	}
-	
+
 	public String getFromRequest_Password(HttpServletRequest request){
 		return request.getParameter(ConstantValue.PASSWORD);
 	}
-	
+
 	public String getfromRequest_CSRFtoken(HttpServletRequest request) {
 		return request.getParameter(ConstantValue.CSRFtoken);//to check for valid request
 	}
-	
+
 	public String getfromRequest_Address(HttpServletRequest request) {
 		return request.getParameter(ConstantValue.ADDRESS);
 	}
-	
+
 	public boolean getFromRequest_SessionCheck(HttpServletRequest request) {
 		String redirectURI = request.getParameter(ConstantValue.SESSIONCHECK);
 		if (redirectURI == null || redirectURI.length() < 1) {
@@ -274,8 +277,8 @@ public enum SessionDao {
 		return true;
 	}
 
-    public String getFromRequest_RedirectURI_Old(HttpServletRequest request) {
-        String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
+	public String getFromRequest_RedirectURI_Old(HttpServletRequest request) {
+		String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
 		if (redirectURI == null || redirectURI.length() < 1) {
 			log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
 			return DEFAULT_REDIRECT;
@@ -289,41 +292,41 @@ public enum SessionDao {
 		}
 	}
 
-    public String getFromRequest_RedirectURI(HttpServletRequest request) {
-        try {
-            String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
-            String hashContent = request.getParameter("hashContent");
-            if (hashContent == null) {
-                hashContent = "";
-            } else {
-                int origSize = hashContent.length();
-                String withoutAccent = Normalizer.normalize(hashContent, Normalizer.Form.NFD);
-                hashContent = withoutAccent.replaceAll("[^a-zA-Z0-9 ]", "");            //hashContent = sanitize(escapeHtml(hashContent.replace("alert", "").replace("confirm", "")));
-                // If there are issues in the hashContent we return default
-                if (origSize != hashContent.length()) {
-                    return DEFAULT_REDIRECT;
-                }
-            }
-            if (redirectURI == null || !(RedirectURI.isValid(redirectURI)) || redirectURI.equalsIgnoreCase("null") || redirectURI.equalsIgnoreCase("")) {
-                log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
-                return DEFAULT_REDIRECT;
-            }
-            try {
-                if (matchRedirectURLtoModel) {
-                    redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList(), null).getInput();
-                } else {
-                    redirectURI = new RedirectURI(redirectURI, null, null).getInput();
-                }
-                URI redirect = new URI(redirectURI + hashContent);
-                return redirect.toString();
-            } catch (Exception e) {
-                return DEFAULT_REDIRECT;
-            }
-        } catch (Exception e) {
-            return DEFAULT_REDIRECT;
+	public String getFromRequest_RedirectURI(HttpServletRequest request) {
+		try {
+			String redirectURI = request.getParameter(ConstantValue.REDIRECT_URI);
+			String hashContent = request.getParameter("hashContent");
+			if (hashContent == null) {
+				hashContent = "";
+			} else {
+				int origSize = hashContent.length();
+				String withoutAccent = Normalizer.normalize(hashContent, Normalizer.Form.NFD);
+				hashContent = withoutAccent.replaceAll("[^a-zA-Z0-9 ]", "");            //hashContent = sanitize(escapeHtml(hashContent.replace("alert", "").replace("confirm", "")));
+				// If there are issues in the hashContent we return default
+				if (origSize != hashContent.length()) {
+					return DEFAULT_REDIRECT;
+				}
+			}
+			if (redirectURI == null || !(RedirectURI.isValid(redirectURI)) || redirectURI.equalsIgnoreCase("null") || redirectURI.equalsIgnoreCase("")) {
+				log.trace("getRedirectURI - No redirectURI found, setting to {}", DEFAULT_REDIRECT);
+				return DEFAULT_REDIRECT;
+			}
+			try {
+				if (matchRedirectURLtoModel) {
+					redirectURI = new RedirectURI(redirectURI, getServiceClient().getWAS().getApplicationList(), null).getInput();
+				} else {
+					redirectURI = new RedirectURI(redirectURI, null, null).getInput();
+				}
+				URI redirect = new URI(redirectURI + hashContent);
+				return redirect.toString();
+			} catch (Exception e) {
+				return DEFAULT_REDIRECT;
+			}
+		} catch (Exception e) {
+			return DEFAULT_REDIRECT;
 
-        }
-    }
+		}
+	}
 
 
 	public String getFromRequest_CellPhone(HttpServletRequest request) {
@@ -334,12 +337,12 @@ public enum SessionDao {
 		}
 		return cellPhone;
 	}
-	
+
 	public String getFromRequest_PhoneNo(HttpServletRequest request) {
 		String phoneNo = request.getParameter("phoneNo");
 		return phoneNo;
 	}
-	
+
 
 	public String getFromRequest_UserTicket(HttpServletRequest request) {
 		return request.getParameter(ConstantValue.USERTICKET);
@@ -348,43 +351,43 @@ public enum SessionDao {
 	public String getFromRequest_UserName(HttpServletRequest request){
 		return request.getParameter(ConstantValue.USERNAME);
 	}
-	
+
 	public String getFromRequest_Email(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.EMAIL), "");
 	}
-	
+
 	public String getFromRequest_FirstName(HttpServletRequest request){
-		 return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.FIRSTNAME), "");
+		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.FIRSTNAME), "");
 	}
-	
+
 	public String getFromRequest_LastName(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.LASTNAME), "");
 	}
-	
+
 	public String getFromRequest_Pin(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.PIN), "");
 	}
-	
+
 	public String getFromRequest_StreetAddress(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.STREETADDRESS), "");
 	}
-	
+
 	public String getFromRequest_ZipCode(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.ZIPCODE), "");
 	}
-	
+
 	public String getFromRequest_City(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.CITY), "");
 	}
-	
+
 	public String getFromRequest_OIDADDRESS(HttpServletRequest request){
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.OIDADDRESS),"");
 	}
-	
+
 	public String getFRomRequest_RoleId(HttpServletRequest request) {
 		return SignupHelper.getValueOrDefault(request.getParameter(ConstantValue.ROLE_ID),"");
 	}
-	
+
 	public String getFromRequest_Token(HttpServletRequest request) {
 		return request.getParameter(ConstantValue.TOKEN);
 	}
@@ -402,12 +405,12 @@ public enum SessionDao {
 		String email = JsonPathHelper.findJsonPathValue(postedJsonString.toString(), "$.email");
 		return email;
 	}
-	
+
 	//////END HANDLE PARAMTERS FROM THE REQUEST
 
 
-    ///  Block side-channel attacks - looks correct bud does not clear the detectify "alert"
-    public void setCSP(HttpServletResponse response) {
+	///  Block side-channel attacks - looks correct bud does not clear the detectify "alert"
+	public void setCSP(HttpServletResponse response) {
 		response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
 		response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline' data:; img-src 'self' data: https://*.quadim.ai https://*.cantara.no https://raw.githubusercontent.com 'unsafe-inline' 'unsafe-eval'; media-src 'none'; frame-src 'none'; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; report-uri REDACTED");
 		response.addHeader("X-Content-Type-Options", "nosniff");
@@ -417,38 +420,38 @@ public enum SessionDao {
 
 	}
 
-    public void setCSP2(HttpServletResponse response) {
+	public void setCSP2(HttpServletResponse response) {
 		response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
 		response.addHeader("Content-Security-Policy-Report-Only", "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline' data:; img-src 'self' data: https://*.quadim.ai https://*.cantara.no https://raw.githubusercontent.com/ 'unsafe-inline' 'unsafe-eval'; media-src 'none'; frame-src 'none'; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; report-uri REDACTED");
 	}
 
 
-    //HANDLE LOGIC FROM CONTROLLERS
+	//HANDLE LOGIC FROM CONTROLLERS
 
 	public String getCSRFtoken() {
 		String csrftoken = UUID.randomUUID().toString();
 		csrftokens.put(csrftoken, String.valueOf(System.currentTimeMillis()));
 		return csrftoken;
 	}
-	
+
 	private boolean isValidUUID(String s) {
-        try {
-            UUID.fromString(s);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+		try {
+			UUID.fromString(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 	public boolean validCSRFToken(String csrftoken) {
 		boolean valid = false;
 		if(csrftokens.containsKey(csrftoken)) {
-			
+
 			if(isValidUUID(csrftokens.get(csrftoken)) || (System.currentTimeMillis() - Long.valueOf(csrftokens.get(csrftoken)) >= 3*60*1000)) {
 				csrftokens.remove(csrftoken);	
 				return false;				
 			}
-			
+
 			valid = true;
 		}	
 		return valid;
@@ -461,11 +464,11 @@ public enum SessionDao {
 	public String getAppLinks() {
 		return ApplicationMapper.toShortListJson(serviceClient.getApplicationList());
 	}
-	
+
 	public String getFullApplicationList() {
 		return ApplicationMapper.toJson(serviceClient.getApplicationList());
 	}
-	
+
 	public String getSafeJsonApplicationList() {
 		return ApplicationMapper.toSafeJson(serviceClient.getApplicationList());
 	}
@@ -496,9 +499,9 @@ public enum SessionDao {
 		}
 		return null;
 	}
-	
+
 	public boolean checkIfUserExists(String username) {
-		Boolean exists = new CommandUserExists(uasServiceUri, serviceClient.getMyAppTokenID(), UserTokenXpathHelper.getUserTokenId(getUserAdminTokenXml()), username).execute();
+		Boolean exists = new CommandUserExists(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), username).execute();
 		return exists;
 	}
 
@@ -507,11 +510,11 @@ public enum SessionDao {
 		return exists;
 	}
 
-//	public boolean checkIfUserNameExists(String username) {
-//		Boolean exists = new CommandUserNameExists(uasServiceUri, serviceClient.getMyAppTokenID(), UserTokenXpathHelper.getUserTokenId(getUserAdminTokenXml()), username).execute();
-//		return exists;
-//	}
-	
+	//	public boolean checkIfUserNameExists(String username) {
+	//		Boolean exists = new CommandUserNameExists(uasServiceUri, serviceClient.getMyAppTokenID(), UserTokenXpathHelper.getUserTokenId(getUserAdminTokenXml()), username).execute();
+	//		return exists;
+	//	}
+
 	public String getUserAdminTokenXml(String userTicket){
 
 		log.trace("getUserAdminTokenId called - Calling UserAdminService at " + uasServiceUri + " userCredentialXml:" + adminUserCredential);
@@ -528,32 +531,31 @@ public enum SessionDao {
 	public String getUserRoleList(String userTokenId){
 		String userTokenXml = serviceClient.getUserTokenByUserTokenID(userTokenId);
 		String userid = UserTokenXpathHelper.getUserID(userTokenXml);
-		UserToken adminUser = getUserAdminToken();
-		String userRolesJson = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenXml(), adminUser.getUserTokenId(), userid).execute();
+		String userRolesJson = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenXml(), adminUserToken.getUserTokenId(), userid).execute();
 		log.debug("Roles returned:" + userRolesJson);
 		return userRolesJson;
 	}
-	
+
 	public String addUserRoleList(String userTokenId, String userRoleJson){
-		
-		
+
+
 		String userTokenXml = serviceClient.getUserTokenByUserTokenID(userTokenId);
-        String uId = UserXpathHelper.getUserIdFromUserTokenXml(userTokenXml);
-        String userAddRoleResult = new CommandAddUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), userTokenId, uId, userRoleJson).execute();
-        log.debug("userAddRoleResult:{}", userAddRoleResult);
+		String uId = UserXpathHelper.getUserIdFromUserTokenXml(userTokenXml);
+		String userAddRoleResult = new CommandAddUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), userTokenId, uId, userRoleJson).execute();
+		log.debug("userAddRoleResult:{}", userAddRoleResult);
 		return userAddRoleResult;
 	}
 
 	public boolean deleteUserRole(String userTokenId, String roleId){
-		
+
 		String userTokenXml = serviceClient.getUserTokenByUserTokenID(userTokenId);
-        String uId = UserXpathHelper.getUserIdFromUserTokenXml(userTokenXml);
-        boolean result = new CommandDeleteUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), userTokenId, uId, roleId).execute();
+		String uId = UserXpathHelper.getUserIdFromUserTokenXml(userTokenXml);
+		boolean result = new CommandDeleteUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), userTokenId, uId, roleId).execute();
 		return result;
 	}
 
 	public String findUserTokenXMLFromSession(HttpServletRequest request, HttpServletResponse response, Model model){
-		
+
 		/* FROM totto's comment
 		   we should probably look at shared function like "public static UserToken findUserTokenFromSession(httprequest,httpresponse)" 
 		   which check and handle cookie(s) and ticket correct and smart...   
@@ -573,7 +575,7 @@ public enum SessionDao {
 
 		CookieManager.addSecurityHTTPHeaders(response);
 		boolean isValidTicket=false;
-		
+
 		try {
 			//try ticket
 			if (userTicket != null && userTicket.length() > 3) { 
@@ -586,7 +588,7 @@ public enum SessionDao {
 				log.trace("Find UserToken - Using userTokenID from cookie");
 				userTokenXml = SessionDao.instance.getServiceClient().getUserTokenByUserTokenID(userTokenId);
 			}
-			
+
 			if(userTokenXml==null){				
 				log.trace("Find UserToken - no session found");
 				//delete cookie NOT WHEN STS is down
@@ -605,8 +607,8 @@ public enum SessionDao {
 				}
 				return userTokenXml;
 			}
-			
-			
+
+
 		} catch (Exception e) {
 			log.warn("welcome redirect - SecurityTokenException exception: ", e);
 			return null;
@@ -614,47 +616,32 @@ public enum SessionDao {
 		return null;
 	}
 
-    public UserToken getUserAdminToken() {
-        UserToken adminUser = UserTokenMapper.fromUserTokenXml(getUserAdminTokenXml());
-        return adminUser;
-    }
+	public UserToken getUserAdminToken() throws Exception {
+		ensureUserAdminToken();
+		return adminUserToken;
+	}
 
-    private String adminUserTicket = null;
-    private String adminUserTokenXML = null;
+	public String getUserAdminTokenXml() throws Exception {
+		ensureUserAdminToken();
+		return adminUserTokenXML;
+	}
 
-    public String getUserAdminTokenXml() {
-        try {
-            adminUserTicket = UUID.randomUUID().toString();
-            adminUserTokenXML = serviceClient.getUserToken(adminUserCredential, adminUserTicket);
-            return adminUserTokenXML;
-        } catch (Exception e) {
-            log.error("Problems getting userAdminTokenId", uasServiceUri);
-            throw e;
-        }
-        //
-        //        if (adminUserTokenXML != null) {
-        //            return adminUserTokenXML;
-        //        } else {
-        //        	if(adminUserTicket==null){
-        //        		adminUserTicket = UUID.randomUUID().toString();
-        //        	}
-        //            log.trace("getUserAdminTokenId called - Calling UserAdminService at " + uasServiceUri + " userCredentialXml:" + adminUserCredential);
-        //            try {
-        //                adminUserTokenXML = serviceClient.getUserToken(adminUserCredential, adminUserTicket);
-        //                return adminUserTokenXML;
-        //            } catch (Exception e) {
-        //                log.error("Problems getting userAdminTokenId", uasServiceUri);
-        //                throw e;
-        //            }
-        //        }
+	public void ensureUserAdminToken() throws Exception {
+		if(adminUserToken == null || !adminUserToken.isValid()) {
+			adminUserTokenXML = serviceClient.getUserToken(adminUserCredential, UUID.randomUUID().toString());
+			if(adminUserTokenXML!=null) {
+				adminUserToken = UserTokenMapper.fromUserTokenXml(adminUserTokenXML);	
+			}
+		}
+		if(adminUserToken ==null) {
+			throw new RuntimeException("Failed to get a token for the admin user");
+		}
+	}
 
-
-    }
-	
 	public String updateUserToken(UserToken ut) {
 		UserIdentity u = new UserIdentity(ut.getUid(), ut.getUserName(), ut.getFirstName(), ut.getLastName(), ut.getPersonRef(), ut.getEmail(), ut.getCellPhone());
 		String userjson = UserIdentityMapper.toJson(u);
-		return new CommandUpdateUser(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), u.getUid(), userjson).execute();
+		return new CommandUpdateUser(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), u.getUid(), userjson).execute();
 	}
 
 	public void addRedirectURIForNewUser(String username, String redirectURI) {
@@ -665,18 +652,18 @@ public enum SessionDao {
 			username_redirectURI_timeout_map.put(username, System.currentTimeMillis());
 		}
 	}
-	
+
 	void cleanUpRedirectURIMap() {
 		log.debug("clean up redirect map");
 		try {
-		List<String> removed = username_redirectURI_timeout_map.keySet().stream().
-			filter(x -> (System.currentTimeMillis() - username_redirectURI_timeout_map.get(x)) > 5*60*1000).collect(Collectors.toList());
-		for(String i : removed) {
-			username_redirectURI.remove(i);
-			username_redirectURI_timeout_map.remove(i);
-		}} catch(Exception ex) {
-			log.error("unexpected error", ex);
-		}
+			List<String> removed = username_redirectURI_timeout_map.keySet().stream().
+					filter(x -> (System.currentTimeMillis() - username_redirectURI_timeout_map.get(x)) > 5*60*1000).collect(Collectors.toList());
+			for(String i : removed) {
+				username_redirectURI.remove(i);
+				username_redirectURI_timeout_map.remove(i);
+			}} catch(Exception ex) {
+				log.error("unexpected error", ex);
+			}
 	}
 
 	public String getRedirectURIForNewUser(String username) {	
@@ -687,7 +674,7 @@ public enum SessionDao {
 		}
 		return redirectURI;
 	}
-	
+
 	public void syncWhydahUserInfoWithThirdPartyUserInfo(String whydahuid, String provider, String accessToken, String appRoles, String userinfoJsonString, String thirdpartyUserId, String username, String firstName, String lastName, String email, String cellPhone, String personRef) {
 		try {
 			String json = new CommandGetUserAggregate(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), whydahuid).execute();
@@ -705,7 +692,7 @@ public enum SessionDao {
 					boolean google_data_found = false;
 					boolean rebel_data_found = false;
 					boolean vipps_data_found = false;
-					
+
 					for (UserApplicationRoleEntry entry : u.getRoleList()) {
 
 						if (provider.equalsIgnoreCase("azuread")) {
@@ -772,7 +759,7 @@ public enum SessionDao {
 						u.getRoleList().add(role);
 
 					}
-					
+
 					if (!rebel_data_found && provider.equalsIgnoreCase("rebel")) {
 						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
 						role.setUserId(whydahuid);
@@ -788,7 +775,7 @@ public enum SessionDao {
 						u.getRoleList().add(role);
 
 					}
-					
+
 					if (!vipps_data_found && provider.equalsIgnoreCase("vipps")) {
 						UserApplicationRoleEntry role = new UserApplicationRoleEntry();
 						role.setUserId(whydahuid);
@@ -855,10 +842,10 @@ public enum SessionDao {
 		}
 
 	}
-	
+
 	public String saveWhydahRole(String payload) {
 		UserApplicationRoleEntry entry = UserRoleMapper.fromJson(payload);	
-		String json = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), entry.getUserId()).execute();
+		String json = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), entry.getUserId()).execute();
 		List<UserApplicationRoleEntry> list = UserRoleMapper.fromJsonAsList(json);
 		UserApplicationRoleEntry found = null;
 		for(UserApplicationRoleEntry item : list) {
@@ -872,20 +859,20 @@ public enum SessionDao {
 		if(found!=null) {
 			found.setOrgName(entry.getOrgName());
 			found.setRoleValue(entry.getRoleValue());
-			return new CommandUpdateUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), entry.getUserId(), found.getId(), UserRoleMapper.toJson(found)).execute();
+			return new CommandUpdateUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), entry.getUserId(), found.getId(), UserRoleMapper.toJson(found)).execute();
 		} else {
-			return new CommandAddUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), entry.getUserId(), payload).execute();
+			return new CommandAddUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), entry.getUserId(), payload).execute();
 		}
 	}
 
 	public Boolean deleteWhydahRole(String uid, String roleId) {
-		return new CommandDeleteUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), uid, roleId).execute();
+		return new CommandDeleteUserRole(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), uid, roleId).execute();
 	}
 
 	public String findWhydahRole(String uid, String appid, String orgname, String rolename) throws JsonProcessingException {
 		List<UserApplicationRoleEntry> foundList = new ArrayList<UserApplicationRoleEntry>();
 		if(uid!=null) {
-			String json = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenID(), getUserAdminToken().getUserTokenId(), uid).execute();
+			String json = new CommandGetUserRoles(uasServiceUri, serviceClient.getMyAppTokenID(), adminUserToken.getUserTokenId(), uid).execute();
 			List<UserApplicationRoleEntry> list = UserRoleMapper.fromJsonAsList(json);
 
 			for(UserApplicationRoleEntry item : list) {

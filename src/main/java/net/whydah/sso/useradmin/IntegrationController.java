@@ -51,7 +51,7 @@ public class IntegrationController {
 	@RequestMapping(value = "/integration/user/{uid}/", method = RequestMethod.PUT)
 	public String updateUserIdentity2(
 			@PathVariable("uid") String uid,
-			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+			HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.trace("updateUserIdentity with uid={}", uid);
 
 		accessCheck(request);
@@ -70,7 +70,7 @@ public class IntegrationController {
 	@RequestMapping(value = "/integration/user/{uid}", method = RequestMethod.PUT)
 	public String updateUserIdentity(
 			@PathVariable("uid") String uid,
-			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+			HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.trace("updateUserIdentity with uid={}", uid);
 
 		accessCheck(request);
@@ -89,7 +89,7 @@ public class IntegrationController {
 	@RequestMapping(value = "/integration/user/{uid}", method = RequestMethod.DELETE)
 	public String deleteUserIdentity(
 			@PathVariable("uid") String uid,
-			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+			HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.trace("updateUserIdentity with uid={}", uid);
 
 		accessCheck(request);
@@ -110,7 +110,7 @@ public class IntegrationController {
 	@RequestMapping(value = "/integration/user/{uid}/", method = RequestMethod.DELETE)
 	public String deleteUserIdentity2(
 			@PathVariable("uid") String uid,
-			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+			HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.trace("updateUserIdentity with uid={}", uid);
 
 		accessCheck(request);
@@ -131,7 +131,7 @@ public class IntegrationController {
 	@RequestMapping(value = "/integration/user/{uid}", method = RequestMethod.GET)
 	public String getUserIdentity(
 			@PathVariable("uid") String uid,
-			HttpServletRequest request, HttpServletResponse response, Model model) throws AppException, IOException {
+			HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.trace("getUserIdentity with uid={}", uid);
 		
 		accessCheck(request);
@@ -149,7 +149,7 @@ public class IntegrationController {
 	public String updatePersonRef(
 			@PathVariable("uid") String uid,
 			@PathVariable("personref") String personRef,
-			HttpServletRequest request, HttpServletResponse response, Model model) throws IOException, AppException {
+			HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.trace("updateUserIdentity with uid={}", uid);
 		accessCheck(request);
 		

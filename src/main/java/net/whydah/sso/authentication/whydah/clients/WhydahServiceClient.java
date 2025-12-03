@@ -312,7 +312,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 	        .replace("'", "&apos;");
 	}
 
-	public String logOnBySharedSecrect(String username, String userticket) {
+	public String logOnBySharedSecrect(String username, String userticket) throws Exception {
 		return new CommandSTSLogonUserBySharedSecrect(
 				uri_securitytoken_service,
 				getMyAppTokenID(),

@@ -40,6 +40,7 @@ public class SSOLoginController {
 		try {
 
 			SessionDao.instance.getServiceClient().ensureActiveAppToken();
+			SessionDao.instance.ensureUserAdminToken();
 
 			String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
 			boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
@@ -237,6 +238,9 @@ public class SSOLoginController {
 
 		try {
 
+			SessionDao.instance.getServiceClient().ensureActiveAppToken();
+			SessionDao.instance.ensureUserAdminToken();
+			
 			String userTokenXml = SessionDao.instance.findUserTokenXMLFromSession(request, response, model);
 			SessionDao.instance.addModel_LOGO_URL(model);
 			SessionDao.instance.addModel_MYURI(model);
@@ -271,6 +275,9 @@ public class SSOLoginController {
 	public String action(HttpServletRequest request, HttpServletResponse response, Model model) throws AppException {
 
 		try {
+			SessionDao.instance.getServiceClient().ensureActiveAppToken();
+			SessionDao.instance.ensureUserAdminToken();
+			
 			String redirectURI = SessionDao.instance.getFromRequest_RedirectURI(request);
 			log.trace("action: redirectURI: {}", redirectURI);
 
