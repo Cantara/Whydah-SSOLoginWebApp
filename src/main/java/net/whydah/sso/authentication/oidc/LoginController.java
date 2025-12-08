@@ -414,7 +414,7 @@ public class LoginController {
 			String personRef = UUID.randomUUID().toString();
 			
 			userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, stored_userinfo_jsson, stored_sub, userName,
-					firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+					firstName, lastName, email, cellPhone, personRef, userticket, httpRequest);
 		}
 
 		if (userTokenXml != null) {

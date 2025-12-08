@@ -296,15 +296,15 @@ public class WhydahOAuthSSOLoginController {
 				//save a new user with uid as username, and have personRef pointed to a new registered username 
 				credential = new WhydahOAuthUserCredential(provider_uid, provider_uid, provider_uid);
 				String personRef = userName;
-				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "",provider_uid, provider_uid, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
+				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "",provider_uid, provider_uid, firstName, lastName, email, cellPhone, personRef, userticket, httpRequest);				
 				if(userTokenXml!=null) {
 					credential = new WhydahOAuthUserCredential(provider_uid, userName, provider_uid);
 					personRef = UUID.randomUUID().toString();
-					userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "", provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+					userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "", provider_uid, userName, firstName, lastName, email, cellPhone, personRef, userticket, httpRequest);
 				}
 			} else {
 				String personRef = UUID.randomUUID().toString();
-				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "", provider_uid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+				userTokenXml = tokenServiceClient.createAndLogonUser(provider, stored_accessToken, null, "", provider_uid, userName, firstName, lastName, email, cellPhone, personRef, userticket, httpRequest);
 			}
 		}
 

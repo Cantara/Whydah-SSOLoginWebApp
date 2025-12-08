@@ -90,7 +90,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         //throw new RuntimeException("User authentication failed with status code " + response.getStatus());
     }
   
-    public String createAndLogonUser(User fbUser, String fbAccessToken, UserCredential userCredential, String userticket) {
+    public String createAndLogonUser(User fbUser, String fbAccessToken, String userticket) throws Exception {
     	
         log.debug("apptokenid: {}", getMyAppTokenID());
 
@@ -100,7 +100,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("apptoken", getMyAppTokenXml());
-        formData.add("usercredential", userCredential.toXML());
+        formData.add("adminUserTokenId", SessionDao.instance.getUserAdminToken().getUserTokenId());
         String facebookUserAsXml = FacebookHelper.getFacebookUserAsXml(fbUser, fbAccessToken);
         formData.add("fbuser", facebookUserAsXml);
         log.trace("createAndLogonUser with fbuser XML: " + facebookUserAsXml + "\nformData:\n" + formData);
@@ -133,7 +133,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         //throw new RuntimeException("createAndLogonUser failed with status code " + response.getStatus());
     }
     
-    public String createAndLogonUser(String netiqUserName, String netiqAccessToken, UserCredential userCredential, String userticket,HttpServletRequest request) {
+    public String createAndLogonUser(String netiqUserName, String netiqAccessToken, String userticket,HttpServletRequest request) throws Exception {
         log.debug("createAndLogonUser - apptokenid: {}", getMyAppTokenID());
 
         WebResource createUserResource = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
@@ -142,7 +142,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("apptoken", getMyAppTokenXml());
-        formData.add("usercredential", userCredential.toXML());
+        formData.add("adminUserTokenId", SessionDao.instance.getUserAdminToken().getUserTokenId());
         NetIQHelper helper = new NetIQHelper();
         String netIQUserAsXml = helper.getNetIQUserAsXml(request);
         formData.add("fbuser", netIQUserAsXml);
@@ -190,7 +190,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         return sb.toString();
     }
     
-    public String createAndLogonUser(String provider, String accessToken, String appRoles, String userinfoJsonString, String userId, String username, String firstName, String lastName, String email, String cellPhone, String personRef, net.whydah.sso.user.types.UserCredential userCredential, String userticket, HttpServletRequest request) {
+    public String createAndLogonUser(String provider, String accessToken, String appRoles, String userinfoJsonString, String userId, String username, String firstName, String lastName, String email, String cellPhone, String personRef, String userticket, HttpServletRequest request) throws Exception {
 		log.debug("createAndLogonUser - apptokenid: {}", getMyAppTokenID());
 
 		WebResource createUserResource = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
@@ -198,7 +198,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
 		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 		formData.add("apptoken", getMyAppTokenXml());
-		formData.add("usercredential", userCredential.toXML());
+		formData.add("adminUserTokenId", SessionDao.instance.getUserAdminToken().getUserTokenId());
 		String userXml = getUserXml(provider, accessToken, appRoles, userinfoJsonString, userId, firstName, lastName, username, email, cellPhone, personRef);
 		formData.add("userxml", userXml);
 		log.trace("createAndLogonUser with User XML: " + userXml +"\nformData:\n"+formData);

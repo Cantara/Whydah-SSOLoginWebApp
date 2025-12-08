@@ -297,7 +297,7 @@ public class AzureSSOLoginController {
 
 			if (userTokenXml == null) {
 				String personRef = UUID.randomUUID().toString();
-				userTokenXml = tokenServiceClient.createAndLogonUser("aad", accessToken, approles, "", oid, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);
+				userTokenXml = tokenServiceClient.createAndLogonUser("aad", accessToken, approles, "", oid, userName, firstName, lastName, email, cellPhone, personRef, userticket, httpRequest);
 			}
 
 			if (userTokenXml != null) {

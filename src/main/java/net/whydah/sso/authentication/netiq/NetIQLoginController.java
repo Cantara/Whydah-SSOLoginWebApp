@@ -61,7 +61,7 @@ public class NetIQLoginController {
         }
 
         @RequestMapping("/netiqauth")
-        public String netiqAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+        public String netiqAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         	if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.NETIQLOGIN_ENABLED)) {
         		return "login";
         	}
@@ -124,7 +124,7 @@ public class NetIQLoginController {
                 // Success etter ny bruker er laget = clients. Alltid ticket id som skal sendes.
 
 
-                userTokenXml = tokenServiceClient.createAndLogonUser(netIQUser, netiqAccessToken, userCredential, ticket,request);
+                userTokenXml = tokenServiceClient.createAndLogonUser(netIQUser, netiqAccessToken, ticket,request);
                 if (userTokenXml == null) {
                     log.error("createAndLogonUser failed. Redirecting to login page.");
                     String redirectURI = request.getParameter("redirectURI");

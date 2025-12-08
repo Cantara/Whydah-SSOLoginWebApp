@@ -61,7 +61,7 @@ public class FacebookLoginController {
     }
 
     @RequestMapping("/fbauth")
-    public String facebookAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
+    public String facebookAuth(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         SessionDao.instance.addModel_CSRFtoken(model);
         SessionDao.instance.addModel_LOGO_URL(model);
         SessionDao.instance.addModel_LoginTypes(model);
@@ -118,7 +118,7 @@ public class FacebookLoginController {
             // Success etter ny bruker er laget = clients. Alltid ticket id som skal sendes.
 
 
-            userTokenXml = tokenServiceClient.createAndLogonUser(fbUser, fbAccessToken, userCredential, userticket);
+            userTokenXml = tokenServiceClient.createAndLogonUser(fbUser, fbAccessToken, userticket);
             if (userTokenXml == null) {
                 log.error("createAndLogonUser failed. Did not get a valid UserToken. Redirecting to login page.");
                 String redirectURI = getfbauthRedirectURI(request);

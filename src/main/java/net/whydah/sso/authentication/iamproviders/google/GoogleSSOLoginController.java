@@ -341,7 +341,7 @@ public class GoogleSSOLoginController {
 
 		if (userTokenXml == null) {	
 			String personRef = UUID.randomUUID().toString();
-			userTokenXml = tokenServiceClient.createAndLogonUser("google", stored_accessToken, null, "", stored_subject, userName, firstName, lastName, email, cellPhone, personRef, credential, userticket, httpRequest);				
+			userTokenXml = tokenServiceClient.createAndLogonUser("google", stored_accessToken, null, "", stored_subject, userName, firstName, lastName, email, cellPhone, personRef, userticket, httpRequest);				
 		} 
 
 

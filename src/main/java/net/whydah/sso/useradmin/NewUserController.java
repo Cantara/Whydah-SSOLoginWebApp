@@ -1,9 +1,24 @@
 package net.whydah.sso.useradmin;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.UUID;
+
+import javax.ws.rs.core.UriBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.commands.adminapi.user.CommandAddUser;
 import net.whydah.sso.commands.adminapi.user.CommandResetUserPassword;
 import net.whydah.sso.config.AppConfig;
@@ -13,20 +28,6 @@ import net.whydah.sso.ddd.model.user.Email;
 import net.whydah.sso.errorhandling.AppException;
 import net.whydah.sso.user.mappers.UserIdentityMapper;
 import net.whydah.sso.user.types.UserIdentity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.Enumeration;
-import java.util.UUID;
 
 @Controller
 public class NewUserController {
@@ -52,7 +53,7 @@ public class NewUserController {
 			return "login";
 		}
 		log.trace("/signup entry");
-		printParams(request);
+		
 		//model.addAttribute("logoURL", LOGOURL);
 		//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
 		SessionDao.instance.addModel_CSRFtoken(model);
@@ -173,77 +174,77 @@ public class NewUserController {
 		response.setContentType("text/html;charset=UTF-8");
 		return "newuser";
 	}
-
-	@RequestMapping("/createnewuser")
-	public String createNewUser(HttpServletRequest request, HttpServletResponse response, Model model) throws MalformedURLException {
-		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.SIGNUPENABLED)) {
-			return "login";
-		}
-		log.trace("/createnewuser entry");
-		//model.addAttribute("logoURL", LOGOURL);
-		//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
-		SessionDao.instance.addModel_LOGO_URL(model);
-		SessionDao.instance.addModel_CSRFtoken(model);
-		SessionDao.instance.setCSP(response);
-
-
-		//String fbId = "";
-		//String username = "user";
-		UserCredential userCredential = new UserCredential() {
-			@Override
-			public String toXML() {
-				return """
-						<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\s
-						 \
-						<usercredential>
-						    <params>
-						        <fbId>\
-						</fbId>
-						        <username>\
-						user\
-						</username>
-						    </params>\s
-						</usercredential>
-						""";
-			}
-		};
-
-
-		String userTokenXml = SessionDao.instance.getServiceClient().createAndLogonUser(null, "", userCredential, "");
-		if (userTokenXml == null) {
-			log.error("createAndLogonUser failed. Redirecting to login page.");
-			String redirectURI = "";
-			model.addAttribute("redirectURI", redirectURI);
-			model.addAttribute("loginError", "Login error: Could not create or authenticate user.");
-			//ModelHelper.setEnabledLoginTypes(model);
-			SessionDao.instance.addModel_LoginTypes(model);
-			return "login";
-		}
-		String clientRedirectURI = request.getParameter("redirectURI");
-		//model.addAttribute("logoURL", LOGOURL);
-		SessionDao.instance.addModel_LOGO_URL(model);
-
-		if (clientRedirectURI == null || clientRedirectURI.length() < 3) {
-			model.addAttribute("redirect", "welcome");
-		} else {
-			model.addAttribute("redirect", clientRedirectURI);
-		}
-		return "action";
-	}
-
-	private void printParams(HttpServletRequest req) {
-		Enumeration<String> parameterNames = req.getParameterNames();
-		while (parameterNames.hasMoreElements()) {
-			String logString = "";
-			String paramName = parameterNames.nextElement();
-			logString = logString + paramName + " - ";
-			String[] paramValues = req.getParameterValues(paramName);
-			for (int i = 0; i < paramValues.length; i++) {
-				String paramValue = paramValues[i];
-				logString = logString + paramValue;
-			}
-			log.trace("signup - request params: " + logString);
-		}
-	}
+//
+//	@RequestMapping("/createnewuser")
+//	public String createNewUser(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+//		if (!SessionDao.instance.isLoginTypeEnabled(ConstantValue.SIGNUPENABLED)) {
+//			return "login";
+//		}
+//		log.trace("/createnewuser entry");
+//		//model.addAttribute("logoURL", LOGOURL);
+//		//model.addAttribute(SessionHelper.CSRFtoken, SessionHelper.getCSRFtoken());
+//		SessionDao.instance.addModel_LOGO_URL(model);
+//		SessionDao.instance.addModel_CSRFtoken(model);
+//		SessionDao.instance.setCSP(response);
+//
+//
+//		//String fbId = "";
+//		//String username = "user";
+//		UserCredential userCredential = new UserCredential() {
+//			@Override
+//			public String toXML() {
+//				return """
+//						<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\s
+//						 \
+//						<usercredential>
+//						    <params>
+//						        <fbId>\
+//						</fbId>
+//						        <username>\
+//						user\
+//						</username>
+//						    </params>\s
+//						</usercredential>
+//						""";
+//			}
+//		};
+//
+//
+//		String userTokenXml = SessionDao.instance.getServiceClient().createAndLogonUser(null, "", "");
+//		if (userTokenXml == null) {
+//			log.error("createAndLogonUser failed. Redirecting to login page.");
+//			String redirectURI = "";
+//			model.addAttribute("redirectURI", redirectURI);
+//			model.addAttribute("loginError", "Login error: Could not create or authenticate user.");
+//			//ModelHelper.setEnabledLoginTypes(model);
+//			SessionDao.instance.addModel_LoginTypes(model);
+//			return "login";
+//		}
+//		String clientRedirectURI = request.getParameter("redirectURI");
+//		//model.addAttribute("logoURL", LOGOURL);
+//		SessionDao.instance.addModel_LOGO_URL(model);
+//
+//		if (clientRedirectURI == null || clientRedirectURI.length() < 3) {
+//			model.addAttribute("redirect", "welcome");
+//		} else {
+//			model.addAttribute("redirect", clientRedirectURI);
+//		}
+//		return "action";
+//	}
+//
+//	private void printParams(HttpServletRequest req) {
+//		Enumeration<String> parameterNames = req.getParameterNames();
+//		while (parameterNames.hasMoreElements()) {
+//			String logString = "";
+//			String paramName = parameterNames.nextElement();
+//			logString = logString + paramName + " - ";
+//			String[] paramValues = req.getParameterValues(paramName);
+//			for (int i = 0; i < paramValues.length; i++) {
+//				String paramValue = paramValues[i];
+//				logString = logString + paramValue;
+//			}
+//			log.trace("signup - request params: " + logString);
+//		}
+//	}
 
 }
