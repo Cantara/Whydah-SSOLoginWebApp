@@ -1,12 +1,12 @@
 package net.whydah.sso.authentication.oidc;
 
-import net.whydah.sso.commands.baseclasses.BaseHttpPostHystrixCommand;
-import net.whydah.sso.ddd.model.application.ApplicationTokenID;
-import net.whydah.sso.ddd.model.user.UserTokenId;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.whydah.sso.commands.baseclasses.BaseHttpPostHystrixCommand;
+import net.whydah.sso.ddd.model.application.ApplicationTokenID;
+import net.whydah.sso.ddd.model.user.UserTokenId;
 
 
 public class CommandSTSLogonUserBySharedSecrect extends BaseHttpPostHystrixCommand<String> {

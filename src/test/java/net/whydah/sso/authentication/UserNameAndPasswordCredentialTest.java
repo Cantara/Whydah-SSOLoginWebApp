@@ -1,10 +1,11 @@
 package net.whydah.sso.authentication;
 
-import net.whydah.sso.ddd.model.user.Password;
-import net.whydah.sso.ddd.model.user.UserName;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import net.whydah.sso.ddd.model.user.Password;
+import net.whydah.sso.ddd.model.user.UserName;
 
 public class UserNameAndPasswordCredentialTest {
 

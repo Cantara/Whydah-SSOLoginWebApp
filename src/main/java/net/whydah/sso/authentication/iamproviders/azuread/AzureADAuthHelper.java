@@ -1,31 +1,6 @@
 package net.whydah.sso.authentication.iamproviders.azuread;
 
 
-import com.microsoft.aad.msal4j.*;
-import com.nimbusds.jwt.JWTParser;
-import com.nimbusds.oauth2.sdk.AuthorizationCode;
-import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
-import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
-import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
-import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
-
-import net.whydah.sso.authentication.iamproviders.ExternalIAMSSOSuppliers;
-import net.whydah.sso.authentication.iamproviders.StateData;
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.ddd.model.application.RedirectURI;
-import net.whydah.sso.slack.SlackNotificationService;
-import net.whydah.sso.utils.HttpConnectionHelper;
-import net.whydah.sso.utils.ToStringHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.naming.ServiceUnavailableException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,9 +9,52 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import javax.annotation.PostConstruct;
+import javax.naming.ServiceUnavailableException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import com.microsoft.aad.msal4j.AuthorizationCodeParameters;
+import com.microsoft.aad.msal4j.AuthorizationRequestUrlParameters;
+import com.microsoft.aad.msal4j.ClientCredentialFactory;
+import com.microsoft.aad.msal4j.ConfidentialClientApplication;
+import com.microsoft.aad.msal4j.IAccount;
+import com.microsoft.aad.msal4j.IAuthenticationResult;
+import com.microsoft.aad.msal4j.IConfidentialClientApplication;
+import com.microsoft.aad.msal4j.Prompt;
+import com.microsoft.aad.msal4j.PublicClientApplication;
+import com.microsoft.aad.msal4j.ResponseMode;
+import com.microsoft.aad.msal4j.SilentParameters;
+import com.nimbusds.jwt.JWTParser;
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
+import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import net.whydah.sso.authentication.iamproviders.ExternalIAMSSOSuppliers;
+import net.whydah.sso.authentication.iamproviders.StateData;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.application.RedirectURI;
+import net.whydah.sso.slack.SlackNotificationService;
+import net.whydah.sso.utils.HttpConnectionHelper;
+import net.whydah.sso.utils.ToStringHelper;
 
 @Component
 public class AzureADAuthHelper {

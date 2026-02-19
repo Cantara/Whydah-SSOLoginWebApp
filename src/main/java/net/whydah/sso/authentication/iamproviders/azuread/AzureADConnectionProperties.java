@@ -1,11 +1,12 @@
 package net.whydah.sso.authentication.iamproviders.azuread;
 
-import net.whydah.sso.config.AppConfig;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Properties;
+import net.whydah.sso.config.AppConfig;
 
 public class AzureADConnectionProperties {
 

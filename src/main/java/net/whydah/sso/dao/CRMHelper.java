@@ -11,8 +11,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,6 +19,7 @@ import org.springframework.ui.Model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
 import net.whydah.sso.commands.extensions.crmapi.CommandCreateCRMCustomer;

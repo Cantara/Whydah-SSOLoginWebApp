@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nimbusds.oauth2.sdk.GeneralException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.iamproviders.WhydahOauthIntegrationConfig;
 import net.whydah.sso.authentication.iamproviders.WhydahProvider;
 import net.whydah.sso.authentication.oidc.LoginController;

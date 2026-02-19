@@ -1,6 +1,13 @@
 package net.whydah.sso.authentication.netiq;
 
-import net.whydah.sso.config.ApplicationMode;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -11,13 +18,7 @@ import org.springframework.ui.Model;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import net.whydah.sso.config.ApplicationMode;
 
 public class NetIQAuthTest {
 

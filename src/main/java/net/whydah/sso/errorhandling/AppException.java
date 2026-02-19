@@ -1,13 +1,14 @@
 package net.whydah.sso.errorhandling;
 
+import java.io.IOException;
+import java.io.Serial;
+
+import org.springframework.http.HttpStatus;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpStatus;
-
-import java.io.IOException;
-import java.io.Serial;
 
 
 public class AppException extends Exception {

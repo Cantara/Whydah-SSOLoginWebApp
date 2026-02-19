@@ -1,13 +1,12 @@
 package net.whydah.sso.authentication.netiq;
 
-import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.UserCredential;
-import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.dao.ConstantValue;
-import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
-import net.whydah.sso.user.helpers.UserTokenXpathHelper;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -16,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.UserCredential;
+import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.session.baseclasses.BaseWhydahServiceClient;
+import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 
 @Controller
 public class NetIQLoginController {

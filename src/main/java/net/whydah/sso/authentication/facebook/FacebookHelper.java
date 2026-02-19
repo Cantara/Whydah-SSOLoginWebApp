@@ -1,13 +1,5 @@
 package net.whydah.sso.authentication.facebook;
 
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Version;
-import com.restfb.types.User;
-import net.whydah.sso.config.AppConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +7,16 @@ import java.net.URL;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Version;
+import com.restfb.types.User;
+
+import net.whydah.sso.config.AppConfig;
 
 /**
  * http://developers.facebook.com/docs/authentication/server-side/

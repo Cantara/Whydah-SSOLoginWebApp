@@ -1,8 +1,10 @@
 package net.whydah.sso;
 
-import net.whydah.sso.config.ApplicationMode;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import net.whydah.sso.config.ApplicationMode;
 
 /**
  * Simple test to reproduce the production startup failure:

@@ -1,12 +1,12 @@
 package net.whydah.sso.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EscapeUtils {
     private static final Logger log = LoggerFactory.getLogger(EscapeUtils.class);

@@ -46,7 +46,7 @@ public class SSOLoginController {
 			boolean sessionCheckOnly = SessionDao.instance.getFromRequest_SessionCheck(request);
 			String userTicket = request.getParameter("userticket");
 
-			SessionDao.instance.updateApplinks();
+			
 			SessionDao.instance.addModel_LOGO_URL(model);
 			SessionDao.instance.addModel_CSRFtoken(model);
 			SessionDao.instance.setCSP(response);

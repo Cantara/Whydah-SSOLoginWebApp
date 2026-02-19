@@ -1,6 +1,21 @@
 package net.whydah.sso.authentication.facebook;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.restfb.types.User;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.whydah.clients.WhydahServiceClient;
@@ -10,19 +25,6 @@ import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.application.RedirectURI;
 import net.whydah.sso.ddd.model.user.UserName;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
 
 /**
  * @author <a href="mailto:erik.drolshammer@altran.com">Erik Drolshammer</a>

@@ -1,14 +1,15 @@
 package net.whydah.sso.authentication.whydah.clients;
 
-import net.whydah.sso.config.ApplicationMode;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.UUID;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import net.whydah.sso.config.ApplicationMode;
 
 public class RedirectURITest {
 

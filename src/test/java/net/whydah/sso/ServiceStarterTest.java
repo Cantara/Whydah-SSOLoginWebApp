@@ -1,9 +1,7 @@
 package net.whydah.sso;
 
-import net.whydah.sso.config.ApplicationMode;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -11,8 +9,11 @@ import java.net.URLConnection;
 import java.util.Random;
 import java.util.Scanner;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import net.whydah.sso.config.ApplicationMode;
 
 public class ServiceStarterTest {
 

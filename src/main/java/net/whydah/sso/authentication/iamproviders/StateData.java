@@ -1,11 +1,11 @@
 package net.whydah.sso.authentication.iamproviders;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class StateData implements Serializable{
 	/**

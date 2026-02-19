@@ -1,19 +1,25 @@
 package net.whydah.sso;
 
-import net.whydah.sso.config.ApplicationMode;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.StringTokenizer;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import net.whydah.sso.config.ApplicationMode;
 
 public class CookieTest {
     private Map<String, Map<String, Map<String,String>>> store;

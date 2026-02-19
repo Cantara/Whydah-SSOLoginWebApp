@@ -1,14 +1,7 @@
 package net.whydah.sso.authentication.whydah;
 
-import net.whydah.sso.authentication.CookieManager;
-import net.whydah.sso.authentication.iamproviders.azuread.AzureADAuthHelper;
-import net.whydah.sso.authentication.iamproviders.google.GoogleAuthHelper;
-import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthHelper;
-import net.whydah.sso.authentication.oidc.Provider;
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.dao.ConstantValue;
-import net.whydah.sso.dao.SessionDao;
-import net.whydah.sso.ddd.model.user.UserTokenId;
+import java.io.IOException;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Properties;
+import net.whydah.sso.authentication.CookieManager;
+import net.whydah.sso.authentication.iamproviders.azuread.AzureADAuthHelper;
+import net.whydah.sso.authentication.iamproviders.google.GoogleAuthHelper;
+import net.whydah.sso.authentication.iamproviders.whydah.WhydahOAuthHelper;
+import net.whydah.sso.authentication.oidc.Provider;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.dao.ConstantValue;
+import net.whydah.sso.dao.SessionDao;
+import net.whydah.sso.ddd.model.user.UserTokenId;
 
 @Controller
 public class SSOLogoutController {

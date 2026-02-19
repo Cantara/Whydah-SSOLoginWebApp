@@ -1,9 +1,23 @@
 package net.whydah.sso.authentication.iamproviders.azuread;
 
+import java.io.IOException;
+import java.util.Properties;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.jayway.jsonpath.JsonPath;
 import com.microsoft.aad.msal4j.IAccount;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
 import net.whydah.sso.authentication.iamproviders.StateData;
@@ -14,18 +28,6 @@ import net.whydah.sso.dao.SessionDao;
 import net.whydah.sso.ddd.model.user.Email;
 import net.whydah.sso.user.helpers.UserTokenXpathHelper;
 import net.whydah.sso.user.types.UserCredential;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.UUID;
 
 @Controller
 public class AzureSSOLoginController {

@@ -1,5 +1,35 @@
 package net.whydah.sso.dao;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URI;
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.core.UriBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ui.Model;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.hazelcast.map.IMap;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.ServerRunner;
 import net.whydah.sso.application.mappers.ApplicationMapper;
 import net.whydah.sso.application.types.Application;
@@ -35,27 +65,6 @@ import net.whydah.sso.user.types.UserToken;
 import net.whydah.sso.utils.HazelcastMapHelper;
 import net.whydah.sso.utils.ServerUtil;
 import net.whydah.sso.utils.SignupHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.hazelcast.map.IMap;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.UriBuilder;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.URI;
-import java.text.Normalizer;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public enum SessionDao {
 
@@ -99,7 +108,8 @@ public enum SessionDao {
 
 	private UserToken adminUserToken = null;
 	private String adminUserTokenXML=null;
-
+	private ScheduledExecutorService appUpdateScheduledExecutorService;
+	 
 	private SessionDao() {
 
 		try {
@@ -125,6 +135,8 @@ public enum SessionDao {
 			whydahOauthConfig = new WhydahOauthIntegrationConfig(properties);
 			DEFAULT_REDIRECT = AppConfig.readProperties().getProperty("DEFAULT_REDIRECT", "welcome");
 
+			initializeUpdateAppListScheduler();
+			
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -132,6 +144,26 @@ public enum SessionDao {
 		}
 
 	}
+	
+	private void initializeUpdateAppListScheduler() {
+    	
+		appUpdateScheduledExecutorService = Executors.newScheduledThreadPool(1);
+		appUpdateScheduledExecutorService.scheduleAtFixedRate(() -> {
+        try {
+        		
+        		if(getServiceClient().getWAS().hasActiveSession()) {
+        			
+        			serviceClient.getWAS().updateApplinks(true);
+        		}
+        		    
+            
+        } catch (Exception e) {
+            log.error("Error in scheduled operation: {}", e.getMessage(), e);
+        }
+    }, 1, 5, TimeUnit.MINUTES); // Run every 5 minutes
+
+    log.info("Initialized scheduled application-list-update thread");
+}
 
 
 
@@ -473,17 +505,7 @@ public enum SessionDao {
 		return ApplicationMapper.toSafeJson(serviceClient.getApplicationList());
 	}
 
-	private boolean shouldUpdate() {
-		int max = 100;
-		return (5 >= ((int) (ThreadLocalRandom.current().nextDouble() * max)));  // update on 5 percent of requests
-	}
-
-	public void updateApplinks() {
-
-		if (shouldUpdate()) {
-			serviceClient.getWAS().updateApplinks();
-		}
-	}
+	
 
 	public String getApplicationID(String redirectURI) {
 		if (redirectURI == null || redirectURI.length() < 10) {

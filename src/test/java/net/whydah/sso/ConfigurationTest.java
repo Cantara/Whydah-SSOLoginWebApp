@@ -1,11 +1,12 @@
 package net.whydah.sso;
 
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.config.ApplicationMode;
+import static net.whydah.sso.ServerRunner.printConfiguration;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static net.whydah.sso.ServerRunner.printConfiguration;
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.config.ApplicationMode;
 
 public class ConfigurationTest {
 

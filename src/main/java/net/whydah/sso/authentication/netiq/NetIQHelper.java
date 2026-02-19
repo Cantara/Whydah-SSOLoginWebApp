@@ -1,12 +1,18 @@
 package net.whydah.sso.authentication.netiq;
 
-import net.whydah.sso.config.AppConfig;
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.*;
+import net.whydah.sso.config.AppConfig;
 
 public class NetIQHelper {
     private static final Logger log = LoggerFactory.getLogger(NetIQHelper.class);

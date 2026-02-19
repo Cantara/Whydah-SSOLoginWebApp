@@ -1,17 +1,5 @@
 package net.whydah.sso.slack;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.slack.api.Slack;
-import com.slack.api.methods.MethodsClient;
-import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.request.chat.ChatPostMessageRequest;
-import com.slack.api.methods.request.conversations.ConversationsJoinRequest;
-import com.slack.api.methods.response.chat.ChatPostMessageResponse;
-import com.slack.api.methods.response.conversations.ConversationsJoinResponse;
-import net.whydah.sso.config.AppConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,6 +13,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.slack.api.Slack;
+import com.slack.api.methods.MethodsClient;
+import com.slack.api.methods.SlackApiException;
+import com.slack.api.methods.request.chat.ChatPostMessageRequest;
+import com.slack.api.methods.request.conversations.ConversationsJoinRequest;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
+import com.slack.api.methods.response.conversations.ConversationsJoinResponse;
+
+import net.whydah.sso.config.AppConfig;
 
 
 public class SlackNotificationService {

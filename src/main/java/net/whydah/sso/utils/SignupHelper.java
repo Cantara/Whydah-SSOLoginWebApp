@@ -1,17 +1,17 @@
 package net.whydah.sso.utils;
 
-import net.whydah.sso.config.AppConfig;
-import net.whydah.sso.extensions.crmcustomer.types.Customer;
-import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
-import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
-import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import net.whydah.sso.config.AppConfig;
+import net.whydah.sso.extensions.crmcustomer.types.Customer;
+import net.whydah.sso.extensions.crmcustomer.types.DeliveryAddress;
+import net.whydah.sso.extensions.crmcustomer.types.EmailAddress;
+import net.whydah.sso.extensions.crmcustomer.types.PhoneNumber;
 
 public class SignupHelper {
 

@@ -1,12 +1,13 @@
 package net.whydah.sso.config;
 
-import net.whydah.sso.authentication.oidc.Provider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.whydah.sso.authentication.oidc.Provider;
 
 public class LoginTypes {
 	private final static Logger log = LoggerFactory.getLogger(LoginTypes.class);

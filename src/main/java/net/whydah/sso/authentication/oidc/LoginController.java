@@ -5,15 +5,14 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.UUID;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 
 import com.nimbusds.oauth2.sdk.GeneralException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.whydah.sso.authentication.CookieManager;
 import net.whydah.sso.authentication.iamproviders.SessionCookieHelper;
 import net.whydah.sso.authentication.iamproviders.WhydahProvider;

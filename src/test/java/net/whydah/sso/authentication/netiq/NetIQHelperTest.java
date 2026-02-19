@@ -1,16 +1,19 @@
 package net.whydah.sso.authentication.netiq;
 
-import net.whydah.sso.authentication.UserCredential;
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Enumeration;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import net.whydah.sso.authentication.UserCredential;
 
 public class NetIQHelperTest {
 

@@ -7,7 +7,6 @@ import static com.sun.jersey.api.client.ClientResponse.Status.OK;
 import java.io.IOException;
 import java.util.Properties;
 
-import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -20,6 +19,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import net.whydah.sso.authentication.UserCredential;
 import net.whydah.sso.authentication.facebook.FacebookHelper;
 import net.whydah.sso.authentication.netiq.NetIQHelper;
@@ -71,7 +71,6 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
-            SessionDao.instance.updateApplinks();
             return responseXML;
         }
 
@@ -116,7 +115,6 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
-            SessionDao.instance.updateApplinks();
             return responseXML;
         }
 
@@ -159,7 +157,6 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
-            SessionDao.instance.updateApplinks();
             return responseXML;
         }
 
@@ -214,7 +211,6 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 		if (response.getStatus() == OK.getStatusCode()) {
 			String responseXML = response.getEntity(String.class);
 			log.debug("createAndLogonUser OK with response {}", responseXML);
-			SessionDao.instance.updateApplinks();
 			return responseXML;
 		}
 
