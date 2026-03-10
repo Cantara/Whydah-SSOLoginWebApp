@@ -1,0 +1,25 @@
+id: SSOLoginWebApp
+name: Whydah SSO Login Web Application
+version: 2.31.2-SNAPSHOT
+description: |
+  Single Sign-On login web application for the Whydah platform. Handles the
+  browser-based authentication flow — login, 2FA, password reset, and session
+  establishment.
+units:
+  - id: login-flow
+    name: Login Flow
+    type: webapp
+    description: SSO login and logout flows including credential submission and token issuance.
+    path: src/main/java/net/whydah/sso
+  - id: session-management
+    name: Session Management
+    type: component
+    description: User session lifecycle — creation, renewal, and invalidation.
+  - id: two-factor
+    name: Two-Factor Authentication
+    type: component
+    description: 2FA and OTP support for stepped-up authentication requirements.
+  - id: redirect-handling
+    name: Redirect Handling
+    type: component
+    description: Post-login redirect orchestration back to the originating application.
