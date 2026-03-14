@@ -1,0 +1,138 @@
+name: whydah-frontend-development
+version: 1.0.0
+description: >
+  Development guide for Whydah's two web frontends: SSOLoginWebApp (user-facing login UI)
+  and UserAdminWebApp (administrator UI). Covers tech stacks, key endpoints, authentication
+  flows, UI frameworks, and development patterns for both.
+
+  Trigger phrases: "whydah login, SSO login webapp, whydah admin UI, user admin webapp,
+  login page, whydah frontend, login flow, password reset, 2FA whydah, admin interface,
+  user management UI, SSOLoginWebApp, UserAdminWebApp"
+
+context:
+  org: cantara
+  repos:
+    - /src/cantara/Whydah-SSOLoginWebApp
+    - /src/cantara/Whydah-UserAdminWebApp
+
+related_skills:
+  - cantara-whydah          # overall Whydah architecture and token flows
+  - whydah-sts-development  # STS that both frontends authenticate against
+  - whydah-sdk-development  # Admin-SDK used by both frontends
+  - whydah-uib-development  # UIB identity storage backing user operations
+
+instructions: |
+  ## SSOLoginWebApp — User Login Frontend
+
+  **Purpose:** Browser-facing SSO login page. The entry point all users see when
+  authenticating to any Whydah-protected application. Handles login, 2FA, password
+  reset, and session establishment.
+
+  **Version:** 2.31.2-SNAPSHOT
+  **Maven:** net.whydah.sso:SSOLoginWebApp
+  **Port:** 9997
+  **Health:** GET /sso/health
+
+  ### Tech Stack
+  - Java 21
+  - Jersey 1.x + Spring 6.x + Spring Security 6.x
+  - Embedded Jetty 12.x
+  - Whydah-Admin-SDK, Dropwizard Metrics
+  - Build: Maven
+
+  ### Key Endpoints
+  - `/sso/login` -- Login page (GET shows form, POST submits credentials)
+  - `/sso/health` -- Health check (port 9997)
+
+  ### Architecture
+  Standalone embedded Jetty web application. Submits credentials to
+  SecurityTokenService (STS) for token generation. Redirects user back to the
+  originating application after successful authentication. Communicates with
+  UserIdentityBackend (UIB) for identity storage.
+
+  ### Key Units
+  - **Login Flow** (`src/main/java/net/whydah/sso`): SSO login/logout flows,
+    credential submission, token issuance coordination
+  - **Session Management**: User session lifecycle -- creation, renewal, invalidation
+  - **Two-Factor Authentication**: 2FA and OTP for stepped-up auth
+  - **Redirect Handling**: Post-login redirect orchestration back to originating app
+
+  ### DEV Mode
+  Supports DEV mode for testing with pre-configured user tokens (same as STS DEV mode).
+
+  ### Build & Run
+  ```bash
+  cd /src/cantara/Whydah-SSOLoginWebApp
+  mvn clean install
+  java -jar target/SSOLoginWebApp-*.jar
+  curl http://localhost:9997/sso/health
+  ```
+
+  ### Service Scripts
+  - `start_service.sh` -- Service startup
+  - `update_service.sh` -- Service update
+
+  ---
+
+  ## UserAdminWebApp — Administrator UI
+
+  **Purpose:** Web UI for system administrators to manage users, roles, applications,
+  and organization memberships in a Whydah deployment.
+
+  **Version:** 2.30.2-SNAPSHOT
+  **Maven:** net.whydah.identity:UserAdminWebApp
+
+  ### Tech Stack
+  - Java 21
+  - Jersey 1.x + Spring 5.x
+  - Embedded Jetty 9.x
+  - Whydah-Admin-SDK
+  - Build: Maven
+
+  ### Architecture
+  Standalone embedded Jetty web application. Connects to UserAdminService (UAS)
+  for backend CRUD operations. Requires SSOLoginWebApp and SecurityTokenService
+  for administrator authentication. Users need the UserAdmin role defined in
+  UserIdentityBackend to access the admin interface.
+
+  ### Key Units
+  - **Web Application** (`src/main/java/net/whydah/useradmin`): Stripes/JSP web
+    application providing admin UI shell and navigation
+  - **User Management**: User create, edit, delete workflows including role assignment
+  - **Application Management**: Application and credential management screens
+
+  ### Access Control
+  Only users with the `UserAdmin` role (defined in UIB) can access this interface.
+  Authentication is handled by redirecting to SSOLoginWebApp, which issues a token
+  validated by STS.
+
+  ### Build & Run
+  ```bash
+  cd /src/cantara/Whydah-UserAdminWebApp
+  mvn clean install
+  java -jar target/UserAdminWebApp-*.jar
+  ```
+
+  ### Service Scripts
+  - `start_service.sh` / `update_service.sh` -- Service lifecycle
+
+  ---
+
+  ## Key Differences Between the Two Frontends
+
+  | Aspect | SSOLoginWebApp | UserAdminWebApp |
+  |--------|---------------|-----------------|
+  | Audience | End users | System administrators |
+  | Framework | Spring 6.x + Jetty 12.x | Spring 5.x + Jetty 9.x |
+  | Port | 9997 | (unspecified) |
+  | Auth required | No (it IS the auth page) | Yes (UserAdmin role) |
+  | Depends on STS | Yes (submits credentials) | Yes (validates admin token) |
+  | Depends on UAS | No | Yes (backend CRUD) |
+
+  ## Common Development Pattern
+  Both apps follow the same structural pattern:
+  1. Embedded Jetty server (no external app server)
+  2. Whydah-Admin-SDK for token and identity operations
+  3. Maven fat-JAR packaging
+  4. Shell scripts for deployment (`start_service.sh`, `update_service.sh`)
+  5. Properties file per environment mode
