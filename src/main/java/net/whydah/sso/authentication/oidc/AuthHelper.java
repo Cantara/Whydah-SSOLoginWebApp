@@ -179,8 +179,9 @@ public class AuthHelper implements Provider {
 		}
 		StateData stateData = sessionManagementHelper.validateState(null, ar.getState().getValue());
 		if (ar instanceof AuthenticationErrorResponse) {
-			// The OpenID provider returned an error
-			throw new Exception(ar.toErrorResponse().getErrorObject().toString());
+			// The OpenID provider returned an error - e.g. user cancelled
+			log.warn("provider {} - Authentication error response: {}", provider, ar.toErrorResponse().getErrorObject().toString());
+			return stateData.getRedirectURI();
 		}
 
 		// Retrieve the authorisation code
@@ -233,8 +234,9 @@ public class AuthHelper implements Provider {
 		}
 		StateData stateData = sessionManagementHelper.validateState(httpRequest.getSession(), ar.getState().getValue());
 		if (ar instanceof AuthenticationErrorResponse) {
-			// The OpenID provider returned an error
-			throw new Exception(ar.toErrorResponse().getErrorObject().toString());
+			// The OpenID provider returned an error - e.g. user cancelled
+			log.warn("provider {} - Authentication error response: {}", provider, ar.toErrorResponse().getErrorObject().toString());
+			return stateData.getRedirectURI();
 		}
 
 		// Retrieve the authorisation code

@@ -159,6 +159,11 @@ public class LoginController {
 			return toAction(model, SessionDao.instance.LOGIN_URI);
 		}
 
+		if (!authHelper.isAuthenticated(httpRequest)) {
+			log.warn("provider {} - user cancelled, redirecting back with original params", provider);
+			return toAction(model, redirectURI);
+		}
+
 		if (!loginEnabled) {
 			log.warn("provider {} is not enabled. Redirect to SSOLWA login page {}", provider, redirectURI);
 			return toAction(model, redirectURI);
