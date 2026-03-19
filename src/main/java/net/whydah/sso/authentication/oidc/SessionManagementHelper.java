@@ -32,7 +32,7 @@ public class SessionManagementHelper {
 
 	private static final Integer STATE_TTL = 86400;
 
-	private static boolean byPassRemoval = true;
+	private static boolean byPassRemoval = false;
 	private IMap<String, SessionData> sessions;
 	private IMap<String, StateData> states;
 

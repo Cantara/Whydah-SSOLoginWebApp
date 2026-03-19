@@ -149,15 +149,21 @@ public class LoginController {
 		SessionDao.instance.addModel_CSRFtoken(model);
 		SessionDao.instance.addModel_LOGO_URL(model);
 		SessionDao.instance.addModel_LoginTypes(model);
-		
+
 		// get the original redirectURI
-		String redirectURI = authHelper.processAuthenticationCodeRedirectAndReturnTheClientRedirectUrl(httpRequest);
-		
+		String redirectURI;
+		try {
+			redirectURI = authHelper.processAuthenticationCodeRedirectAndReturnTheClientRedirectUrl(httpRequest);
+		} catch (Exception e) {
+			log.warn("provider {} - OAuth2 callback failed, redirecting to login. Reason: {}", provider, e.getMessage());
+			return toAction(model, SessionDao.instance.LOGIN_URI);
+		}
+
 		if (!loginEnabled) {
 			log.warn("provider {} is not enabled. Redirect to SSOLWA login page {}", provider, redirectURI);
 			return toAction(model, redirectURI);
 		}
-		
+
 		// append the ticket and return to our client
 		return resolve(httpRequest, httpResponse, model, redirectURI);
 	}
