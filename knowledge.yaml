@@ -1,4 +1,4 @@
-kcp_version: "0.21"
+kcp_version: "0.26"
 updated: "2026-06-20"
 language: en
 license: "Apache-2.0"
@@ -25,27 +25,23 @@ units:
     type: webapp
     description: SSO login and logout flows including credential submission and token issuance.
     path: src/main/java/net/whydah/sso
-      content_hash:
-        algorithm: sha256
-        value: ""
   - id: session-management
     name: Session Management
     type: component
     description: User session lifecycle — creation, renewal, and invalidation.
-      content_hash:
-        algorithm: sha256
-        value: ""
   - id: two-factor
     name: Two-Factor Authentication
     type: component
     description: 2FA and OTP support for stepped-up authentication requirements.
-      content_hash:
-        algorithm: sha256
-        value: ""
   - id: redirect-handling
     name: Redirect Handling
     type: component
     description: Post-login redirect orchestration back to the originating application.
-      content_hash:
-        algorithm: sha256
-        value: ""
+
+# Serving Endpoint Binding (KCP SPEC v0.26 §3.12): authoritative manifest URL
+# and authorized MCP representative. Ignored by pre-0.26 verifiers.
+serving:
+  manifest:
+    - https://raw.githubusercontent.com/Cantara/Whydah-SSOLoginWebApp/master/knowledge.yaml
+  mcp:
+    - https://mcp.cantara.no/mcp
