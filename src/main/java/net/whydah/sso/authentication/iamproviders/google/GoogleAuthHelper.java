@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.naming.ServiceUnavailableException;
 
 import org.apache.commons.lang3.StringUtils;

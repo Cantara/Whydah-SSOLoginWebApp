@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.UUID;
 
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ import net.whydah.sso.user.types.UserIdentity;
 public class NewUserController {
 
 	private static final Logger log = LoggerFactory.getLogger(NewUserController.class);
-	private static final Client uasClient = Client.create();
+	private static final Client uasClient = ClientBuilder.newClient();
 	private URI uasServiceUri;
 
 	//private final WhydahServiceClient tokenServiceClient = new WhydahServiceClient();
@@ -105,8 +106,8 @@ public class NewUserController {
 			}
 
 			try {
-				WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()).path("signup");//.path("signup");
-				log.debug("signup was called. Calling UAS with url " + uasWR.getURI());
+				WebTarget uasWR = uasClient.target(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID()).path("signup");//.path("signup");
+				log.debug("signup was called. Calling UAS with url " + uasWR.getUri());
 
 				
 				// Move to new hystrix userAdd command
