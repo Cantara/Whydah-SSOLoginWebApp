@@ -1,23 +1,25 @@
 package net.whydah.sso.authentication.whydah.clients;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
-import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
-import static com.sun.jersey.api.client.ClientResponse.Status.OK;
+import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
+import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
+import static jakarta.ws.rs.core.Response.Status.OK;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.restfb.types.User;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.Response;
 
 import jakarta.servlet.http.HttpServletRequest;
 import net.whydah.sso.authentication.UserCredential;
@@ -36,7 +38,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 
     //TODO: HUYDO will check, move all general functions to base
 	
-	private final Client tokenServiceClient = Client.create();
+	private final Client tokenServiceClient = ClientBuilder.newClient();
 
     public WhydahServiceClient() throws IOException {
         super(AppConfig.readProperties());
@@ -58,26 +60,26 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
             }
             return userToken;
         }
-        WebResource getUserToken = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/clients");
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        WebTarget getUserToken = tokenServiceClient.target(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/clients");
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<>();
         formData.add("apptoken", getMyAppTokenXml());
         formData.add("usercredential", user.toXML());
-        ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        Response response = getUserToken.request().post(Entity.form(formData), Response.class);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
             log.info("getUserToken - User authentication failed with status code " + response.getStatus());
             return null;
-            //throw new IllegalArgumentException("Log on failed. " + ClientResponse.Status.FORBIDDEN);
+            //throw new IllegalArgumentException("Log on failed. " + Response.Status.FORBIDDEN);
         }
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         }
 
         //retry once for other statuses
-        response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        response = getUserToken.request().post(Entity.form(formData), Response.class);
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             log.debug("getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         } else if (response.getStatus() == NOT_FOUND.getStatusCode()) {
@@ -94,17 +96,17 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         log.debug("apptokenid: {}", getMyAppTokenID());
 
 
-        WebResource createUserResource = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
+        WebTarget createUserResource = tokenServiceClient.target(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
         log.trace("createUserResource:"+createUserResource.toString());
 
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<>();
         formData.add("apptoken", getMyAppTokenXml());
         formData.add("adminUserTokenId", SessionDao.instance.getUserAdminToken().getUserTokenId());
         String facebookUserAsXml = FacebookHelper.getFacebookUserAsXml(fbUser, fbAccessToken);
         formData.add("fbuser", facebookUserAsXml);
         log.trace("createAndLogonUser with fbuser XML: " + facebookUserAsXml + "\nformData:\n" + formData);
         log.info("createAndLogonUser id=" + fbUser.getId());
-        ClientResponse response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        Response response = createUserResource.request().post(Entity.form(formData), Response.class);
 
         //No need to retry if we know it is forbidden.
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -113,15 +115,15 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
             return null;
         }
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
             return responseXML;
         }
 
         //retry once for other statuses
-        response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        response = createUserResource.request().post(Entity.form(formData), Response.class);
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
             return responseXML;
         }
@@ -134,11 +136,11 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
     public String createAndLogonUser(String netiqUserName, String netiqAccessToken, String userticket,HttpServletRequest request) throws Exception {
         log.debug("createAndLogonUser - apptokenid: {}", getMyAppTokenID());
 
-        WebResource createUserResource = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
+        WebTarget createUserResource = tokenServiceClient.target(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
         log.debug("createUserResource:"+createUserResource.toString());
 
 
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<>();
         formData.add("apptoken", getMyAppTokenXml());
         formData.add("adminUserTokenId", SessionDao.instance.getUserAdminToken().getUserTokenId());
         NetIQHelper helper = new NetIQHelper();
@@ -146,7 +148,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         formData.add("fbuser", netIQUserAsXml);
         log.trace("createAndLogonUser with netiquser XML: " + netIQUserAsXml+"\nformData:\n"+formData);
         log.info("createAndLogonUser username=" + helper.getUserName(request));
-        ClientResponse response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        Response response = createUserResource.request().post(Entity.form(formData), Response.class);
 
         //No need to retry if we know it is forbidden.
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -155,15 +157,15 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
             return null;
         }
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
             return responseXML;
         }
 
         //retry once for other statuses
-        response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        response = createUserResource.request().post(Entity.form(formData), Response.class);
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             log.debug("createAndLogonUser OK with response {}", responseXML);
             return responseXML;
         }
@@ -173,7 +175,7 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
         //throw new RuntimeException("createAndLogonUser failed with status code " + response.getStatus());
     }
     
-    public static  String printableUrlErrorMessage(String errorMessage, WebResource request, ClientResponse response) {
+    public static  String printableUrlErrorMessage(String errorMessage, WebTarget request, Response response) {
         StringBuilder sb = new StringBuilder();
         sb.append(errorMessage);
         sb.append(" Code: ");
@@ -190,17 +192,17 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
     public String createAndLogonUser(String provider, String accessToken, String appRoles, String userinfoJsonString, String userId, String username, String firstName, String lastName, String email, String cellPhone, String personRef, String userticket, HttpServletRequest request) throws Exception {
 		log.debug("createAndLogonUser - apptokenid: {}", getMyAppTokenID());
 
-		WebResource createUserResource = tokenServiceClient.resource(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
+		WebTarget createUserResource = tokenServiceClient.target(uri_securitytoken_service).path("user/" + getMyAppTokenID() + "/" + userticket + "/create_user");
 		log.debug("createUserResource:"+createUserResource.toString());
 
-		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		MultivaluedMap<String,String> formData = new MultivaluedHashMap<>();
 		formData.add("apptoken", getMyAppTokenXml());
 		formData.add("adminUserTokenId", SessionDao.instance.getUserAdminToken().getUserTokenId());
 		String userXml = getUserXml(provider, accessToken, appRoles, userinfoJsonString, userId, firstName, lastName, username, email, cellPhone, personRef);
 		formData.add("userxml", userXml);
 		log.trace("createAndLogonUser with User XML: " + userXml +"\nformData:\n"+formData);
 		log.info("createAndLogonUser username=" + username);
-		ClientResponse response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+		Response response = createUserResource.request().post(Entity.form(formData), Response.class);
 
 		//No need to retry if we know it is forbidden.
 		if (response.getStatus() == FORBIDDEN.getStatusCode()) {
@@ -209,15 +211,15 @@ public class WhydahServiceClient extends BaseDevelopmentWhydahServiceClient {
 			return null;
 		}
 		if (response.getStatus() == OK.getStatusCode()) {
-			String responseXML = response.getEntity(String.class);
+			String responseXML = response.readEntity(String.class);
 			log.debug("createAndLogonUser OK with response {}", responseXML);
 			return responseXML;
 		}
 
 		//retry once for other statuses
-		response = createUserResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+		response = createUserResource.request().post(Entity.form(formData), Response.class);
 		if (response.getStatus() == OK.getStatusCode()) {
-			String responseXML = response.getEntity(String.class);
+			String responseXML = response.readEntity(String.class);
 			log.debug("createAndLogonUser OK with response {}", responseXML);
 			return responseXML;
 		}

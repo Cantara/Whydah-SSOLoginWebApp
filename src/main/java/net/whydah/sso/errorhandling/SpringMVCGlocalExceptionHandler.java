@@ -3,7 +3,7 @@ package net.whydah.sso.errorhandling;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.ws.rs.WebApplicationException;
+import jakarta.ws.rs.WebApplicationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

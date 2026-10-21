@@ -1,7 +1,7 @@
 package net.whydah.sso.errorhandling;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;

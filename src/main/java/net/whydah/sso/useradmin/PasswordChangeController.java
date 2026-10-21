@@ -5,8 +5,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,7 +39,7 @@ import net.whydah.sso.user.types.UserCredential;
 @Controller
 public class PasswordChangeController {
 	private static final Logger log = LoggerFactory.getLogger(PasswordChangeController.class);
-	private static final Client uasClient = Client.create();
+	private static final Client uasClient = ClientBuilder.newClient();
 	private URI uasServiceUri;
 
 
@@ -77,10 +79,10 @@ public class PasswordChangeController {
 			return "resetpassword";
 		}
 
-		WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + username);
-		ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
-		if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			String error = uasResponse.getEntity(String.class);
+		WebTarget uasWR = uasClient.target(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + username);
+		Response uasResponse = uasWR.request().post(Entity.json(""), Response.class);
+		if (uasResponse.getStatus() != Response.Status.OK.getStatusCode()) {
+			String error = uasResponse.readEntity(String.class);
 			log.error(error);
 			model.addAttribute("error", error + "\nusername:" + username);
 			return "resetpassword";
@@ -162,16 +164,16 @@ public class PasswordChangeController {
 		}
 		
 		
-		//        WebResource uibWR = uibClient.resource(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
-		WebResource uasWR = uasClient.resource(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
-		log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getURI());
+		//        WebTarget uibWR = uibClient.target(uibServiceUri).path("/password/" + tokenServiceClient.getMyAppTokenID() + "/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
+		WebTarget uasWR = uasClient.target(uasServiceUri).path(SessionDao.instance.getServiceClient().getMyAppTokenID() + "/auth/password/reset/username/" + passwordChangeToken.getUser() + "/newpassword/" + passwordChangeToken.getToken());
+		log.trace("doChangePasswordFromLink was called. Calling UAS with url " + uasWR.getUri());
 
-		ClientResponse uasResponse = uasWR.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "{\"newpassword\":\"" + newpassword + "\"}");
+		Response uasResponse = uasWR.request().post(Entity.json("{\"newpassword\":\"" + newpassword + "\"}"), Response.class);
 		
-		if (uasResponse.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			String error = uasResponse.getEntity(String.class);
+		if (uasResponse.getStatus() != Response.Status.OK.getStatusCode()) {
+			String error = uasResponse.readEntity(String.class);
 			log.error(error);
-			if (uasResponse.getStatus() == ClientResponse.Status.NOT_ACCEPTABLE.getStatusCode()) {
+			if (uasResponse.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
 				model.addAttribute("error", "The password you entered was found to be too weak. Please try another password.");
 			} else {
 				model.addAttribute("error", error + "\nusername:" + passwordChangeToken.getUser());

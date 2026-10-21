@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.naming.ServiceUnavailableException;
 
 import org.apache.commons.lang3.StringUtils;

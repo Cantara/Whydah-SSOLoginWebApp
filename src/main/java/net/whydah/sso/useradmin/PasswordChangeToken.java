@@ -1,6 +1,7 @@
 package net.whydah.sso.useradmin;
 
-import com.sun.jersey.core.util.Base64;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class PasswordChangeToken {
     private final String user;
@@ -9,7 +10,8 @@ public class PasswordChangeToken {
 
     public PasswordChangeToken(String token) {
         this.token = token;
-        String decoded = Base64.base64Decode(token);
+        String decoded = new String(Base64.getMimeDecoder().decode(token),
+                StandardCharsets.ISO_8859_1);
         String[] elements = decoded.split(":");
         user = elements[0];
         timeout = Long.parseLong(elements[1]);

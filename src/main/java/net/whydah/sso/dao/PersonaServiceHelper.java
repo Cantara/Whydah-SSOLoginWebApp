@@ -11,9 +11,10 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 import net.whydah.sso.model.PersonaCredential;
 
@@ -37,16 +38,16 @@ public class PersonaServiceHelper {
 
 				list = mapper.readValue(personascredentials, new TypeReference<List<PersonaCredential>>() {});
 			} else {
-				Client client = Client.create();
+				Client client = ClientBuilder.newClient();
 
-				WebResource webResource = client.resource(personascredentials);
-				ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
+				WebTarget webResource = client.target(personascredentials);
+				Response response = webResource.request("application/json").get(Response.class);
 
 				if (response.getStatus() != 200) {
 					throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 				}
 
-				String output = response.getEntity(String.class);
+				String output = response.readEntity(String.class);
 				list = mapper.readValue(output, new TypeReference<List<PersonaCredential>>() {});
 			}
 
